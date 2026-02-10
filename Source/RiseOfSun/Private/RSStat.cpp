@@ -1,0 +1,12 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "RSStat.h"
+
+RSStat::RSStat()
+{
+}
+
+RSStat::~RSStat()
+{
+}
