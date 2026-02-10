@@ -3,13 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/GameInstance.h"
+#include "RSGameInstance.generated.h"
 
 /**
  * 
  */
-class RISEOFSUN_API RSGameInstance
+UCLASS()
+class RISEOFSUN_API URSGameInstance : public UGameInstance
 {
-public:
-	RSGameInstance();
-	~RSGameInstance();
+	GENERATED_BODY()
+	
 };
