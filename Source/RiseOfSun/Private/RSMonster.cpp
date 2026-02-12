@@ -4,7 +4,7 @@
 ARSMonster::ARSMonster()
 {
     AttackRange = 200.0f;
-    MonsterDamage = 10.0f;
+    
 }
 
 bool ARSMonster::CanAttack(ACharacter* Target)

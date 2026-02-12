@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "RSStat.h"
 #include "GameFramework/Character.h"
 #include "RSCharacter.generated.h"
 
@@ -30,6 +31,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// 스탯
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")
+	FRSStat Stat;
 	// 공격 
 	virtual FDamageResult Attack(ARSCharacter* Target);
 	// 받는 피해
