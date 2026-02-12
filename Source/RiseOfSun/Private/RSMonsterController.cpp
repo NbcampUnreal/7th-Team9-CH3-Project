@@ -1,22 +1,17 @@
-﻿#include "RSMonsterController.h"
+#include "RSMonsterController.h"
 #include "Kismet/GameplayStatics.h"
 
 ARSMonsterController::ARSMonsterController()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
 void ARSMonsterController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-		{
-			TargetPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-			ChangeState(AIState::Chase);
-		});
+	TargetPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	ChangeState(AIState::Chase);
 }
 
 void ARSMonsterController::Tick(float DeltaTime)
@@ -28,23 +23,16 @@ void ARSMonsterController::Tick(float DeltaTime)
 	case AIState::Chase:
 		TickChase(DeltaTime);
 		break;
-
 	case AIState::Attack:
-		TickAttack(DeltaTime);
+		TickChase(DeltaTime);
 		break;
 	}
 }
 void ARSMonsterController::ChangeState(AIState NewState)
 {
-	CurrentState = NewState;
-
-	if (NewState == AIState::Chase)
+	if (CurrentState == NewState)
 	{
-
-		if (TargetPlayer)
-		{
-			const auto Result = MoveToActor(TargetPlayer, AttackRadius);
-		}
+		return;
 	}
 
 	switch (NewState)
@@ -52,12 +40,13 @@ void ARSMonsterController::ChangeState(AIState NewState)
 	case AIState::Chase:
 		if (TargetPlayer)
 		{
-			const EPathFollowingRequestResult::Type Result =
-				MoveToActor(TargetPlayer, AttackRadius);
+			MoveToActor(TargetPlayer, AttackRange);
 		}
 		break;
-
 	case AIState::Attack:
+		StopMovement();
+		break;
+	default:
 		StopMovement();
 		break;
 	}
@@ -73,12 +62,15 @@ void ARSMonsterController::TickChase(float DeltaTime)
 	if (IsPlayerInRange(AttackRange))
 	{
 		ChangeState(AIState::Attack);
+		return;
 	}
+
+	MoveToActor(TargetPlayer, AttackRange);
 }
 
 void ARSMonsterController::TickAttack(float DeltaTime)
 {
-
+	
 }
 
 bool ARSMonsterController::IsPlayerInRange(float Range) const
@@ -91,6 +83,6 @@ bool ARSMonsterController::IsPlayerInRange(float Range) const
 	const float Distance = FVector::Dist(
 		GetPawn()->GetActorLocation(),
 		TargetPlayer->GetActorLocation());
-
+	
 	return Distance <= Range;
 }

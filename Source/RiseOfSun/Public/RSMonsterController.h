@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "AIController.h"
@@ -27,7 +27,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 private:
-	AIState CurrentState = AIState::Idle;
+	AIState CurrentState = AIState::Chase;
 	void ChangeState(AIState NewState);
 
 	void TickChase(float DeltaTime);
@@ -36,8 +36,7 @@ private:
 	UPROPERTY()
 	APawn* TargetPlayer = nullptr;
 
-	float AttackRange = 50.0f;
-	float AttackRadius = 5.f;
+	float AttackRange = 100.0f;
 
 	bool IsPlayerInRange(float Range) const;
 };
