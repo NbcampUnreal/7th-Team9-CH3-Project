@@ -1,4 +1,4 @@
-#include "RSMonster.h"
+﻿#include "RSMonster.h"
 #include "RSPlayer.h"
 
 ARSMonster::ARSMonster()
@@ -16,9 +16,11 @@ bool ARSMonster::CanAttack(ACharacter* Target)
     return DistSq <= AttackRange * AttackRange; // 공격범위
 }
 
-void ARSMonster::Attack(ACharacter* Target)
+FDamageResult ARSMonster::Attack(ARSCharacter* Target)
 {
-    if (!CanAttack(Target)) return;
-    
-    //Target->TakeDamage(MonsterDamage);
+    if (!CanAttack(Target)) return FDamageResult();
+    FDamageResult result = ARSCharacter::Attack(Target);
+    return result;
 }
+
+

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "RSCharacter.h"
@@ -18,7 +18,7 @@ public:
 	bool CanAttack(ACharacter* Target);
 
 	// 몬스터 공격
-	void Attack(ACharacter* Target);
+	virtual FDamageResult Attack(ARSCharacter* Target) override;
 
 	// 공격 범위
 	float AttackRange;
