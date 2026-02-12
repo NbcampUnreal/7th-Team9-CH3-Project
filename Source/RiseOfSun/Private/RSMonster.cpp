@@ -1,4 +1,4 @@
-﻿#include "RSMonster.h"
+#include "RSMonster.h"
 #include "RSPlayer.h"
 
 ARSMonster::ARSMonster()
