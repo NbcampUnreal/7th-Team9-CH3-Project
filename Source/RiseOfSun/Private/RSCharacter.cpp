@@ -34,8 +34,8 @@ void ARSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
 {
-	int Damage = 100; //TODO : 무기 공격력 받아와야 할 듯
-	int FinalDamage = Target->HitDamage(Damage);
+	int32 Damage = 100; //TODO : 무기 공격력 받아와야 할 듯
+	int32 FinalDamage = Target->HitDamage(Damage);
 	FDamageResult result;
 	result.Attacker = this;
 	result.Target = Target;
@@ -46,7 +46,7 @@ FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
 
 int32 ARSCharacter::HitDamage(int32 DamageAmount)
 {
-	int Damage = DamageAmount;
+	int32 Damage = DamageAmount;
 	Damage = std::max(Damage, 0);
 
 	//Stat.Hp -= Damage;
