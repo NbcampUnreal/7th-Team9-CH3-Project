@@ -1,14 +1,9 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "RSCharacter.h"
 #include "RSPlayer.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class RISEOFSUN_API ARSPlayer : public ARSCharacter
 {
@@ -23,7 +18,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
+	virtual FDamageResult Attack(ARSCharacter* Target) override;
 protected:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SpringArm;
@@ -35,4 +31,5 @@ private:
 	void InitializationPlayerMesh();
 
 	void InitializationPlayerCamera();
+
 };
