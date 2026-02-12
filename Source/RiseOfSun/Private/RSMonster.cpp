@@ -20,6 +20,7 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
 {
     if (!CanAttack(Target)) return FDamageResult();
     FDamageResult result = ARSCharacter::Attack(Target);
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Monster Attack")));
     return result;
 }
 
