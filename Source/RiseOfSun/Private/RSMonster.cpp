@@ -1,10 +1,17 @@
-#include "RSMonster.h"
+﻿#include "RSMonster.h"
 #include "RSPlayer.h"
+#include "RSMonsterController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ARSMonster::ARSMonster()
 {
-    AttackRange = 200.0f;
+    AIControllerClass = ARSMonsterController::StaticClass();
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+    AttackRange = 50.0f;
     MonsterDamage = 10.0f;
+
+    GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
 bool ARSMonster::CanAttack(ACharacter* Target)
@@ -22,3 +29,4 @@ void ARSMonster::Attack(ACharacter* Target)
     
     //Target->TakeDamage(MonsterDamage);
 }
+

@@ -15,17 +15,17 @@ ARSPlayer::ARSPlayer()
 
 void ARSPlayer::BeginPlay()
 {
-
+	Super::BeginPlay();
 }
 
 void ARSPlayer::Tick(float DeltaTime)
 {
-
+	Super::Tick(DeltaTime);
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 void ARSPlayer::InitializationPlayerMesh()
