@@ -11,10 +11,10 @@ class RISEOFSUN_API ARSPlayer : public ARSCharacter
     GENERATED_BODY()
 
 public:
+    ARSPlayer();
+
 	virtual void BeginPlay() override;
 
-public:
-    ARSPlayer();
     virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -63,8 +63,7 @@ public:
     // 현재 HP
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats", meta = (AllowPrivateAccess = "true"))
     float CurrentHp = 100.0f;
-
-public:
+    
     // Getter: 현재 HP
     UFUNCTION(BlueprintCallable, Category = "Player Stats")
     float GetCurrentHp() const { return CurrentHp; }
