@@ -14,6 +14,4 @@ class RISEOFSUN_API ARSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
-protected:
-	virtual void BeginPlay() override;
 };
