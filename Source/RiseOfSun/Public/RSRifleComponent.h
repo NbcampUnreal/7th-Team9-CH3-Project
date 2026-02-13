@@ -23,7 +23,7 @@ public:
 	float FireDebugDuration = 1.0f;
 
 	float ReloadDuration = 3.0f;
-
+	UPROPERTY(EditAnywhere, Category = "Weapon")
 	int32 AmmoInClip = 30;
 
 	struct FTimerHandle ReloadTimerHandle;
