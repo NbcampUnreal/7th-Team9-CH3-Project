@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "RSCharacter.h"
+#include "InputActionValue.h"
 #include "RSPlayer.generated.h"
 
 UCLASS()
@@ -9,8 +10,8 @@ class RISEOFSUN_API ARSPlayer : public ARSCharacter
 {
     GENERATED_BODY()
 
-protected:
-    virtual void BeginPlay() override;
+public:
+	virtual void BeginPlay() override;
 
 public:
     ARSPlayer();
@@ -33,6 +34,29 @@ private:
 
     // ---------- 여기부터 HP 관련 추가 ----------
 
+	void InitializationPlayerCamera();
+	void InitializationInput();
+
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	class UInputMappingContext* DefaultContext;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	class UInputAction* MoveAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	class UInputAction* LookAction;
+
+public:
+	UPROPERTY(EditAnywhere)
+	float mouseSpeed = 30.0f;
+
+	UPROPERTY(EditAnywhere)
+	float playerMoveSpeed = 350.0f;//캐릭터 속도 설정 값
     // 최대 HP (BP에서 읽기만 가능, 코드에서 수정 금지)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = "true"))
     float MaxHp = 100.0f;
