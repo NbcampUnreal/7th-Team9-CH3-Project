@@ -3,10 +3,3 @@
 
 #include "RSStat.h"
 
-RSStat::RSStat()
-{
-}
-
-RSStat::~RSStat()
-{
-}
