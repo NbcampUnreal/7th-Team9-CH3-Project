@@ -1,11 +1,9 @@
-﻿#include "RSPlayer.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "EnhancedInputComponent.h"
-#include "InputMappingContext.h"
-#include "EnhancedInputSubsystems.h"
-#include "Engine/Engine.h"
-#include "Kismet/KismetMathLibrary.h"
 
 ARSPlayer::ARSPlayer()
 {
@@ -13,20 +11,11 @@ ARSPlayer::ARSPlayer()
 	
 	InitializationPlayerMesh();
 	InitializationPlayerCamera();
-	InitializationInput(); 
 }
 
 void ARSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController())) 
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			SubSystem->AddMappingContext(DefaultContext, 0);
-		}
-	}
 }
 
 void ARSPlayer::Tick(float DeltaTime)
@@ -37,11 +26,7 @@ void ARSPlayer::Tick(float DeltaTime)
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayer::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
+}
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
 {
@@ -76,42 +61,4 @@ void ARSPlayer::InitializationPlayerCamera()
 	{
 		Camera->SetupAttachment(SpringArm);
 	}
-}
-
-void ARSPlayer::InitializationInput()
-{
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext>InputContext(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
-	if (InputContext.Object != nullptr)
-	{
-		DefaultContext = InputContext.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction>InputMove(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
-	if (InputMove.Object != nullptr)
-	{
-		MoveAction = InputMove.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction>InputLook(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
-	if (InputLook.Object != nullptr)
-	{
-		LookAction = InputLook.Object;
-	}
-}
-
-void ARSPlayer::Move(const FInputActionValue& Value)
-{
-	const FVector2D Movement = Value.Get<FVector2D>(); //X : 좌, 우 Y: 앞, 뒤
-
-	const FRotator ControlRot = Controller ? Controller->GetControlRotation() : FRotator::ZeroRotator;
-	const FRotator YawOnly(0.f, ControlRot.Yaw, 0.f);
-
-	const FVector Forward = UKismetMathLibrary::GetForwardVector(YawOnly);
-	const FVector Right = UKismetMathLibrary::GetRightVector(YawOnly);
-
-	AddMovementInput(Forward, Movement.Y);
-	AddMovementInput(Right, Movement.X);
-}
-
-void ARSPlayer::Look(const FInputActionValue& Value)
-{
-	
 }
