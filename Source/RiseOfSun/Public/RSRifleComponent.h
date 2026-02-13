@@ -13,7 +13,7 @@ class RISEOFSUN_API URSRifleComponent : public USceneComponent
 public:	
 	// Sets default values for this component's properties
 	URSRifleComponent();
-	//Ʈ���̽� ä��
+	// 웨폰 트레이스
 	TEnumAsByte<ECollisionChannel> WeaponTraceChannel = ECC_Visibility;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
