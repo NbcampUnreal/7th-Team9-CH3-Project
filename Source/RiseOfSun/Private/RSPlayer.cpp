@@ -3,6 +3,7 @@
 
 #include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
@@ -14,8 +15,11 @@
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	InitializationPlayerMesh();
+
+	// ---------- HP 초기값 ----------
+	CurrentHp = MaxHp;
+
+	InitializationPlayerMesh(); 
 	InitializationPlayerCamera();
 	InitializationInput();
 }
@@ -32,6 +36,17 @@ void ARSPlayer::BeginPlay()
 		}
 	}
 	GetCharacterMovement()->MaxWalkSpeed = playerMoveSpeed; //캐릭터 속도
+	// 시작 시 HP 초기화
+	CurrentHp = MaxHp;
+
+	if (HUDWidgetclass != nullptr)
+	{
+		UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		if (PlayerHUD)
+		{
+			PlayerHUD->AddToViewport();
+		}
+	}
 }
 
 void ARSPlayer::Tick(float DeltaTime)
