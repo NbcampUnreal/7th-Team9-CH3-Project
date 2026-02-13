@@ -3,19 +3,35 @@
 
 #include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	InitializationPlayerMesh();
+
+	// ---------- HP 초기값 ----------
+	CurrentHp = MaxHp;
+
+	InitializationPlayerMesh(); 
 	InitializationPlayerCamera();
 }
 
 void ARSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 시작 시 HP 초기화
+	CurrentHp = MaxHp;
+
+	if (HUDWidgetclass != nullptr)
+	{
+		UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		if (PlayerHUD)
+		{
+			PlayerHUD->AddToViewport();
+		}
+	}
 }
 
 void ARSPlayer::Tick(float DeltaTime)
