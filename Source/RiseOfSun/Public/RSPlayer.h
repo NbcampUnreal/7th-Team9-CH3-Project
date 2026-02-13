@@ -34,7 +34,6 @@ private:
 
     // ---------- 여기부터 HP 관련 추가 ----------
 
-	void InitializationPlayerCamera();
 	void InitializationInput();
 
 	void Move(const FInputActionValue& Value);
