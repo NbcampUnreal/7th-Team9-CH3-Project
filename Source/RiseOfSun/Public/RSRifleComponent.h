@@ -1,6 +1,4 @@
-Ôªø// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+Ôªø#pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
@@ -15,7 +13,7 @@ class RISEOFSUN_API URSRifleComponent : public USceneComponent
 public:	
 	// Sets default values for this component's properties
 	URSRifleComponent();
-	//∆Æ∑π¿ÃΩ∫ √§≥Œ
+	// Ïõ®Ìè∞ Ìä∏Î†àÏù¥Ïä§
 	TEnumAsByte<ECollisionChannel> WeaponTraceChannel = ECC_Visibility;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")

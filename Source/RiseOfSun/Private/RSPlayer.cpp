@@ -44,6 +44,12 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
+{
+	FDamageResult result = ARSCharacter::Attack(Target);
+	return result;
+}
+
 void ARSPlayer::InitializationPlayerMesh()
 {
 	ConstructorHelpers::FObjectFinder<USkeletalMesh>
