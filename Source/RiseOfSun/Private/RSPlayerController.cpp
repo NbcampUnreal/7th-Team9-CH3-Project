@@ -2,6 +2,8 @@
 
 
 #include "RSPlayerController.h"
+#include "Engine/Engine.h"
+#include "GameFramework/GameUserSettings.h"
 
 void ARSPlayerController::BeginPlay()
 {
@@ -12,7 +14,14 @@ void ARSPlayerController::BeginPlay()
     {
         if (GEngine)
         {
-            GEngine->Exec(GetWorld(), TEXT("r.SetRes 1920x1080w"));
+            UGameUserSettings* Settings = GEngine->GetGameUserSettings();
+            if (Settings)
+            {
+                Settings->SetScreenResolution(FIntPoint(1920, 1080));
+                Settings->SetFullscreenMode(EWindowMode::Windowed);
+                Settings->ApplySettings(true);
+                Settings->SaveSettings();
+            }
         }
     }
 }
