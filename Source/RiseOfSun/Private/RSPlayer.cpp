@@ -17,6 +17,7 @@ ARSPlayer::ARSPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// ---------- HP 초기값 ----------
+	MaxHp = 100.f;
 	CurrentHp = MaxHp;
 
 	//---------- EXP 초기값 ----------
@@ -43,12 +44,11 @@ void ARSPlayer::BeginPlay()
 		}
 	}
 	GetCharacterMovement()->MaxWalkSpeed = playerMoveSpeed; //캐릭터 속도
-	// 시작 시 HP 초기화
-	CurrentHp = MaxHp;
 
-	if (HUDWidgetclass != nullptr)
+	if (HUDWidgetclass)
 	{
-		UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();
@@ -154,6 +154,7 @@ void ARSPlayer::AddEXP(int32 ExpAmount)
 
 	CurrentEXP += ExpAmount;
 
+	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %d / %d"), CurrentEXP, MaxEXP);
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)
 	{
@@ -165,5 +166,6 @@ void ARSPlayer::AddEXP(int32 ExpAmount)
 void ARSPlayer::LevelUp()
 {
 	Level++;
+	CurrentHp = FMath::Clamp(CurrentHp + 20.f, 0.f, MaxHp);
 	UE_LOG(LogTemp, Warning, TEXT("Level Up! Current Level: %d"), Level);
 }
