@@ -39,6 +39,10 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
+    // ---------- 여기부터 EXP 관련 추가 ----------
+    void AddEXP(int32 ExpAmount);
+    void LevelUp();
+
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
@@ -63,6 +67,10 @@ public:
     // 현재 HP
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats", meta = (AllowPrivateAccess = "true"))
     float CurrentHp = 100.0f;
+
+    int32 CurrentEXP;
+    int32 MaxEXP;
+    int32 Level;
     
     // Getter: 현재 HP
     UFUNCTION(BlueprintCallable, Category = "Player Stats")

@@ -19,6 +19,13 @@ ARSPlayer::ARSPlayer()
 	// ---------- HP 초기값 ----------
 	CurrentHp = MaxHp;
 
+	//---------- EXP 초기값 ----------
+	Level = 1;
+
+	// 경험치 초기값 설정
+	CurrentEXP = 0;
+	MaxEXP = 100;
+
 	InitializationPlayerMesh(); 
 	InitializationPlayerCamera();
 	InitializationInput();
@@ -138,4 +145,25 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddControllerYawInput(LookAxisVector.X * GetWorld()->DeltaTimeSeconds * mouseSpeed);
 	AddControllerPitchInput(LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
+}
+
+void ARSPlayer::AddEXP(int32 ExpAmount)
+{
+	if (ExpAmount <= 0)
+		return;
+
+	CurrentEXP += ExpAmount;
+
+	// 여러 레벨업 가능성까지 고려
+	while (CurrentEXP >= MaxEXP)
+	{
+		CurrentEXP -= MaxEXP;
+		LevelUp();
+	}
+}
+
+void ARSPlayer::LevelUp()
+{
+	Level++;
+	UE_LOG(LogTemp, Warning, TEXT("Level Up! Current Level: %d"), Level);
 }
