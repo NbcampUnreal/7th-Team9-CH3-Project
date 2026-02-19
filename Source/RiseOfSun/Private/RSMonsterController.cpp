@@ -1,5 +1,6 @@
 ﻿#include "RSMonsterController.h"
 #include "Kismet/GameplayStatics.h"
+#include "RSMonster.h"
 
 ARSMonsterController::ARSMonsterController()
 {
@@ -34,17 +35,41 @@ void ARSMonsterController::Tick(float DeltaTime)
 		break;
 	}
 }
+
+static const TCHAR* StateToText(AIState S)
+{
+	switch (S)
+	{
+	case AIState::Chase:  return TEXT("Chase");
+	case AIState::Attack: return TEXT("Attack");
+	default:              return TEXT("Unknown");
+	}
+}
+
 void ARSMonsterController::ChangeState(AIState NewState)
 {
+	if (CurrentState == NewState)
+		return;
+
+	AIState OldState = CurrentState;
 	CurrentState = NewState;
+
+	UE_LOG(LogTemp, Display, TEXT("[AI] State: %s -> %s"),
+		StateToText(OldState), StateToText(NewState));
 
 	if (NewState == AIState::Chase)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[AI] ENTER CHASE"));
+	}
+	else if (NewState == AIState::Attack)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AI] ENTER ATTACK"));
+	}
 
-		if (TargetPlayer)
-		{
-			const auto Result = MoveToActor(TargetPlayer, AttackRadius);
-		}
+	if (NewState == AIState::Attack)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("State changed: %d -> %d (ENTER ATTACK)"),
+			(int32)OldState, (int32)NewState);
 	}
 
 	switch (NewState)
@@ -52,8 +77,9 @@ void ARSMonsterController::ChangeState(AIState NewState)
 	case AIState::Chase:
 		if (TargetPlayer)
 		{
-			const EPathFollowingRequestResult::Type Result =
-				MoveToActor(TargetPlayer, AttackRadius);
+			ARSMonster* Monster = Cast<ARSMonster>(GetPawn());
+			if (!Monster) return;
+			float Range = Monster->GetAttackRange();
 		}
 		break;
 
@@ -63,34 +89,74 @@ void ARSMonsterController::ChangeState(AIState NewState)
 	}
 }
 
+
 void ARSMonsterController::TickChase(float DeltaTime)
 {
-	if (TargetPlayer == nullptr)
+	if (!TargetPlayer) return;
+
+	ARSMonster* Monster = Cast<ARSMonster>(GetPawn());
+	if (!Monster) return;
+
+	float AttackRange = 10.f;
+	float Range = Monster->GetAttackRange();
+	UE_LOG(LogTemp, Warning, TEXT("Range=%.1f"), Range);
+
+	const float Dist = FVector::Dist(
+		GetPawn()->GetActorLocation(),
+		TargetPlayer->GetActorLocation()
+	);
+
+
+	if (Dist <= Range)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("IN RANGE -> TRY ATTACK"));
+	}
+
+	if (IsPlayerInRange(Range))
+	{
+		ChangeState(AIState::Attack);
 		return;
 	}
 
-	if (IsPlayerInRange(AttackRange))
-	{
-		ChangeState(AIState::Attack);
-	}
+	auto Result = MoveToActor(TargetPlayer, AttackRange);
 }
 
 void ARSMonsterController::TickAttack(float DeltaTime)
 {
+	ARSMonster* Monster = Cast<ARSMonster>(GetPawn());
+	if (!Monster) return;
+
+	const float Range = Monster->GetAttackRange();
+	if (!IsPlayerInRange(Range))
+	{
+		ChangeState(AIState::Chase);
+		return;
+	}
+
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+
+	ARSCharacter* AttackTargetPlayer = Cast<ARSCharacter>(TargetPlayer);
+	if (!AttackTargetPlayer) return;
+
+
+	if (Monster->CanAttack(AttackTargetPlayer) && CurrentTime - LastAttackTime >= AttackCooldown)
+	{
+		Monster->Attack(AttackTargetPlayer);
+		LastAttackTime = CurrentTime;
+	}
 
 }
 
 bool ARSMonsterController::IsPlayerInRange(float Range) const
 {
-	if (TargetPlayer == nullptr || GetPawn() == nullptr)
-	{
-		return false;
-	}
+	if (!TargetPlayer || !GetPawn()) return false;
 
-	const float Distance = FVector::Dist(
-		GetPawn()->GetActorLocation(),
-		TargetPlayer->GetActorLocation());
+	const FVector P = GetPawn()->GetActorLocation();
+	const FVector T = TargetPlayer->GetActorLocation();
 
-	return Distance <= Range;
+	const float Dist3D = FVector::Dist(P, T);
+	const float Dist2D = FVector::Dist2D(P, T);
+	const float DeltaZ = FMath::Abs(P.Z - T.Z);
+
+	return Dist3D <= Range;
 }
