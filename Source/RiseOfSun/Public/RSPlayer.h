@@ -37,13 +37,10 @@ protected:
     class UCameraComponent* Camera;
 
 private:
-    void InitializationPlayerMesh();
 
-    void InitializationPlayerCamera();
 
     // ---------- 여기부터 HP 관련 추가 ----------
 
-	void InitializationInput();
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

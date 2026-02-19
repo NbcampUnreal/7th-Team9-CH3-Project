@@ -1,4 +1,4 @@
-#include "RSPlayer.h"
+﻿#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -33,7 +33,7 @@ ARSPlayer::ARSPlayer()
 
 	}
 
-		bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = true;
 
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
 	if (MoveComp)
@@ -54,7 +54,7 @@ ARSPlayer::ARSPlayer()
 	{
 		Camera->SetupAttachment(SpringArm);
 	}
-}
+
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext>InputContext(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
 	if (InputContext.Object != nullptr)
@@ -117,9 +117,6 @@ ARSPlayer::ARSPlayer()
 	CurrentEXP = 0;
 	MaxEXP = 100;
 
-	InitializationPlayerMesh(); 
-	InitializationPlayerCamera();
-	InitializationInput();
 }
 
 void ARSPlayer::BeginPlay()
@@ -179,42 +176,6 @@ FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
 	return result;
 }
 
-void ARSPlayer::InitializationPlayerMesh()
-{
-
-	
-}
-
-void ARSPlayer::InitializationPlayerCamera()
-{
-
-	bUseControllerRotationYaw = true;
-
-	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-	if (MoveComp)
-	{
-		MoveComp->bOrientRotationToMovement = false;
-	}
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	if (SpringArm)
-	{
-		SpringArm->SetupAttachment(RootComponent);
-		SpringArm->SetWorldLocation(FVector(0, 0, 55));
-		SpringArm->TargetArmLength = 100;
-		SpringArm->SocketOffset = FVector(0, 40, 30);
-		SpringArm->bUsePawnControlRotation = true;
-	}
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	if (Camera)
-	{
-		Camera->SetupAttachment(SpringArm);
-	}
-}
-
-void ARSPlayer::InitializationInput()
-{
-
-}
 
 void ARSPlayer::Move(const FInputActionValue& Value)
 {
@@ -234,7 +195,7 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddControllerYawInput(LookAxisVector.X * GetWorld()->DeltaTimeSeconds * mouseSpeed);
-	AddControllerPitchInput(LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
+	AddControllerPitchInput(-LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)
@@ -253,6 +214,7 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
 	RifleComp->Reload();
+}
 void ARSPlayer::AddEXP(int32 ExpAmount)
 {
 	if (ExpAmount <= 0)
