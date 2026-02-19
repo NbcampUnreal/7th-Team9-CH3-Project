@@ -1,18 +1,20 @@
-﻿#pragma once
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "RSRifleComponent.generated.h"
+#include "Components/SceneComponent.h"
+#include "RSRifleSceneComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class RISEOFSUN_API URSRifleComponent : public USceneComponent
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class RISEOFSUN_API URSRifleSceneComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
-	URSRifleComponent();
+	URSRifleSceneComponent();
 	// 웨폰 트레이스
 	TEnumAsByte<ECollisionChannel> WeaponTraceChannel = ECC_Visibility;
 
@@ -27,7 +29,6 @@ public:
 	int32 AmmoInClip = 30;
 
 	struct FTimerHandle ReloadTimerHandle;
-
 	bool bIsReloading;
 
 	bool bCanFire = true;
@@ -36,13 +37,13 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	
 
-public:	
+
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Fire();
+	void Fire(USceneComponent* MuzzlePoint);
 
 	void Reload();
 

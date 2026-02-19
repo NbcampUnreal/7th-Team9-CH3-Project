@@ -1,38 +1,40 @@
-﻿
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RSRifleComponent.h"
+
+#include "RSRifleSceneComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 
-URSRifleComponent::URSRifleComponent()
+// Sets default values for this component's properties
+URSRifleSceneComponent::URSRifleSceneComponent()
 {
-	
+
 	PrimaryComponentTick.bCanEverTick = true;
-	
 
 
-	
 }
 
 
-void URSRifleComponent::BeginPlay()
+void URSRifleSceneComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-	
+
+
 }
 
 
-void URSRifleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void URSRifleSceneComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
 }
 
-void URSRifleComponent::Fire()
+void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
 {
-	if(AmmoInClip <= 0)
+	if (AmmoInClip <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Ammo"));
 		bCanFire = false;
@@ -43,13 +45,13 @@ void URSRifleComponent::Fire()
 
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
-	
+
 
 	const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
 
-	FVector Start = GetComponentLocation();
+	FVector Start = MuzzlePoint->GetComponentLocation();
 
-	FVector End = GetComponentLocation() + GetForwardVector() * FireRange;
+	FVector End = MuzzlePoint->GetComponentLocation() + GetForwardVector() * FireRange;
 
 	FHitResult Hit;
 
@@ -71,13 +73,13 @@ void URSRifleComponent::Fire()
 	AmmoInClip--;
 }
 
-void URSRifleComponent::Reload()
+void URSRifleSceneComponent::Reload()
 {
-	if(bIsReloading)
+	if (bIsReloading)
 	{
 		return;
 	}
-	if(AmmoInClip == 30)
+	if (AmmoInClip == 30)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Clip Full"));
 		return;
@@ -86,13 +88,13 @@ void URSRifleComponent::Reload()
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
 		this,
-		&URSRifleComponent::ReloadComplete,
+		&URSRifleSceneComponent::ReloadComplete,
 		ReloadDuration,
 		false
 	);
 }
 
-void URSRifleComponent::ReloadComplete()
+void URSRifleSceneComponent::ReloadComplete()
 {
 	AmmoInClip = 30;
 	bCanFire = true;

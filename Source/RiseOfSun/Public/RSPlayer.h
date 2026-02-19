@@ -47,6 +47,9 @@ private:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Fire(const FInputActionValue& Value);
+	void Aim(const FInputActionValue& Value);
+    void Reloading(const FInputActionValue& Value);
     void LevelUp();
 
 
@@ -59,6 +62,16 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class UInputAction* LookAction;
+
+    UPROPERTY(VisibleAnywhere, Category = "Input")
+    class UInputAction* FireAction;
+
+    UPROPERTY(VisibleAnywhere, Category = "Input")
+    class UInputAction* AimAction;
+
+    UPROPERTY(VisibleAnywhere, Category = "Input")
+    class UInputAction* ReloadingAction;
+
 
 	// HUD 업데이트 위해 PlayerHUD 참조
     UPROPERTY()
@@ -108,4 +121,16 @@ public:
     }
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
     TSubclassOf<UUserWidget> HUDWidgetclass;
+
+	// 라이플 컴포넌트 클래스 참조 (BP에서 설정 가능)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+    TObjectPtr<class URSRifleSceneComponent> RifleComp;
+
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+	TObjectPtr<class UStaticMeshComponent> RifleMeshComp;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+    TObjectPtr<class USceneComponent> MuzzlePoint;
+
 };

@@ -30,6 +30,15 @@ void ARSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void ARSCharacter::Die()
+{
+	if(bIsDead)
+		return;
+	bIsDead = true;
+
+
+}
+
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
 {
 	int32 Damage = Stat.AttackDamage; //TODO : 무기 공격력 받아와야 할 듯
