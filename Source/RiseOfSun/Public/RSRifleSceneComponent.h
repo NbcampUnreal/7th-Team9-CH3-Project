@@ -29,10 +29,6 @@ public:
 	int32 AmmoInClip = 30;
 
 	struct FTimerHandle ReloadTimerHandle;
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	TObjectPtr<class USceneComponent> MuzzlePoint;
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	TObjectPtr<class UStaticMeshComponent> RifleMesh;
 	bool bIsReloading;
 
 	bool bCanFire = true;
@@ -47,7 +43,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Fire();
+	void Fire(USceneComponent* MuzzlePoint);
 
 	void Reload();
 

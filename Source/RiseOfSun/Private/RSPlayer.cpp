@@ -13,6 +13,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RSRifleSceneComponent.h"
 
+#include "Components/StaticMeshComponent.h"
+
+#include "Components/SceneComponent.h"
+
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,14 +24,80 @@ ARSPlayer::ARSPlayer()
 	// ---------- HP 초기값 ----------
 	CurrentHp = MaxHp;
 
-	InitializationPlayerMesh(); 
-	InitializationPlayerCamera();
-	InitializationInput();
+	ConstructorHelpers::FObjectFinder<USkeletalMesh>
+		PlayerSkeletalMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/Character/QuantumCharacter/Mesh/SKM_QuantumCharacter.SKM_QuantumCharacter'"));
 
-	RifleComp = CreateDefaultSubobject<URSRifleSceneComponent>(TEXT("RifleComp2"));
+	if (PlayerSkeletalMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(PlayerSkeletalMesh.Object);
+		GetMesh()->SetWorldLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+
+	}
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	if (SpringArm)
+	{
+		SpringArm->SetupAttachment(RootComponent);
+		SpringArm->SetWorldLocation(FVector(0, 0, 55));
+		SpringArm->TargetArmLength = 100;
+		SpringArm->SocketOffset = FVector(0, 40, 30);
+		//SpringArm->bUsePawnControlRotation
+	}
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	if (Camera)
+	{
+		Camera->SetupAttachment(SpringArm);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext>InputContext(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
+	if (InputContext.Object != nullptr)
+	{
+		DefaultContext = InputContext.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputMove(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
+	if (InputMove.Object != nullptr)
+	{
+		MoveAction = InputMove.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputLook(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
+	if (InputLook.Object != nullptr)
+	{
+		LookAction = InputLook.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputFire(TEXT("/Game/Input/Actions/IA_Fire.IA_Fire"));
+	if (InputFire.Object != nullptr)
+	{
+		FireAction = InputFire.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputAim(TEXT("/Game/Input/Actions/IA_Aim.IA_Aim"));
+	if (InputAim.Object != nullptr)
+	{
+		AimAction = InputAim.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputReloading(TEXT("/Game/Input/Actions/IA_Reloading.IA_Reloading"));
+	if (InputReloading.Object != nullptr)
+	{
+		ReloadingAction = InputReloading.Object;
+	}
+
+	RifleComp = CreateDefaultSubobject<URSRifleSceneComponent>(TEXT("RifleComp"));
+	RifleComp->SetupAttachment(RootComponent);
+
+	RifleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RifleMeshComp"));
+	RifleMeshComp->SetupAttachment(RifleComp);
+
+	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
+	MuzzlePoint->SetupAttachment(RifleMeshComp);
+
+
 
 	if (RifleComp)
 	{
+		
+		
 		//총을 손에 붙이기
 		/*RifleComp->SetupAttachment(GetMesh(), FName("hand_rSocket"));*/
 		RifleComp->SetRelativeLocation(FVector(0, 0, 0));
@@ -73,6 +143,10 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ARSPlayer::Fire);
+	//에임 구현 미정
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
+	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -83,53 +157,18 @@ FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
 
 void ARSPlayer::InitializationPlayerMesh()
 {
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>
-		PlayerSkeletalMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/Character/QuantumCharacter/Mesh/SKM_QuantumCharacter.SKM_QuantumCharacter'"));
 
-	if (PlayerSkeletalMesh.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(PlayerSkeletalMesh.Object);
-		GetMesh()->SetWorldLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-
-	}
 	
 }
 
 void ARSPlayer::InitializationPlayerCamera()
 {
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	if (SpringArm)
-	{
-		SpringArm->SetupAttachment(RootComponent);
-		SpringArm->SetWorldLocation(FVector(0, 0, 55));
-		SpringArm->TargetArmLength = 100;
-		SpringArm->SocketOffset = FVector(0, 40, 30);
-		//SpringArm->bUsePawnControlRotation
-	}
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	if (Camera)
-	{
-		Camera->SetupAttachment(SpringArm);
-	}
+
 }
 
 void ARSPlayer::InitializationInput()
 {
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext>InputContext(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
-	if (InputContext.Object != nullptr)
-	{
-		DefaultContext = InputContext.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction>InputMove(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
-	if (InputMove.Object != nullptr)
-	{
-		MoveAction = InputMove.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction>InputLook(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
-	if (InputLook.Object != nullptr)
-	{
-		LookAction = InputLook.Object;
-	}
+
 }
 
 void ARSPlayer::Move(const FInputActionValue& Value)
@@ -151,4 +190,22 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddControllerYawInput(LookAxisVector.X * GetWorld()->DeltaTimeSeconds * mouseSpeed);
 	AddControllerPitchInput(LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
+}
+
+void ARSPlayer::Fire(const FInputActionValue& Value)
+{
+	
+		RifleComp->Fire(MuzzlePoint);
+	
+}
+
+//에임 구현 미정
+void ARSPlayer::Aim(const FInputActionValue& Value)
+{
+	//미정미정
+}
+
+void ARSPlayer::Reloading(const FInputActionValue& Value)
+{
+	RifleComp->Reload();
 }

@@ -51,7 +51,7 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
 
 	FVector Start = MuzzlePoint->GetComponentLocation();
 
-	FVector End =Start + MuzzlePoint->GetForwardVector() * FireRange;
+	FVector End = MuzzlePoint->GetComponentLocation() + GetForwardVector() * FireRange;
 
 	FHitResult Hit;
 
