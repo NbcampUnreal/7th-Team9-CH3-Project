@@ -3,6 +3,7 @@
 
 #include "RSGameMode.h"
 #include "RSPlayer.h"
+#include "RSPlayerController.h"
 
 ARSGameMode::ARSGameMode()
 {
@@ -15,4 +16,5 @@ ARSGameMode::ARSGameMode()
 		DefaultPawnClass = PlayerCharacter.Class;
 		
 	}
+	PlayerControllerClass = ARSPlayerController::StaticClass();
 }

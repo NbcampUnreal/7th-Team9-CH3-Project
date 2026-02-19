@@ -1,6 +1,3 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -10,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RSRifleSceneComponent.h"
 
@@ -22,6 +20,7 @@ ARSPlayer::ARSPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// ---------- HP 초기값 ----------
+	MaxHp = 100.f;
 	CurrentHp = MaxHp;
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh>
@@ -34,6 +33,13 @@ ARSPlayer::ARSPlayer()
 
 	}
 
+		bUseControllerRotationYaw = true;
+
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (MoveComp)
+	{
+		MoveComp->bOrientRotationToMovement = false;
+	}
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	if (SpringArm)
 	{
@@ -41,13 +47,14 @@ ARSPlayer::ARSPlayer()
 		SpringArm->SetWorldLocation(FVector(0, 0, 55));
 		SpringArm->TargetArmLength = 100;
 		SpringArm->SocketOffset = FVector(0, 40, 30);
-		//SpringArm->bUsePawnControlRotation
+		SpringArm->bUsePawnControlRotation = true;
 	}
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	if (Camera)
 	{
 		Camera->SetupAttachment(SpringArm);
 	}
+}
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext>InputContext(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
 	if (InputContext.Object != nullptr)
@@ -103,6 +110,16 @@ ARSPlayer::ARSPlayer()
 		RifleComp->SetRelativeLocation(FVector(0, 0, 0));
 		RifleComp->SetRelativeRotation(FRotator(0, 0, 0));
 	}
+	//---------- EXP 초기값 ----------
+	Level = 1;
+
+	// 경험치 초기값 설정
+	CurrentEXP = 0;
+	MaxEXP = 100;
+
+	InitializationPlayerMesh(); 
+	InitializationPlayerCamera();
+	InitializationInput();
 }
 
 void ARSPlayer::BeginPlay()
@@ -117,12 +134,14 @@ void ARSPlayer::BeginPlay()
 		}
 	}
 	GetCharacterMovement()->MaxWalkSpeed = playerMoveSpeed; //캐릭터 속도
+
 	// 시작 시 HP 초기화
 	CurrentHp = MaxHp;
 
-	if (HUDWidgetclass != nullptr)
+	if (HUDWidgetclass)
 	{
-		UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();
@@ -133,6 +152,11 @@ void ARSPlayer::BeginPlay()
 void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), CurrentHp);
+	CurrentHp -= 1 * DeltaTime;
+
+	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+	CurrentEXP += 1 * DeltaTime;
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -164,6 +188,27 @@ void ARSPlayer::InitializationPlayerMesh()
 void ARSPlayer::InitializationPlayerCamera()
 {
 
+	bUseControllerRotationYaw = true;
+
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (MoveComp)
+	{
+		MoveComp->bOrientRotationToMovement = false;
+	}
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	if (SpringArm)
+	{
+		SpringArm->SetupAttachment(RootComponent);
+		SpringArm->SetWorldLocation(FVector(0, 0, 55));
+		SpringArm->TargetArmLength = 100;
+		SpringArm->SocketOffset = FVector(0, 40, 30);
+		SpringArm->bUsePawnControlRotation = true;
+	}
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	if (Camera)
+	{
+		Camera->SetupAttachment(SpringArm);
+	}
 }
 
 void ARSPlayer::InitializationInput()
@@ -208,4 +253,25 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
 	RifleComp->Reload();
+void ARSPlayer::AddEXP(int32 ExpAmount)
+{
+	if (ExpAmount <= 0)
+		return;
+
+	CurrentEXP += ExpAmount;
+
+	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+	// 여러 레벨업 가능성까지 고려
+	while (CurrentEXP >= MaxEXP)
+	{
+		CurrentEXP -= MaxEXP;
+		LevelUp();
+	}
+}
+
+void ARSPlayer::LevelUp()
+{
+	Level++;
+	CurrentHp = FMath::Clamp(CurrentHp + 20.f, 0.f, MaxHp);
+	UE_LOG(LogTemp, Warning, TEXT("Level Up! Current Level: %d"), Level);
 }

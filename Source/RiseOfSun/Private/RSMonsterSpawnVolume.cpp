@@ -14,61 +14,79 @@ ARSMonsterSpawnVolume::ARSMonsterSpawnVolume()
 	MonsterDataTable = nullptr;
 }
 
-void ARSMonsterSpawnVolume::SpawnRandomMonster()
+void ARSMonsterSpawnVolume::BeginPlay()
 {
-	if (FMonsterSpawnRow* SelectedRow = GetRandomMonster())
+	Super::BeginPlay();
+
+	if (MonsterDataTable) 
 	{
-		if (UClass* ActualClass = SelectedRow->MonsterClass.Get())
-		{
-			SpawnMonster(ActualClass);
+		static const FString ContextString(TEXT("MonsterSpawnContext"));
+		MonsterDataTable->GetAllRows(ContextString, CachedMonsterRows);
+	}
+	
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ARSMonsterSpawnVolume::SpawnNextMonster, 2.0f, true);
+}
+
+void ARSMonsterSpawnVolume::SpawnNextMonster()
+{
+	if (SpawnCount >= MaxSpawnCount)
+	{
+		// 타이머 멈춤
+		GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+		return;
+	}
+		// 데이터 테이블이 멀쩡한 지 확인
+	if (CachedMonsterRows.IsEmpty()) return;
+		// 인덱스 연결이 잘 됐나
+	if (CachedMonsterRows.IsValidIndex(CurrentSpawnIndex))
+	{	// 현재 인덱스의 데이터 가져오기
+		FMonsterSpawnRow* SelectedRow = CachedMonsterRows[CurrentSpawnIndex];
+		
+		if (SelectedRow && SelectedRow->MonsterClass)
+		{	// 실제 스폰 진행
+			SpawnMonster(SelectedRow->MonsterClass);
+			// 다음 몬스터
+			CurrentSpawnIndex++;
+			SpawnCount++;
+			// 다 소환되면 초기화
+			if (CurrentSpawnIndex >= CachedMonsterRows.Num())
+			{
+				CurrentSpawnIndex = 0;
+			}
 		}
 	}
 }
 
-FMonsterSpawnRow* ARSMonsterSpawnVolume::GetRandomMonster() const
+void ARSMonsterSpawnVolume::OnMonsterDestroyed(AActor* DestroyedActor)
 {
-	if (!MonsterDataTable) return nullptr;
+	ActiveMonsterCount--;
 
-	TArray<FMonsterSpawnRow*> AllRows;
-	static const FString ContextString(TEXT("MonsterSpawnContext"));
-	MonsterDataTable->GetAllRows(ContextString, AllRows);
-
-	if (AllRows.IsEmpty()) return nullptr;
-
-	float TotalChance = 0.0f;
-	for (const FMonsterSpawnRow* Row : AllRows)
+	if (SpawnCount >= MaxSpawnCount && ActiveMonsterCount <= 0)
 	{
-		if (Row)
-		{
-			TotalChance += Row->SpawnChance;
-		}
+		LevelUp();
 	}
-
-	const float RandValue = FMath::FRandRange(0.0f, TotalChance);
-	
-	float AccumulateChance = 0.0f;
-
-	for (FMonsterSpawnRow* Row : AllRows)
-	{
-		AccumulateChance += Row->SpawnChance;
-		if (RandValue <= AccumulateChance)
-		{
-			return Row;
-		}
-	}
-
-	return nullptr;
 }
 
 void ARSMonsterSpawnVolume::SpawnMonster(TSubclassOf<ARSMonster> MonsterClass)
 {
 	if (!MonsterClass) return;
 
-	GetWorld()->SpawnActor<ARSMonster>(
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	ARSMonster* NewMonster = GetWorld()->SpawnActor<ARSMonster>(
 		MonsterClass,
 		GetRandomPointVolume(),
-		FRotator::ZeroRotator
+		FRotator::ZeroRotator,
+		SpawnParams
 	);
+
+	if (NewMonster)
+	{
+		ActiveMonsterCount++;
+
+		NewMonster->OnDestroyed.AddDynamic(this, &ARSMonsterSpawnVolume::OnMonsterDestroyed);
+	}
 }
 
 FVector ARSMonsterSpawnVolume::GetRandomPointVolume() const
@@ -77,9 +95,20 @@ FVector ARSMonsterSpawnVolume::GetRandomPointVolume() const
 	// 중심 좌표
 	FVector BoxOrigin = SpawningBox->GetComponentLocation();
 
-	return BoxOrigin + FVector(
-		FMath::FRandRange(-BoxExtent.X, BoxExtent.X),
-		FMath::FRandRange(-BoxExtent.Y, BoxExtent.Y),
-		FMath::FRandRange(-BoxExtent.Z, BoxExtent.Z)
-	);
+	float RandomX = FMath::FRandRange(-BoxExtent.X, BoxExtent.X);
+	float RandomY = FMath::FRandRange(-BoxExtent.Y, BoxExtent.Y);
+	float FixedZ = BoxOrigin.Z - BoxExtent.Z;
+
+	return BoxOrigin + FVector(RandomX, RandomY, -BoxExtent.Z);
+}
+
+void ARSMonsterSpawnVolume::LevelUp()
+{
+	CurrentLevel++;
+	MaxSpawnCount += 10;
+
+	SpawnCount = 0;
+	CurrentSpawnIndex = 0;
+
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ARSMonsterSpawnVolume::SpawnNextMonster, 2.0f, true);
 }

@@ -19,6 +19,10 @@ protected:
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
     double DisplayHp = 0.0;
 
+    // 현재 표시할 EXP
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
+    double DisplayEXP = 0.0;
+
 private:
     // 참조할 플레이어 캐릭터
     UPROPERTY()

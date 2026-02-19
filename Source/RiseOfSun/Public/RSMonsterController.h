@@ -36,8 +36,9 @@ private:
 	UPROPERTY()
 	APawn* TargetPlayer = nullptr;
 
-	float AttackRange = 50.0f;
-	float AttackRadius = 5.f;
+	//float AttackRadius = 5.f;
+	float AttackCooldown = 2.0f;
+	float LastAttackTime = -9999.0f;
 
 	bool IsPlayerInRange(float Range) const;
 };
