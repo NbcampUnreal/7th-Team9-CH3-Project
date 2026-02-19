@@ -16,7 +16,4 @@ public:
     // 실제로 스폰될 몬스터 클래스
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TSubclassOf<ARSMonster> MonsterClass;
-    //몬스터 스폰 확률
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float SpawnChance;
 };
