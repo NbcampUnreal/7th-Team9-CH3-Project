@@ -36,6 +36,7 @@ void ARSPlayer::BeginPlay()
 		}
 	}
 	GetCharacterMovement()->MaxWalkSpeed = playerMoveSpeed; //캐릭터 속도
+
 	// 시작 시 HP 초기화
 	CurrentHp = MaxHp;
 
@@ -84,6 +85,13 @@ void ARSPlayer::InitializationPlayerMesh()
 
 void ARSPlayer::InitializationPlayerCamera()
 {
+	bUseControllerRotationYaw = true;
+
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (MoveComp)
+	{
+		MoveComp->bOrientRotationToMovement = false;
+	}
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	if (SpringArm)
 	{
@@ -91,7 +99,7 @@ void ARSPlayer::InitializationPlayerCamera()
 		SpringArm->SetWorldLocation(FVector(0, 0, 55));
 		SpringArm->TargetArmLength = 100;
 		SpringArm->SocketOffset = FVector(0, 40, 30);
-		//SpringArm->bUsePawnControlRotation
+		SpringArm->bUsePawnControlRotation = true;
 	}
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	if (Camera)
