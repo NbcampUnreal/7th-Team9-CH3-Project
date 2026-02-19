@@ -24,4 +24,6 @@ public:
 	float AttackRange;
 	// 몬스터 데미지
 	float MonsterDamage;
+
+	float GetAttackRange() const { return AttackRange; }
 };

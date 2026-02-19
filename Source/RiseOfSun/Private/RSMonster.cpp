@@ -4,14 +4,13 @@
 ARSMonster::ARSMonster()
 {
     AttackRange = 200.0f;
-    
 }
 
 bool ARSMonster::CanAttack(ACharacter* Target)
 {
     FVector ActorLocation = GetActorLocation();  //몬스터 위치
     FVector PlayerLocation = Target->GetActorLocation();  //플레이어 위치
-    const float DistSq = FVector::DistSquared(ActorLocation, PlayerLocation);
+    const float DistSq = FVector::DistSquared2D(ActorLocation, PlayerLocation);
     
     return DistSq <= AttackRange * AttackRange; // 공격범위
 }
