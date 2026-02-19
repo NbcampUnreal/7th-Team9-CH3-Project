@@ -78,7 +78,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = "true"))
     float CurrentHp;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
-    int32 CurrentEXP;
+    float CurrentEXP;
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
     int32 MaxEXP;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
@@ -94,7 +94,7 @@ public:
 
 	// Getter: 현재 EXP
     UFUNCTION(BlueprintPure, Category = "Player Stats")
-    int32 GetCurrentEXP() const { return CurrentEXP; }
+    float GetCurrentEXP() const { return CurrentEXP; }
 
     // Getter: 최대 EXP
     UFUNCTION(BlueprintPure, Category = "Player Stats")

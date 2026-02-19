@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ARSPlayer::ARSPlayer()
@@ -59,8 +60,11 @@ void ARSPlayer::BeginPlay()
 void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentHp);
+	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), CurrentHp);
 	CurrentHp -= 1 * DeltaTime;
+
+	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+	CurrentEXP += 1 * DeltaTime;
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -156,7 +160,7 @@ void ARSPlayer::AddEXP(int32 ExpAmount)
 
 	CurrentEXP += ExpAmount;
 
-	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %d / %d"), CurrentEXP, MaxEXP);
+	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)
 	{
