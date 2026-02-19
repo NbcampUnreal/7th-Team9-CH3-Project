@@ -95,11 +95,11 @@ FVector ARSMonsterSpawnVolume::GetRandomPointVolume() const
 	// 중심 좌표
 	FVector BoxOrigin = SpawningBox->GetComponentLocation();
 
-	return BoxOrigin + FVector(
-		FMath::FRandRange(-BoxExtent.X, BoxExtent.X),
-		FMath::FRandRange(-BoxExtent.Y, BoxExtent.Y),
-		FMath::FRandRange(-BoxOrigin.Z, BoxOrigin.Z)
-	);
+	float RandomX = FMath::FRandRange(-BoxExtent.X, BoxExtent.X);
+	float RandomY = FMath::FRandRange(-BoxExtent.Y, BoxExtent.Y);
+	float FixedZ = BoxOrigin.Z - BoxExtent.Z;
+
+	return BoxOrigin + FVector(RandomX, RandomY, -BoxExtent.Z);
 }
 
 void ARSMonsterSpawnVolume::LevelUp()
