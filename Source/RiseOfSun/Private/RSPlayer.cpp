@@ -1,6 +1,3 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -10,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ARSPlayer::ARSPlayer()
@@ -17,7 +15,15 @@ ARSPlayer::ARSPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// ---------- HP 초기값 ----------
+	MaxHp = 100.f;
 	CurrentHp = MaxHp;
+
+	//---------- EXP 초기값 ----------
+	Level = 1;
+
+	// 경험치 초기값 설정
+	CurrentEXP = 0;
+	MaxEXP = 100;
 
 	InitializationPlayerMesh(); 
 	InitializationPlayerCamera();
@@ -40,9 +46,10 @@ void ARSPlayer::BeginPlay()
 	// 시작 시 HP 초기화
 	CurrentHp = MaxHp;
 
-	if (HUDWidgetclass != nullptr)
+	if (HUDWidgetclass)
 	{
-		UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();
@@ -53,6 +60,11 @@ void ARSPlayer::BeginPlay()
 void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), CurrentHp);
+	CurrentHp -= 1 * DeltaTime;
+
+	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+	CurrentEXP += 1 * DeltaTime;
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -146,4 +158,27 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddControllerYawInput(LookAxisVector.X * GetWorld()->DeltaTimeSeconds * mouseSpeed);
 	AddControllerPitchInput(LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
+}
+
+void ARSPlayer::AddEXP(int32 ExpAmount)
+{
+	if (ExpAmount <= 0)
+		return;
+
+	CurrentEXP += ExpAmount;
+
+	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+	// 여러 레벨업 가능성까지 고려
+	while (CurrentEXP >= MaxEXP)
+	{
+		CurrentEXP -= MaxEXP;
+		LevelUp();
+	}
+}
+
+void ARSPlayer::LevelUp()
+{
+	Level++;
+	CurrentHp = FMath::Clamp(CurrentHp + 20.f, 0.f, MaxHp);
+	UE_LOG(LogTemp, Warning, TEXT("Level Up! Current Level: %d"), Level);
 }
