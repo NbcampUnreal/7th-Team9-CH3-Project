@@ -59,8 +59,6 @@ void ARSPlayer::BeginPlay()
 void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentHp);
-	CurrentHp -= 1 * DeltaTime;
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -161,7 +159,6 @@ void ARSPlayer::AddEXP(int32 ExpAmount)
 	while (CurrentEXP >= MaxEXP)
 	{
 		CurrentEXP -= MaxEXP;
-		LevelUp();
 	}
 }
 
