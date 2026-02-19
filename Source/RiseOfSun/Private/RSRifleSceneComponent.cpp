@@ -1,38 +1,46 @@
-﻿
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RSRifleComponent.h"
+
+#include "RSRifleSceneComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-URSRifleComponent::URSRifleComponent()
+// Sets default values for this component's properties
+URSRifleSceneComponent::URSRifleSceneComponent()
 {
-	
+
 	PrimaryComponentTick.bCanEverTick = true;
+
+	RifleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RifleMesh2"));
+	/*RifleMesh->SetupAttachment(this);*/
+
+	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint2"));
+	/*MuzzlePoint->SetupAttachment(RifleMesh);*/
 	
 
 
-	
+
 }
 
 
-void URSRifleComponent::BeginPlay()
+void URSRifleSceneComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-	
+
+
 }
 
 
-void URSRifleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void URSRifleSceneComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
 }
 
-void URSRifleComponent::Fire()
+void URSRifleSceneComponent::Fire()
 {
-	if(AmmoInClip <= 0)
+	if (AmmoInClip <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Ammo"));
 		bCanFire = false;
@@ -43,7 +51,7 @@ void URSRifleComponent::Fire()
 
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
-	
+
 
 	const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
 
@@ -71,13 +79,13 @@ void URSRifleComponent::Fire()
 	AmmoInClip--;
 }
 
-void URSRifleComponent::Reload()
+void URSRifleSceneComponent::Reload()
 {
-	if(bIsReloading)
+	if (bIsReloading)
 	{
 		return;
 	}
-	if(AmmoInClip == 30)
+	if (AmmoInClip == 30)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Clip Full"));
 		return;
@@ -86,13 +94,13 @@ void URSRifleComponent::Reload()
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
 		this,
-		&URSRifleComponent::ReloadComplete,
+		&URSRifleSceneComponent::ReloadComplete,
 		ReloadDuration,
 		false
 	);
 }
 
-void URSRifleComponent::ReloadComplete()
+void URSRifleSceneComponent::ReloadComplete()
 {
 	AmmoInClip = 30;
 	bCanFire = true;

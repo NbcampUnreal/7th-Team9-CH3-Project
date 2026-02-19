@@ -27,10 +27,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	bool bIsDead = false;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void Die();
 	// 스탯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")
 	FRSStat Stat;

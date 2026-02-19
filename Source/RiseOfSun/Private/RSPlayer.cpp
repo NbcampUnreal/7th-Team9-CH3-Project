@@ -11,6 +11,7 @@
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RSRifleSceneComponent.h"
 
 ARSPlayer::ARSPlayer()
 {
@@ -22,6 +23,16 @@ ARSPlayer::ARSPlayer()
 	InitializationPlayerMesh(); 
 	InitializationPlayerCamera();
 	InitializationInput();
+
+	RifleComp = CreateDefaultSubobject<URSRifleSceneComponent>(TEXT("RifleComp2"));
+
+	if (RifleComp)
+	{
+		//총을 손에 붙이기
+		/*RifleComp->SetupAttachment(GetMesh(), FName("hand_rSocket"));*/
+		RifleComp->SetRelativeLocation(FVector(0, 0, 0));
+		RifleComp->SetRelativeRotation(FRotator(0, 0, 0));
+	}
 }
 
 void ARSPlayer::BeginPlay()
@@ -79,7 +90,9 @@ void ARSPlayer::InitializationPlayerMesh()
 	{
 		GetMesh()->SetSkeletalMesh(PlayerSkeletalMesh.Object);
 		GetMesh()->SetWorldLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+
 	}
+	
 }
 
 void ARSPlayer::InitializationPlayerCamera()

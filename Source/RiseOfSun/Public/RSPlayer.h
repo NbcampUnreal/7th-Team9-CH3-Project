@@ -80,4 +80,8 @@ public:
     }
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
     TSubclassOf<UUserWidget> HUDWidgetclass;
+
+	// 라이픓 컴포넌트 클래스 참조 (BP에서 설정 가능)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RifleComp")
+    TObjectPtr<class URSRifleSceneComponent> RifleComp;
 };
