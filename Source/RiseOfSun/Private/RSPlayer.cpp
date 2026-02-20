@@ -19,10 +19,6 @@ ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ---------- HP 초기값 ----------
-	MaxHp = 100.f;
-	CurrentHp = MaxHp;
-
 	ConstructorHelpers::FObjectFinder<USkeletalMesh>
 		PlayerSkeletalMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/Character/QuantumCharacter/Mesh/SKM_QuantumCharacter.SKM_QuantumCharacter'"));
 
@@ -132,9 +128,6 @@ void ARSPlayer::BeginPlay()
 	}
 	GetCharacterMovement()->MaxWalkSpeed = playerMoveSpeed; //캐릭터 속도
 
-	// 시작 시 HP 초기화
-	CurrentHp = MaxHp;
-
 	if (HUDWidgetclass)
 	{
 		PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
@@ -149,10 +142,24 @@ void ARSPlayer::BeginPlay()
 void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), CurrentHp);
-	CurrentHp -= 1 * DeltaTime;
 
+	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
 	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+
+	static float DamageAccumulator = 0.f;
+	DamageAccumulator += DeltaTime;
+
+	if (DamageAccumulator >= 1.f)
+	{
+		HitDamage(1);
+		DamageAccumulator = 0.f;
+	}
+
+	if (Stat.CurrentHealth <= 0.f && !bIsDead)
+	{
+		Die();
+	}
+
 	CurrentEXP += 1 * DeltaTime;
 }
 
@@ -234,6 +241,12 @@ void ARSPlayer::AddEXP(int32 ExpAmount)
 void ARSPlayer::LevelUp()
 {
 	Level++;
-	CurrentHp = FMath::Clamp(CurrentHp + 20.f, 0.f, MaxHp);
+
+	Stat.CurrentHealth = FMath::Clamp(
+		Stat.CurrentHealth + 20.f,
+		0.f,
+		Stat.MaxHealth
+	);
+
 	UE_LOG(LogTemp, Warning, TEXT("Level Up! Current Level: %d"), Level);
 }
