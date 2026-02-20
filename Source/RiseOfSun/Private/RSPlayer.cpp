@@ -32,7 +32,7 @@ ARSPlayer::ARSPlayer()
 		GetMesh()->SetWorldLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 
 	}
-
+	
 	bUseControllerRotationYaw = true;
 
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
@@ -199,8 +199,21 @@ void ARSPlayer::Move(const FInputActionValue& Value)
 	const FVector Forward = UKismetMathLibrary::GetForwardVector(YawOnly);
 	const FVector Right = UKismetMathLibrary::GetRightVector(YawOnly);
 
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if(Movement.Y!=-1)
+	{ 
+			MoveComp->bOrientRotationToMovement = true;
+	}
+	else
+	{
+		MoveComp->bOrientRotationToMovement = false;
+	}
+	
+
 	AddMovementInput(Forward, Movement.Y);
 	AddMovementInput(Right, Movement.X);
+
+	
 }
 
 void ARSPlayer::Look(const FInputActionValue& Value)
