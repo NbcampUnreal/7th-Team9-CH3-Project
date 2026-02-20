@@ -36,6 +36,8 @@ protected:
     UPROPERTY(EditAnywhere)
     class UCameraComponent* Camera;
 
+    
+
 private:
 
 
@@ -109,5 +111,8 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     TObjectPtr<class USceneComponent> MuzzlePoint;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+    class UNiagaraSystem* MuzzleFlashSystem;
 
 };

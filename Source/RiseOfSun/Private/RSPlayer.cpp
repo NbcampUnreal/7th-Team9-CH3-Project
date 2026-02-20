@@ -15,6 +15,10 @@
 
 #include "Components/SceneComponent.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -95,6 +99,7 @@ ARSPlayer::ARSPlayer()
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
 
+	
 
 
 	if (RifleComp)
@@ -221,7 +226,8 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
 	
-		RifleComp->Fire(MuzzlePoint);
+		RifleComp->Fire(MuzzlePoint, MuzzleFlashSystem);
+		
 	
 }
 

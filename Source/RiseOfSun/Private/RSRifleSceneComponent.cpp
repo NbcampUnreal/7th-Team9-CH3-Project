@@ -5,6 +5,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values for this component's properties
 URSRifleSceneComponent::URSRifleSceneComponent()
@@ -32,7 +35,7 @@ void URSRifleSceneComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 }
 
-void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
+void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* MuzzleFlashSystem)
 {
 	if (AmmoInClip <= 0)
 	{
@@ -69,7 +72,15 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
 		FLinearColor::Green,
 		FireDebugDuration
 	);
-
+	if (AmmoInClip > 0)
+	{
+		UNiagaraComponent* Comp =
+			UNiagaraFunctionLibrary::SpawnSystemAttached(
+				MuzzleFlashSystem, MuzzlePoint, NAME_None,
+				FVector::ZeroVector, FRotator::ZeroRotator,
+				EAttachLocation::SnapToTarget, true);
+	}
+	
 	AmmoInClip--;
 }
 

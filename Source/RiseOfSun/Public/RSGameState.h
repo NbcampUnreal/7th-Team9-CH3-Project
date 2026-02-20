@@ -14,4 +14,10 @@ class RISEOFSUN_API ARSGameState : public AGameState
 {
 	GENERATED_BODY()
 	
+
+public:
+	ARSGameState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	int32 Kills = 0;
+
 };
