@@ -12,6 +12,7 @@ ARSMonster::ARSMonster()
 
     // 블루프린트/코드 위젯 클래스 지정
     HPWidgetComponent->SetWidgetClass(URSMonsterWidget::StaticClass());
+
     HPWidgetComponent->SetupAttachment(GetMesh());
 
     // 머리 위 위치

@@ -6,7 +6,6 @@
 
 void URSMonsterWidget::SetOwnerMonster(ARSMonster* NewOwner)
 {
-	OwnerMonster = NewOwner;
 }
 
 float URSMonsterWidget::GetHPPercent() const
