@@ -7,7 +7,7 @@
 ARSCharacter::ARSCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	Stat.CurrentHealth = Stat.MaxHealth;
 }
 
 // Called when the game starts or when spawned
