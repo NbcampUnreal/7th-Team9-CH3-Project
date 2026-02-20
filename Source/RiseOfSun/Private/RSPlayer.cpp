@@ -160,7 +160,7 @@ void ARSPlayer::Tick(float DeltaTime)
 		Die();
 	}
 
-	CurrentEXP += 1 * DeltaTime;
+	AddEXP(1 * DeltaTime);
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -222,20 +222,21 @@ void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
 	RifleComp->Reload();
 }
-void ARSPlayer::AddEXP(int32 ExpAmount)
+void ARSPlayer::AddEXP(float  ExpAmount)
 {
 	if (ExpAmount <= 0)
 		return;
 
 	CurrentEXP += ExpAmount;
-
 	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)
 	{
 		CurrentEXP -= MaxEXP;
 		LevelUp();
 	}
+	OnEXPChanged.Broadcast();
 }
 
 void ARSPlayer::LevelUp()

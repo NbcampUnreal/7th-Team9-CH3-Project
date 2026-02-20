@@ -13,6 +13,8 @@ void URSPlayerHUD::NativeConstruct()
     {
         DisplayHp = PlayerCharacter->GetCurrentHP(); // C++ 플레이어 클래스에 CurrentHp가 있어야 함
 		DisplayEXP = PlayerCharacter->GetCurrentEXP(); // C++ 플레이어 클래스에 CurrentEXP가 있어야 함
+
+        PlayerCharacter->OnEXPChanged.AddDynamic(this, &URSPlayerHUD::OnEXPUpdated);
     }
 }
 
@@ -33,4 +35,10 @@ void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     // 보간
     DisplayEXP = FMath::FInterpTo(DisplayEXP, TargetEXP, InDeltaTime, 7.0f);
+}
+
+void URSPlayerHUD::OnEXPUpdated()
+{
+    if (!PlayerCharacter) return;
+    DisplayEXP = PlayerCharacter->GetCurrentEXP();
 }

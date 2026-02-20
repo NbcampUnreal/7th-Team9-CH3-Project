@@ -25,7 +25,7 @@ public:
 
     // ---------- 여기부터 EXP 관련 추가 ----------
     UFUNCTION(BlueprintCallable)
-    void AddEXP(int32 ExpAmount);
+    void AddEXP(float ExpAmount);
 
     UPROPERTY(BlueprintAssignable)
     FOnEXPChanged OnEXPChanged;
