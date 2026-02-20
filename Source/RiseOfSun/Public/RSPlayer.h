@@ -36,6 +36,8 @@ protected:
     UPROPERTY(EditAnywhere)
     class UCameraComponent* Camera;
 
+    
+
 private:
 
 
@@ -80,13 +82,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float playerMoveSpeed = 350.0f;//캐릭터 속도 설정 값
-    // 최대 HP (BP에서 읽기만 가능, 코드에서 수정 금지)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = "true"))
-    float MaxHp;
 
-    // 현재 HP
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = "true"))
-    float CurrentHp;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
     float CurrentEXP;
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
@@ -94,15 +90,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
     int32 Level;
     
-    // Getter: 현재 HP
-    UFUNCTION(BlueprintPure, Category = "Player Stats")
-    float GetCurrentHp() const { return CurrentHp; }
-
-    // Getter: 최대 HP
-    UFUNCTION(BlueprintPure, Category = "Player Stats")
-    float GetMaxHp() const { return MaxHp; }
-
-	// Getter: 현재 EXP
+    // Getter: 현재 EXP
     UFUNCTION(BlueprintPure, Category = "Player Stats")
     float GetCurrentEXP() const { return CurrentEXP; }
 
@@ -110,12 +98,6 @@ public:
     UFUNCTION(BlueprintPure, Category = "Player Stats")
     int32 GetMaxEXP() const { return MaxEXP; }
 
-    // Setter: 현재 HP
-    UFUNCTION(BlueprintCallable, Category = "Player Stats")
-    void SetCurrentHp(float NewHp)
-    {
-        CurrentHp = FMath::Clamp(NewHp, 0.0f, MaxHp);
-    }
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
     TSubclassOf<UUserWidget> HUDWidgetclass;
 
@@ -129,5 +111,8 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     TObjectPtr<class USceneComponent> MuzzlePoint;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+    class UNiagaraSystem* MuzzleFlashSystem;
 
 };

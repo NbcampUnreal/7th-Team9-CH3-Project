@@ -12,4 +12,10 @@ class RISEOFSUN_API URSGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
+
+public:
+
+	int32 LevelIndex = 0;
+	int32 SubLevelIndex = 0;
+	int32 MaxLevelIndex = 5;
 };

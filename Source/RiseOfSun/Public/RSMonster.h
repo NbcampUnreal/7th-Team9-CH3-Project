@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "RSCharacter.h"
+#include "Components/WidgetComponent.h"
 #include "RSMonster.generated.h"
 
 class USphereComponent;
@@ -16,14 +17,17 @@ public:
 
 	// 몬스터 범위 내 플레이어가 있는지
 	bool CanAttack(ACharacter* Target);
-
-	// 몬스터 공격
-	virtual FDamageResult Attack(ARSCharacter* Target) override;
-
-	// 공격 범위
-	float AttackRange;
-	// 몬스터 데미지
-	float MonsterDamage;
+	virtual FDamageResult Attack(ARSCharacter* Target) override;;
 
 	float GetAttackRange() const { return AttackRange; }
+
+protected:
+	virtual void BeginPlay() override;
+	
+private:
+	float AttackRange;
+	float MonsterDamage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* HPWidgetComponent;
 };
