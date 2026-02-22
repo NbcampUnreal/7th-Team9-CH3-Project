@@ -37,12 +37,21 @@ void ARSCharacter::Die()
 		return;
 	
 	bIsDead = true;
-	this->Destroy();
+
+	SetActorEnableCollision(false);
+	SetActorHiddenInGame(true);
+	SetLifeSpan(2.0f);
 
 }
 
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
 {
+	// Target이 없으면 리턴
+	if (!IsValid(Target))
+	{
+		return FDamageResult();
+	}
+
 	int32 Damage = Stat.AttackDamage; //TODO : 무기 공격력 받아와야 할 듯
 	int32 FinalDamage = Target->HitDamage(Damage);
 	FDamageResult result;
@@ -55,11 +64,20 @@ FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
 
 int32 ARSCharacter::HitDamage(int32 DamageAmount)
 {
+	if (bIsDead)
+		return 0;
+
 	int32 Damage = DamageAmount - Stat.Defense;
 	Damage = std::max(Damage, 0);
 
 	Stat.CurrentHealth -= Damage;
 	Stat.CurrentHealth = std::max(Stat.CurrentHealth, 0.0f);
+
+	if (Stat.CurrentHealth <= 0)
+	{
+		Die();
+	}
+
 
 	// 데미지를 몬스터가 받는다면 UI 띄우기
 	if (Damage > 0)
