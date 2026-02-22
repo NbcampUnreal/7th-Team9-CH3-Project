@@ -84,6 +84,7 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* 
 			Player->Attack(Target); // 실제 데미지 함수 호출
 			UE_LOG(LogTemp, Warning, TEXT("attack"));
 		}
+		// Attack 이후에도 유효한지 다시 체크
 		if (IsValid(Target) && Target->IsDead())
 		{
 			Target->Destroy();

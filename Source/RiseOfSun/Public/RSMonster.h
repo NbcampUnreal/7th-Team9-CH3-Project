@@ -22,6 +22,9 @@ public:
 	UFUNCTION()
 	void ShowDamageUI();
 
+	UFUNCTION()
+	void HideDamageUI();
+
 	// 몬스터 범위 내 플레이어가 있는지
 	bool CanAttack(ACharacter* Target);
 	virtual FDamageResult Attack(ARSCharacter* Target) override;;
