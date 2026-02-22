@@ -42,8 +42,13 @@ void ARSCharacter::Die()
 }
 
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
-{
-	int32 Damage = Stat.AttackDamage; //TODO : 무기 공격력 받아와야 할 듯
+{	// Target이 없으면 리턴
+	if (!IsValid(Target))
+	{
+		return FDamageResult();
+	}
+
+	int32 Damage = Stat.AttackDamage;
 	int32 FinalDamage = Target->HitDamage(Damage);
 	FDamageResult result;
 	result.Attacker = this;
