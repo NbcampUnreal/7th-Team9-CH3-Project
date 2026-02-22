@@ -7,7 +7,7 @@
 
 ARSCharacter::ARSCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	Stat.CurrentHealth = Stat.MaxHealth;
 }
 
@@ -35,8 +35,9 @@ void ARSCharacter::Die()
 {
 	if(bIsDead)
 		return;
+	
 	bIsDead = true;
-
+	this->Destroy();
 
 }
 

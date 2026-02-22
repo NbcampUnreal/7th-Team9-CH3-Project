@@ -32,6 +32,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Die();
+	//죽었나 확인
+	bool IsDead() { return Stat.CurrentHealth <= 0; }
 
 	// 스탯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")

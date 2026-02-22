@@ -2,6 +2,8 @@
 
 
 #include "RSRifleSceneComponent.h"
+#include "RSCharacter.h"
+#include "RSPlayer.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
@@ -72,6 +74,22 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* 
 		FLinearColor::Green,
 		FireDebugDuration
 	);
+
+	if (bIsHit)
+	{
+		ARSCharacter* Player = Cast<ARSCharacter>(GetOwner());
+		ARSCharacter* Target = Cast<ARSCharacter>(Hit.GetActor());
+		if (Target && Player)
+		{
+			Player->Attack(Target); // 실제 데미지 함수 호출
+			UE_LOG(LogTemp, Warning, TEXT("attack"));
+		}
+		if (Target->IsDead())
+		{
+			Target->Destroy();
+		}
+	}
+
 	if (AmmoInClip > 0)
 	{
 		UNiagaraComponent* Comp =
