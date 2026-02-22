@@ -18,6 +18,8 @@ ARSMonster::ARSMonster()
 
     // 크기
     HPWidgetComponent->SetDrawSize(FVector2D(300.f, 80.f));
+
+    Stat.AttackDamage = 50.f;
 }
 
 bool ARSMonster::CanAttack(ACharacter* Target)

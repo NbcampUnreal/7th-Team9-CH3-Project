@@ -11,9 +11,9 @@ struct RISEOFSUN_API FRSStat
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
-	float MaxHealth = 100.0f;
+	float MaxHealth = 1000.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
-	float CurrentHealth = 100.0f;
+	float CurrentHealth = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	float AttackDamage = 10.0f;
