@@ -15,6 +15,10 @@
 
 #include "Components/SceneComponent.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -28,7 +32,7 @@ ARSPlayer::ARSPlayer()
 		GetMesh()->SetWorldLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 
 	}
-
+	
 	bUseControllerRotationYaw = true;
 
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
@@ -95,6 +99,7 @@ ARSPlayer::ARSPlayer()
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
 
+	
 
 
 	if (RifleComp)
@@ -162,7 +167,7 @@ void ARSPlayer::Tick(float DeltaTime)
 		Die();
 	}
 
-	CurrentEXP += 1 * DeltaTime;
+	AddEXP(1 * DeltaTime);
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -196,8 +201,21 @@ void ARSPlayer::Move(const FInputActionValue& Value)
 	const FVector Forward = UKismetMathLibrary::GetForwardVector(YawOnly);
 	const FVector Right = UKismetMathLibrary::GetRightVector(YawOnly);
 
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if(Movement.Y!=-1)
+	{ 
+			MoveComp->bOrientRotationToMovement = true;
+	}
+	else
+	{
+		MoveComp->bOrientRotationToMovement = false;
+	}
+	
+
 	AddMovementInput(Forward, Movement.Y);
 	AddMovementInput(Right, Movement.X);
+
+	
 }
 
 void ARSPlayer::Look(const FInputActionValue& Value)
@@ -210,7 +228,8 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
 	
-		RifleComp->Fire(MuzzlePoint);
+		RifleComp->Fire(MuzzlePoint, MuzzleFlashSystem);
+		
 	
 }
 
@@ -224,20 +243,21 @@ void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
 	RifleComp->Reload();
 }
-void ARSPlayer::AddEXP(int32 ExpAmount)
+void ARSPlayer::AddEXP(float  ExpAmount)
 {
 	if (ExpAmount <= 0)
 		return;
 
 	CurrentEXP += ExpAmount;
-
 	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)
 	{
 		CurrentEXP -= MaxEXP;
 		LevelUp();
 	}
+	OnEXPChanged.Broadcast();
 }
 
 void ARSPlayer::LevelUp()

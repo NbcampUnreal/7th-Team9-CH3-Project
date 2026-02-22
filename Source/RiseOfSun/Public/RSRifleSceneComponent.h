@@ -43,7 +43,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Fire(USceneComponent* MuzzlePoint);
+	void Fire(USceneComponent* MuzzlePoint, class UNiagaraSystem* MuzzleFlashSystem);
 
 	void Reload();
 

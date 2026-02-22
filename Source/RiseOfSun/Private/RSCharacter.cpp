@@ -2,6 +2,7 @@
 
 
 #include "RSCharacter.h"
+#include "RSMonster.h"
 
 
 ARSCharacter::ARSCharacter()
@@ -59,6 +60,16 @@ int32 ARSCharacter::HitDamage(int32 DamageAmount)
 	Stat.CurrentHealth -= Damage;
 	Stat.CurrentHealth = std::max(Stat.CurrentHealth, 0.0f);
 
+	// 데미지를 몬스터가 받는다면 UI 띄우기
+	if (Damage > 0)
+		{
+			ARSMonster* Monster = Cast<ARSMonster>(this);
+			if (Monster)
+			{
+				// 공격자 여부 상관없이 데미지가 들어오면 UI 표시
+				Monster->ShowDamageUI();
+			}
+		}
 	return Damage;
 }
 

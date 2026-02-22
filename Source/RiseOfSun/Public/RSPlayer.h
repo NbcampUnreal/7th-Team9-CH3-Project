@@ -25,7 +25,7 @@ public:
 
     // ---------- 여기부터 EXP 관련 추가 ----------
     UFUNCTION(BlueprintCallable)
-    void AddEXP(int32 ExpAmount);
+    void AddEXP(float ExpAmount);
 
     UPROPERTY(BlueprintAssignable)
     FOnEXPChanged OnEXPChanged;
@@ -35,6 +35,8 @@ protected:
 
     UPROPERTY(EditAnywhere)
     class UCameraComponent* Camera;
+
+    
 
 private:
 
@@ -109,5 +111,8 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     TObjectPtr<class USceneComponent> MuzzlePoint;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+    class UNiagaraSystem* MuzzleFlashSystem;
 
 };
