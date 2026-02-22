@@ -118,6 +118,8 @@ ARSPlayer::ARSPlayer()
 	CurrentEXP = 0;
 	MaxEXP = 100;
 
+	Stat.AttackDamage = 250.0f;
+	Stat.Defense = 30.0f;
 }
 
 void ARSPlayer::BeginPlay()

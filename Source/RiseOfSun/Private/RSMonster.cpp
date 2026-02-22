@@ -23,6 +23,7 @@ ARSMonster::ARSMonster()
     // 크기
     HPWidgetComponent->SetDrawSize(FVector2D(300.f, 80.f));
 
+    Stat.AttackDamage = 50.f;
     // 스케일 1로 설정 (월드 공간일 때 화면 크기에 영향)
     HPWidgetComponent->SetWorldScale3D(FVector(1.f));
 
