@@ -36,6 +36,9 @@ protected:
     UPROPERTY(EditAnywhere)
     class UCameraComponent* Camera;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+    class URSInventoryComponent* Inventory;
+
     
 
 private:

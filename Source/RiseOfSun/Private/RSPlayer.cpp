@@ -1,4 +1,4 @@
-﻿#include "RSPlayer.h"
+#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -11,14 +11,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RSRifleSceneComponent.h"
 #include "Components/StaticMeshComponent.h"
-
 #include "Components/SceneComponent.h"
-
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "RSInventoryComponent.h"
 #include "RSPlayerController.h"
-
 #include "Kismet/KismetSystemLibrary.h"
 
 ARSPlayer::ARSPlayer()
@@ -101,7 +99,8 @@ ARSPlayer::ARSPlayer()
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
 
-	
+	Inventory = CreateDefaultSubobject<URSInventoryComponent>("Inventory");
+	Inventory->Capacity = 20;
 
 
 	if (RifleComp)
