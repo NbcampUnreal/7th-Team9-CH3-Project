@@ -52,6 +52,7 @@ private:
     void Fire(const FInputActionValue& Value);
     void StopFire(const FInputActionValue& Value);
 	void Aim(const FInputActionValue& Value);
+    void Shoot();
     void Reloading(const FInputActionValue& Value);
     void LevelUp();
 	//카메라 중앙에 조준점 계산함수
@@ -79,6 +80,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Input")
     class UInputAction* ReloadingAction;
+
+    UPROPERTY(VisibleAnywhere, Category = "Input")
+    class UInputAction* ShootingAction;
 
 
 	// HUD 업데이트 위해 PlayerHUD 참조
