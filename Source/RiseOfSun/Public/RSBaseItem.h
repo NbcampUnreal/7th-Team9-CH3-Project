@@ -12,8 +12,14 @@ class RISEOFSUN_API ARSBaseItem : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSBaseItem();
+
+	// 월드 정보
+	UPROPERTY(Transient)
+	class UWorld* World;
+	UPROPERTY()
+	class URSInventoryComponent* OwningInventory;
+
 
 protected:
 	// Called when the game starts or when spawned
