@@ -30,4 +30,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* HPWidgetComponent;
+
+
+	UPROPERTY(EditAnywhere, Category = "AttackAnim")
+	class UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "DieAnim")
+	class UAnimMontage* DieMontage;
 };
