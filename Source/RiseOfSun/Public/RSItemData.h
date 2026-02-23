@@ -45,4 +45,8 @@ struct FRSItemData
     // 소모품 개수용
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 StackCount = 1;
+
+    // --- 확장 기능 ---
+    FText GetCategoryAsText() const;
+    bool IsValidItem() const;
 };
