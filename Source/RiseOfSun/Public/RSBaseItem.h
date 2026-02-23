@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RSItemBase.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
 #include "RSBaseItem.generated.h"
 
 UCLASS()
@@ -12,15 +15,39 @@ class RISEOFSUN_API ARSBaseItem : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSBaseItem();
 
+	// 월드 정보
+	UPROPERTY(Transient)
+	class UWorld* World;
+	UPROPERTY()
+	class URSInventoryComponent* OwningInventory;
+
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//충돌 영역 (픽업 감지용)
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	USphereComponent* Collision;
+
+	//아이템 메시 
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	UStaticMeshComponent* Mesh;
+
+	//실제 아이템 데이터 객체 
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	URSItemBase* ItemInstance;
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//아이템 데이터 초기화 
+	void InitializeItem(const FRSItemData& Data);
+
+	/** 아이템 이름 반환 */
+	FString GetItemName() const;
+
+	/** 공격력 반환 */
+	int32 GetAttackPower() const;
 
 };

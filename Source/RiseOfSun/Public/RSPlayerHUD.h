@@ -14,14 +14,17 @@ public:
 	virtual void NativeConstruct() override;
     virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+    UFUNCTION()
+    void OnEXPUpdated();
+
 protected:
     // 현재 표시할 HP
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
-    double DisplayHp = 0.0;
+    float DisplayHp = 0.0;
 
     // 현재 표시할 EXP
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
-    double DisplayEXP = 0.0;
+    float DisplayEXP = 0.0;
 
 private:
     // 참조할 플레이어 캐릭터

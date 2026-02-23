@@ -25,7 +25,7 @@ public:
 
     // ---------- 여기부터 EXP 관련 추가 ----------
     UFUNCTION(BlueprintCallable)
-    void AddEXP(int32 ExpAmount);
+    void AddEXP(float ExpAmount);
 
     UPROPERTY(BlueprintAssignable)
     FOnEXPChanged OnEXPChanged;
@@ -36,6 +36,11 @@ protected:
     UPROPERTY(EditAnywhere)
     class UCameraComponent* Camera;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+    class URSInventoryComponent* Inventory;
+
+    
+
 private:
 
 
@@ -44,11 +49,17 @@ private:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Fire(const FInputActionValue& Value);
+    void Fire(const FInputActionValue& Value);
+    void StopFire(const FInputActionValue& Value);
 	void Aim(const FInputActionValue& Value);
     void Shoot();
     void Reloading(const FInputActionValue& Value);
     void LevelUp();
+	//카메라 중앙에 조준점 계산함수
+    void AimStart();
+    void HandleFire();
+
+
 
 
 private:
@@ -91,7 +102,24 @@ public:
     int32 MaxEXP;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
     int32 Level;
-    
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
+    FVector LastAimPoint = FVector::ZeroVector;
+
+    FTimerHandle FireTimerHandle;
+    UPROPERTY(EditAnywhere)
+    float FireInterval = 0.1f; // 발사 간격 (초)
+
+    bool bIsFiring;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
+    bool bHasAimPoint = false;
+    UPROPERTY(EditAnywhere, Category = "CameraTrace")
+    float CamRange = 10000.0f;
+    UPROPERTY(EditAnywhere, Category = "CameraTrace")
+    float FireDebugDuration = 1.0f;
+	//카메라 중앙에 조준점 계산할 때 사용할 트레이스 채널
+    TEnumAsByte<ECollisionChannel> CamTraceChannel = ECC_Visibility;
     // Getter: 현재 EXP
     UFUNCTION(BlueprintPure, Category = "Player Stats")
     float GetCurrentEXP() const { return CurrentEXP; }
@@ -113,5 +141,8 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     TObjectPtr<class USceneComponent> MuzzlePoint;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
+    class UNiagaraSystem* MuzzleFlashSystem;
 
 };

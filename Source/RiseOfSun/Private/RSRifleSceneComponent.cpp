@@ -2,9 +2,14 @@
 
 
 #include "RSRifleSceneComponent.h"
+#include "RSCharacter.h"
+#include "RSPlayer.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values for this component's properties
 URSRifleSceneComponent::URSRifleSceneComponent()
@@ -32,7 +37,7 @@ void URSRifleSceneComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 }
 
-void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
+void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd)
 {
 	if (AmmoInClip <= 0)
 	{
@@ -49,15 +54,24 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
 
 	const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
 
-	FVector Start = MuzzlePoint->GetComponentLocation();
 
-	FVector End =Start + MuzzlePoint->GetForwardVector() * FireRange;
+
+	FVector MuzzleStart = MuzzlePoint->GetComponentLocation();
+
+	FVector FIreDirection = AimEnd - MuzzleStart;
+	if(!FIreDirection.Normalize())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Fire Direction"));
+		return;
+	}
+
+	FVector End = MuzzleStart + (FIreDirection * FireRange);
 
 	FHitResult Hit;
 
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingle(
 		GetWorld(),
-		Start,
+		MuzzleStart,
 		End,
 		TraceType,
 		true,
@@ -70,8 +84,39 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint)
 		FireDebugDuration
 	);
 
+	if (bIsHit)
+	{
+		ARSCharacter* Player = Cast<ARSCharacter>(GetOwner());
+		ARSCharacter* Target = Cast<ARSCharacter>(Hit.GetActor());
+		if (Target && Player)
+		{
+			Player->Attack(Target); // 실제 데미지 함수 호출
+			UE_LOG(LogTemp, Warning, TEXT("attack"));
+		}
+		// Attack 이후에도 유효한지 다시 체크
+		if (IsValid(Target) && Target->IsDead())
+		{
+			Target->Destroy();
+		}
+	}
+
+	if (AmmoInClip > 0)
+	{
+
+
+
+		FRotator Rot = FRotator(0.f, -90.f, 0.f);
+		MuzzleFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			MuzzleFlashSystem, MuzzlePoint, NAME_None,
+			FVector::ZeroVector, Rot,
+			EAttachLocation::SnapToTarget, true);
+
+	}
+	
+	
 	AmmoInClip--;
 }
+
 
 void URSRifleSceneComponent::Reload()
 {
