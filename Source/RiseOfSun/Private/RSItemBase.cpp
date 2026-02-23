@@ -1,21 +1,31 @@
 ﻿#include "RSItemBase.h"
 
+//FRSItemData에 정의된 정보를 담는 실제 객체 클래스 = 아이템 정보만 있는 논리 객체 클래스(두뇌)
+
 URSItemBase::URSItemBase()
 {
     // 필요 시 기본값 세팅 가능
 }
-void URSItemBase::InitializeItem(const FRSItemData& Data)
+
+// 데이터 세팅
+void URSItemBase::SetItemData(const FRSItemData& Data)
 {
     ItemData = Data;
 }
+
+// 공격력 반환
 int32 URSItemBase::GetAttackPower() const
 {
     return ItemData.AttackPower;
 }
+
+// 무기 여부
 bool URSItemBase::IsWeapon() const
 {
     return ItemData.Category == EItemCategory::Weapon;
 }
+
+// 아이템 이름 반환
 FString URSItemBase::GetItemName() const
 {
     return ItemData.ItemName;

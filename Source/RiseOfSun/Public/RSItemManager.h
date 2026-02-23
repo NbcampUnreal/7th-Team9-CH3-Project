@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "RSItemData.h"
+#include "RSItemBase.h"
 #include "UObject/NoExportTypes.h"
 #include "RSItemManager.generated.h"
 
@@ -20,4 +21,6 @@ public:
     /** DataTable에서 ID로 데이터 불러오기 */
     UFUNCTION(BlueprintCallable, Category = "Item")
     FRSItemData GetItemDataByID(FName ItemID) const;
+    UFUNCTION(BlueprintCallable)
+    URSItemBase* SpawnItem(FName ItemID, UObject* Outer);
 };

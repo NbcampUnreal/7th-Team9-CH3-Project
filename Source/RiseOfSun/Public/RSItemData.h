@@ -1,8 +1,7 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "RSItemData.generated.h"
 
 UENUM(BlueprintType)
@@ -22,7 +21,7 @@ enum class EWeaponType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FRSItemData
+struct FRSItemData : public FTableRowBase
 {
     GENERATED_BODY()
 

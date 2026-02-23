@@ -7,6 +7,7 @@
 #include "Engine/Engine.h" //GEngine 사용
 #include "GameFramework/GameUserSettings.h" // UGameUserSettings 헤더 포함
 
+// 전역 매니저를 보관할 클래스
 void URSGameInstance::Init()
 {
     Super::Init();
@@ -54,10 +55,15 @@ void URSGameInstance::Init()
         return;
     }
     // 테스트용 데이터 로드
-    FRSItemData RifleData = ItemManager->GetItemDataByID(FName("Rifle01"));
-    URSItemBase* RifleItem = NewObject<URSItemBase>(this);
-    RifleItem->InitializeItem(RifleData);
-    UE_LOG(LogTemp, Log, TEXT("아이템 이름: %s, 공격력: %d"),
-        *RifleItem->GetItemName(),
-        RifleItem->GetAttackPower());
+    if (ItemManager && ItemManager->ItemDataTable)
+    {
+        //RowName -> 데이터 테이블에서 맞춤
+        URSItemBase* RifleItem = ItemManager->SpawnItem(FName("Rifle"), this);
+        if (RifleItem)
+        {
+            UE_LOG(LogTemp, Log, TEXT("아이템 이름: %s, 공격력: %d"),
+                *RifleItem->GetItemName(),
+                RifleItem->GetAttackPower());
+        }
+    }
 }
