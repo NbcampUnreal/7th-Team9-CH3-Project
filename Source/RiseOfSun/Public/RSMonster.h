@@ -41,6 +41,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* HPWidgetComponent;
 
+<<<<<<< feature/Player/bullet
+
+	UPROPERTY(EditAnywhere, Category = "AttackAnim")
+	class UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "DieAnim")
+	class UAnimMontage* DieMontage;
+=======
 	// 추가: 데미지 UI 타이머 핸들
 	FTimerHandle DamageUITimerHandle;
+>>>>>>> develop
 };

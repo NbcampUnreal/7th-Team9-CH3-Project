@@ -10,7 +10,6 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RSRifleSceneComponent.h"
-
 #include "Components/StaticMeshComponent.h"
 
 #include "Components/SceneComponent.h"
@@ -18,6 +17,9 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "RSPlayerController.h"
+
+#include "Kismet/KismetSystemLibrary.h"
 
 ARSPlayer::ARSPlayer()
 {
@@ -179,6 +181,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ARSPlayer::Fire);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ARSPlayer::StopFire);
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
@@ -225,12 +228,45 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(-LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
 }
 
-void ARSPlayer::Fire(const FInputActionValue& Value)
+
+void ARSPlayer::HandleFire()
 {
 	
-		RifleComp->Fire(MuzzlePoint, MuzzleFlashSystem);
-		
+		AimStart();
+
+		if (!RifleComp || !bHasAimPoint)
+		{
+			return;
+		}
+		RifleComp->Fire(MuzzlePoint, MuzzleFlashSystem, LastAimPoint);
+
+
 	
+
+}
+void ARSPlayer::Fire(const FInputActionValue& Value)
+{
+	if (bIsFiring) 
+	{
+		return;
+	}
+	bIsFiring = true;
+
+	HandleFire();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FireTimerHandle,
+		this,
+		&ARSPlayer::HandleFire,
+		FireInterval,
+		true
+	);
+}
+
+void ARSPlayer::StopFire(const FInputActionValue& Value)
+{
+	bIsFiring = false;
+	GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
 }
 
 //에임 구현 미정
@@ -271,4 +307,66 @@ void ARSPlayer::LevelUp()
 	);
 
 	UE_LOG(LogTemp, Warning, TEXT("Level Up! Current Level: %d"), Level);
+}
+
+void ARSPlayer::AimStart()
+{
+	ARSPlayerController* PlayerController = Cast<ARSPlayerController>(GetController());
+	if (!PlayerController)
+	{
+		bHasAimPoint = false;
+		return;
+	}
+	
+		//마우스로 위치 가져오기
+		//PlayerController->GetMousePosition();
+		//뷰포트 크기 가져오기
+		int32 SizeX, SizeY;
+		
+		PlayerController->GetViewportSize(SizeX, SizeY);
+		float ScreenX = SizeX * 0.5f;
+		float ScreenY = SizeY * 0.5f;
+		UE_LOG(LogTemp, Warning, TEXT("Viewport: %d %d"), SizeX, SizeY);
+		FVector CamStart = FVector::ZeroVector;
+		FVector CamDirection = FVector::ForwardVector;
+
+		const bool bDeprojectOK = PlayerController->DeprojectScreenPositionToWorld(
+			ScreenX,
+			ScreenY,
+			CamStart,
+			CamDirection
+		);
+		if (!bDeprojectOK) return;
+
+		UE_LOG(LogTemp, Warning, TEXT("Deproject OK=%d Screen(%.1f, %.1f) CamStart=%s CamDir=%s"),
+			bDeprojectOK, ScreenX, ScreenY, *CamStart.ToString(), *CamDirection.ToString());
+
+		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(CamTraceChannel);
+
+		TArray<AActor*> ActorsToIgnore;
+		ActorsToIgnore.Add(this);
+
+		const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
+
+		FVector TraceStart = CamStart;
+		FVector TraceEnd = CamStart + (CamDirection * CamRange);
+
+		FHitResult Hit;
+
+		const bool bIsHit = UKismetSystemLibrary::LineTraceSingle(
+			GetWorld(),
+			TraceStart,
+			TraceEnd,
+			TraceType,
+			true,
+			ActorsToIgnore,
+			DrawDebugType,
+			Hit,
+			true,
+			FLinearColor::Red,
+			FLinearColor::Green,
+			FireDebugDuration
+		);
+		LastAimPoint = bIsHit ? Hit.ImpactPoint : TraceEnd;
+		bHasAimPoint = true;
 }

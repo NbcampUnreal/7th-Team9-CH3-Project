@@ -23,8 +23,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float FireDebugDuration = 1.0f;
-
-	float ReloadDuration = 3.0f;
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	float ReloadDuration = 0.1f;
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	int32 AmmoInClip = 30;
 
@@ -33,6 +33,10 @@ public:
 
 	bool bCanFire = true;
 
+	bool bWantsToFire = false;
+
+	UPROPERTY()
+	TObjectPtr<class UNiagaraComponent> MuzzleFXComp;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -43,7 +47,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Fire(USceneComponent* MuzzlePoint, class UNiagaraSystem* MuzzleFlashSystem);
+	void Fire(USceneComponent* MuzzlePoint, class UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd);
+
+
 
 	void Reload();
 

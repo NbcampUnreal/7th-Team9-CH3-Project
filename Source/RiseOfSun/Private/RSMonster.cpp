@@ -50,10 +50,23 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
 {
     if (!CanAttack(Target)) return FDamageResult();
     FDamageResult result = ARSCharacter::Attack(Target);
+<<<<<<< feature/Player/bullet
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+    if (AnimInstance)
+    {
+        if (AttackMontage)
+        {
+            AnimInstance->Montage_Play(AttackMontage);
+        }
+    }
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Monster Attack")));
+=======
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Monster Attack")));
     }
+>>>>>>> develop
     return result;
 }
 
