@@ -46,6 +46,7 @@ private:
 	void Look(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
 	void Aim(const FInputActionValue& Value);
+    void Shoot();
     void Reloading(const FInputActionValue& Value);
     void LevelUp();
 
@@ -68,6 +69,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Input")
     class UInputAction* ReloadingAction;
+
+    UPROPERTY(VisibleAnywhere, Category = "Input")
+    class UInputAction* ShootingAction;
 
 
 	// HUD 업데이트 위해 PlayerHUD 참조

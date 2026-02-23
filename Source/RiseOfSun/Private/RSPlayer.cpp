@@ -86,6 +86,12 @@ ARSPlayer::ARSPlayer()
 		ReloadingAction = InputReloading.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputShooting(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Shooting.IA_Shooting'"));
+	if (InputShooting.Object != nullptr)
+	{
+		ShootingAction = InputShooting.Object;
+	}
+
 	RifleComp = CreateDefaultSubobject<URSRifleSceneComponent>(TEXT("RifleComp"));
 	RifleComp->SetupAttachment(RootComponent);
 
@@ -172,6 +178,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ARSPlayer::Fire);
+	EnhancedInputComponent->BindAction(ShootingAction, ETriggerEvent::Started, this, &ARSPlayer::Shoot);
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
@@ -216,6 +223,11 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddControllerYawInput(LookAxisVector.X * GetWorld()->DeltaTimeSeconds * mouseSpeed);
 	AddControllerPitchInput(-LookAxisVector.Y * GetWorld()->DeltaTimeSeconds * mouseSpeed);
+}
+
+void ARSPlayer::Shoot()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Shootmode"));
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)
