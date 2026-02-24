@@ -23,6 +23,12 @@ FRSItemData URSItemManager::GetItemDataByID(FName ItemID) const
 
 URSItemBase* URSItemManager::SpawnItem(FName ItemID, UObject* Outer) 
 {
+    if (!ItemDataTable)
+    {
+        UE_LOG(LogTemp, Error, TEXT("데이터 테이블 없음!"));
+        return nullptr;
+    }
+
     FRSItemData Data = GetItemDataByID(ItemID);
     if (!Data.IsValidItem())
     {

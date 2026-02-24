@@ -16,38 +16,29 @@ ARSBaseItem::ARSBaseItem()
 	RootComponent = Mesh;
 }
 
-void ARSBaseItem::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void ARSBaseItem::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 // 데이터 초기화
 void ARSBaseItem::InitializeItem(const FRSItemData& Data)
 {
-    if (!ItemInstance)
-    {
-        ItemInstance = NewObject<URSItemBase>(this);
-    }
-
-    ItemInstance->SetItemData(Data);
+	ItemData = Data;
 }
 
 // 이름 반환
 FString ARSBaseItem::GetItemName() const
 {
-    return ItemInstance ? ItemInstance->GetItemName() : FString("None");
+	if (ItemData.IsValidItem())
+	{
+		return ItemData.ItemName;
+	}
+	return FString("None");
 }
 
 // 공격력 반환
 int32 ARSBaseItem::GetAttackPower() const
 {
-    return ItemInstance ? ItemInstance->GetAttackPower() : 0;
+	if (ItemData.IsValidItem())
+	{
+		return ItemData.AttackPower;
+	}
+	return 0;
 }
 
