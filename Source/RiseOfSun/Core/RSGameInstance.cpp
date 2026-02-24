@@ -3,9 +3,9 @@
 
 #include "RSGameInstance.h"
 #include "RSItemManager.h"
-#include "RSItemBase.h"
 #include "Engine/Engine.h" //GEngine 사용
 #include "GameFramework/GameUserSettings.h" // UGameUserSettings 헤더 포함
+#include "Item/RSItemBase.h"
 
 // 전역 매니저를 보관할 클래스
 void URSGameInstance::Init()

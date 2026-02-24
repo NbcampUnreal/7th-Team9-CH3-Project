@@ -2,12 +2,12 @@
 
 
 #include "RSGameMode.h"
-#include "RSPlayer.h"
-#include "RSPlayerController.h"
+
+#include "Actor/Character/RSPlayer.h"
+#include "Actor/Character/Controller/RSPlayerController.h"
 
 ARSGameMode::ARSGameMode()
 {
-	
 	static ConstructorHelpers::FClassFinder<ARSPlayer>
 		PlayerCharacter(TEXT("/Script/Engine.Blueprint'/Game/BluePrint/Character/BP_RSPlayer.BP_RSPlayer_C'"));
 	

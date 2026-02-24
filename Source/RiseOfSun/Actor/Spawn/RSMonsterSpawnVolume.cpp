@@ -1,5 +1,8 @@
 ﻿#include "RSMonsterSpawnVolume.h"
+
+#include "Actor/Character/RSMonster.h"
 #include "Components/BoxComponent.h"
+#include "Data/MonsterSpawnRow.h"
 
 ARSMonsterSpawnVolume::ARSMonsterSpawnVolume()
 {
@@ -65,6 +68,11 @@ void ARSMonsterSpawnVolume::OnMonsterDestroyed(AActor* DestroyedActor)
 	{
 		LevelUp();
 	}
+}
+
+FMonsterSpawnRow* ARSMonsterSpawnVolume::GetRandomMonster() const
+{
+	return nullptr;
 }
 
 void ARSMonsterSpawnVolume::SpawnMonster(TSubclassOf<ARSMonster> MonsterClass)

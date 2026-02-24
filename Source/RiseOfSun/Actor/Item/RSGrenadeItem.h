@@ -6,9 +6,7 @@
 #include "RSBaseItem.h"
 #include "RSGrenadeItem.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class RISEOFSUN_API ARSGrenadeItem : public ARSBaseItem
 {

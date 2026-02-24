@@ -1,10 +1,11 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "MonsterSpawnRow.h"
 #include "GameFramework/Actor.h"
-#include "RSMonster.h"
 #include "RSMonsterSpawnVolume.generated.h"
+
+class ARSMonster;
+struct FMonsterSpawnRow;
 
 UCLASS()
 class RISEOFSUN_API ARSMonsterSpawnVolume : public AActor

@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "RSItemData.h"
-#include "UObject/NoExportTypes.h"
+#include "Data/RSItemData.h"
 #include "RSItemBase.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)

@@ -1,6 +1,7 @@
 ﻿#include "RSPlayerHUD.h"
+
+#include "Actor/Character/RSPlayer.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 void URSPlayerHUD::NativeConstruct()
 {

@@ -3,6 +3,8 @@
 //실제 객체를 담는 클래스(월드에 존재하는 아이템)(몸통)
 #include "RSBaseItem.h"
 
+#include "Item/RSItemBase.h"
+
 ARSBaseItem::ARSBaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;

@@ -2,9 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "RSItemData.h"
-#include "RSItemBase.h"
-#include "UObject/NoExportTypes.h"
 #include "RSItemManager.generated.h"
 
 //아이템 데이터를 전역적으로 관리하는 매니저 클래스

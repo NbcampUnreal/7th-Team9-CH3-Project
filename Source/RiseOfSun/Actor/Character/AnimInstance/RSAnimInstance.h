@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "RSAniminstance.generated.h"
+#include "RSAnimInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RISEOFSUN_API URSAniminstance : public UAnimInstance
+class RISEOFSUN_API URSAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	

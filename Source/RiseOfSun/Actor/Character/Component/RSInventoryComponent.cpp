@@ -1,5 +1,6 @@
 ﻿#include "RSInventoryComponent.h"
-#include "RSBaseItem.h"
+
+#include "Actor/Item/RSBaseItem.h"
 
 URSInventoryComponent::URSInventoryComponent()
 {

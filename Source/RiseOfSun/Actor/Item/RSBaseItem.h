@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RSItemBase.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "RSBaseItem.generated.h"
+
+struct FRSItemData;
+class URSItemBase;
 
 UCLASS()
 class RISEOFSUN_API ARSBaseItem : public AActor

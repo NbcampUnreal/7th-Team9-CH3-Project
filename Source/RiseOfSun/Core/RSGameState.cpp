@@ -2,7 +2,6 @@
 
 
 #include "RSGameState.h"
-#include "RSPlayer.h"
 
 ARSGameState::ARSGameState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

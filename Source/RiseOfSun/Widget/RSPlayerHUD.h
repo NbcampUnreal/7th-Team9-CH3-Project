@@ -2,8 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSPlayer.h"
 #include "RSPlayerHUD.generated.h"
+
+class ARSPlayer;
 
 UCLASS()
 class RISEOFSUN_API URSPlayerHUD : public UUserWidget

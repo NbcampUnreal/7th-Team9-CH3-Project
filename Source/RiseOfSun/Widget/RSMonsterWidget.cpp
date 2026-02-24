@@ -2,7 +2,8 @@
 
 
 #include "RSMonsterWidget.h"
-#include "RSMonster.h"
+
+#include "Actor/Character/RSMonster.h"
 
 void URSMonsterWidget::SetOwnerMonster(ARSMonster* NewOwner)
 {

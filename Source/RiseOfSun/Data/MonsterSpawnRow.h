@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "RSMonster.h"
 #include "MonsterSpawnRow.generated.h"
+
+class ARSMonster;
 
 USTRUCT(BlueprintType)
 struct FMonsterSpawnRow : public FTableRowBase

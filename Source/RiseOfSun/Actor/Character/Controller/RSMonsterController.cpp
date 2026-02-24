@@ -1,6 +1,6 @@
 ﻿#include "RSMonsterController.h"
 #include "Kismet/GameplayStatics.h"
-#include "RSMonster.h"
+#include "Actor/Character/RSMonster.h"
 
 ARSMonsterController::ARSMonsterController()
 {

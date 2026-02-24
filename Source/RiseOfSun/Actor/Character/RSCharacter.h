@@ -12,7 +12,11 @@ struct FDamageResult
 	GENERATED_BODY()
 
 	int32 Damage;
+	
+	UPROPERTY()
 	ACharacter* Attacker;
+	
+	UPROPERTY()
 	ACharacter* Target;
 };	
 

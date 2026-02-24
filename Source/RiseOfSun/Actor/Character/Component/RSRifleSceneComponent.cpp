@@ -2,14 +2,13 @@
 
 
 #include "RSRifleSceneComponent.h"
-#include "RSCharacter.h"
-#include "RSPlayer.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Actor/Character/RSCharacter.h"
 
 // Sets default values for this component's properties
 URSRifleSceneComponent::URSRifleSceneComponent()

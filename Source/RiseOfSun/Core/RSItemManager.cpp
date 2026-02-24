@@ -1,5 +1,7 @@
 ﻿#include "RSItemManager.h"
-#include "RSItemBase.h"
+
+#include "Data/RSItemData.h"
+#include "Item/RSItemBase.h"
 
 //정보제공 아이템 관리자 클래스 
 FRSItemData URSItemManager::GetItemDataByID(FName ItemID) const
