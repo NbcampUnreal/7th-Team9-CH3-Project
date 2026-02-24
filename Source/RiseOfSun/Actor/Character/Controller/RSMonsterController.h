@@ -27,18 +27,18 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 private:
-	AIState CurrentState = AIState::Idle;
 	void ChangeState(AIState NewState);
 
 	void TickChase(float DeltaTime);
 	void TickAttack(float DeltaTime);
+	bool IsPlayerInRange(float Range) const;
 
+	AIState CurrentState = AIState::Idle;
+	
 	UPROPERTY()
 	APawn* TargetPlayer = nullptr;
 
 	//float AttackRadius = 5.f;
 	float AttackCooldown = 2.0f;
 	float LastAttackTime = -9999.0f;
-
-	bool IsPlayerInRange(float Range) const;
 };

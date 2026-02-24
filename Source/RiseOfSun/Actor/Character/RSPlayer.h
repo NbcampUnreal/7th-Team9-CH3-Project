@@ -133,7 +133,7 @@ public:
 
 	// 라이플 컴포넌트 클래스 참조 (BP에서 설정 가능)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
-    TObjectPtr<class URSRifleSceneComponent> RifleComp;
+    TObjectPtr<class URSRifleComponent> RifleComp;
 
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")

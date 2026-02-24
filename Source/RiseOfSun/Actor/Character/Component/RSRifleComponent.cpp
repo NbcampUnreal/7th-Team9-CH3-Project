@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSRifleSceneComponent.h"
+#include "RSRifleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
@@ -11,32 +11,12 @@
 #include "Actor/Character/RSCharacter.h"
 
 // Sets default values for this component's properties
-URSRifleSceneComponent::URSRifleSceneComponent()
+URSRifleComponent::URSRifleComponent()
 {
-
 	PrimaryComponentTick.bCanEverTick = true;
-
-
 }
 
-
-void URSRifleSceneComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-
-
-}
-
-
-void URSRifleSceneComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-
-}
-
-void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd)
+void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd)
 {
 	if (AmmoInClip <= 0)
 	{
@@ -44,28 +24,23 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* 
 		bCanFire = false;
 		return;
 	}
+
 	bCanFire = true;
 	const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(WeaponTraceChannel);
 
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
-
-
 	const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
 
-
-
 	FVector MuzzleStart = MuzzlePoint->GetComponentLocation();
-
 	FVector FIreDirection = AimEnd - MuzzleStart;
-	if(!FIreDirection.Normalize())
+	if (!FIreDirection.Normalize())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Fire Direction"));
 		return;
 	}
 
 	FVector End = MuzzleStart + (FIreDirection * FireRange);
-
 	FHitResult Hit;
 
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingle(
@@ -87,6 +62,7 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* 
 	{
 		ARSCharacter* Player = Cast<ARSCharacter>(GetOwner());
 		ARSCharacter* Target = Cast<ARSCharacter>(Hit.GetActor());
+		
 		if (Target && Player)
 		{
 			Player->Attack(Target); // 실제 데미지 함수 호출
@@ -99,25 +75,17 @@ void URSRifleSceneComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* 
 		}
 	}
 
-	if (AmmoInClip > 0)
-	{
+	FRotator Rot = FRotator(0.f, -90.f, 0.f);
+	MuzzleFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		MuzzleFlashSystem, MuzzlePoint, NAME_None,
+		FVector::ZeroVector, Rot,
+		EAttachLocation::SnapToTarget, true);
 
-
-
-		FRotator Rot = FRotator(0.f, -90.f, 0.f);
-		MuzzleFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			MuzzleFlashSystem, MuzzlePoint, NAME_None,
-			FVector::ZeroVector, Rot,
-			EAttachLocation::SnapToTarget, true);
-
-	}
-	
-	
 	AmmoInClip--;
 }
 
 
-void URSRifleSceneComponent::Reload()
+void URSRifleComponent::Reload()
 {
 	if (bIsReloading)
 	{
@@ -132,17 +100,15 @@ void URSRifleSceneComponent::Reload()
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
 		this,
-		&URSRifleSceneComponent::ReloadComplete,
+		&URSRifleComponent::ReloadComplete,
 		ReloadDuration,
 		false
 	);
 }
 
-void URSRifleSceneComponent::ReloadComplete()
+void URSRifleComponent::ReloadComplete()
 {
 	AmmoInClip = 30;
 	bCanFire = true;
 	bIsReloading = false;
-
-
 }

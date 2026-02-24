@@ -36,12 +36,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Die();
+	
 	//죽었나 확인
 	bool IsDead() { return Stat.CurrentHealth <= 0; }
+	
+	//현재 HP와 최대 HP를 반환하는 함수
+	UFUNCTION(BlueprintPure)
+	float GetCurrentHP() const { return Stat.CurrentHealth; }
 
-	// 스탯
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")
-	FRSStat Stat;
+	UFUNCTION(BlueprintPure)
+	float GetMaxHP() const { return Stat.MaxHealth; }
 
 	// 공격 
 	virtual FDamageResult Attack(ARSCharacter* Target);
@@ -49,10 +53,7 @@ public:
 	// 받는 피해
 	int32 HitDamage(int32 DamageAmount);
 
-	//현재 HP와 최대 HP를 반환하는 함수
-	UFUNCTION(BlueprintPure)
-	float GetCurrentHP() const { return Stat.CurrentHealth; }
-
-	UFUNCTION(BlueprintPure)
-	float GetMaxHP() const { return Stat.MaxHealth; }
+	// 스탯
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")
+	FRSStat Stat;
 };

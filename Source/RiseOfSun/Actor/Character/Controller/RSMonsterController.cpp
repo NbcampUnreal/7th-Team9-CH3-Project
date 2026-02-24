@@ -13,11 +13,11 @@ void ARSMonsterController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-		{
-			TargetPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	{
+		TargetPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-			ChangeState(AIState::Chase);
-		});
+		ChangeState(AIState::Chase);
+	});
 }
 
 void ARSMonsterController::Tick(float DeltaTime)
@@ -40,9 +40,9 @@ static const TCHAR* StateToText(AIState S)
 {
 	switch (S)
 	{
-	case AIState::Chase:  return TEXT("Chase");
+	case AIState::Chase: return TEXT("Chase");
 	case AIState::Attack: return TEXT("Attack");
-	default:              return TEXT("Unknown");
+	default: return TEXT("Unknown");
 	}
 }
 
@@ -55,7 +55,7 @@ void ARSMonsterController::ChangeState(AIState NewState)
 	CurrentState = NewState;
 
 	UE_LOG(LogTemp, Display, TEXT("[AI] State: %s -> %s"),
-		StateToText(OldState), StateToText(NewState));
+	       StateToText(OldState), StateToText(NewState));
 
 	if (NewState == AIState::Chase)
 	{
@@ -69,7 +69,7 @@ void ARSMonsterController::ChangeState(AIState NewState)
 	if (NewState == AIState::Attack)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("State changed: %d -> %d (ENTER ATTACK)"),
-			(int32)OldState, (int32)NewState);
+		       (int32)OldState, (int32)NewState);
 	}
 
 	switch (NewState)
@@ -78,7 +78,10 @@ void ARSMonsterController::ChangeState(AIState NewState)
 		if (TargetPlayer)
 		{
 			ARSMonster* Monster = Cast<ARSMonster>(GetPawn());
-			if (!Monster) return;
+			if (!Monster)
+			{
+				return;
+			}
 			float Range = Monster->GetAttackRange();
 		}
 		break;
@@ -92,10 +95,16 @@ void ARSMonsterController::ChangeState(AIState NewState)
 
 void ARSMonsterController::TickChase(float DeltaTime)
 {
-	if (!TargetPlayer) return;
+	if (!TargetPlayer)
+	{
+		return;
+	}
 
 	ARSMonster* Monster = Cast<ARSMonster>(GetPawn());
-	if (!Monster) return;
+	if (!Monster)
+	{
+		return;
+	}
 
 	float AttackRange = 10.f;
 	float Range = Monster->GetAttackRange();
@@ -144,7 +153,6 @@ void ARSMonsterController::TickAttack(float DeltaTime)
 		Monster->Attack(AttackTargetPlayer);
 		LastAttackTime = CurrentTime;
 	}
-
 }
 
 bool ARSMonsterController::IsPlayerInRange(float Range) const

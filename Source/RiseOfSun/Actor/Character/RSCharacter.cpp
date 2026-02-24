@@ -8,44 +8,42 @@
 ARSCharacter::ARSCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	Stat.CurrentHealth = Stat.MaxHealth;
 }
 
 // Called when the game starts or when spawned
 void ARSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	Stat.CurrentHealth = Stat.MaxHealth;
 }
 
 void ARSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 
 void ARSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void ARSCharacter::Die()
 {
-	if(bIsDead)
+	if (bIsDead)
 		return;
-	
+
 	bIsDead = true;
 
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
 	SetLifeSpan(2.0f);
-
 }
 
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
-{	// Target이 없으면 리턴
+{
+	// Target이 없으면 리턴
 	if (!IsValid(Target))
 	{
 		return FDamageResult();
@@ -80,14 +78,13 @@ int32 ARSCharacter::HitDamage(int32 DamageAmount)
 
 	// 데미지를 몬스터가 받는다면 UI 띄우기
 	if (Damage > 0)
+	{
+		if (ARSMonster* Monster = Cast<ARSMonster>(this))
 		{
-			ARSMonster* Monster = Cast<ARSMonster>(this);
-			if (Monster)
-			{
-				// 공격자 여부 상관없이 데미지가 들어오면 UI 표시
-				Monster->ShowDamageUI();
-			}
+			// 공격자 여부 상관없이 데미지가 들어오면 UI 표시
+			Monster->ShowDamageUI();
 		}
+	}
+	
 	return Damage;
 }
-

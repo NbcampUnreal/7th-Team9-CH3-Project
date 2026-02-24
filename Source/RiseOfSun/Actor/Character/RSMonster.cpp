@@ -62,8 +62,6 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
         }
     }
 
-  
-
     return result;
 }
 
@@ -130,5 +128,3 @@ void ARSMonster::HideDamageUI()
         HPWidgetComponent->SetVisibility(false);
     }
 }
-
-

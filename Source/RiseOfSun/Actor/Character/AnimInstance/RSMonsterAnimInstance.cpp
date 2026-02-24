@@ -9,6 +9,17 @@ URSMonsterAnimInstance::URSMonsterAnimInstance()
 {
 }
 
+void URSMonsterAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	Owner = Cast<ACharacter>(GetOwningActor());
+
+	if (Owner)
+	{
+		Movement = Owner->GetCharacterMovement();
+	}
+}
 
 void URSMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -22,14 +33,3 @@ void URSMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 }
 
-void URSMonsterAnimInstance::NativeInitializeAnimation()
-{
-	Super::NativeInitializeAnimation();
-
-	Owner = Cast<ACharacter>(GetOwningActor());
-
-	if (Owner)
-	{
-		Movement = Owner->GetCharacterMovement();
-	}
-}

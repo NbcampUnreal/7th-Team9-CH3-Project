@@ -6,7 +6,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "Component/RSInventoryComponent.h"
-#include "Component/RSRifleSceneComponent.h"
+#include "Component/RSRifleComponent.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
@@ -93,7 +93,7 @@ ARSPlayer::ARSPlayer()
 		ShootingAction = InputShooting.Object;
 	}
 
-	RifleComp = CreateDefaultSubobject<URSRifleSceneComponent>(TEXT("RifleComp"));
+	RifleComp = CreateDefaultSubobject<URSRifleComponent>(TEXT("RifleComp"));
 	RifleComp->SetupAttachment(RootComponent);
 
 	RifleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RifleMeshComp"));
