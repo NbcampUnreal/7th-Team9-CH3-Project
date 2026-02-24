@@ -19,14 +19,12 @@ public:
 
 	// 월드 정보
 	UPROPERTY(Transient)
-	class UWorld* World;
+	class UWorld* World = GetWorld();
 	UPROPERTY()
 	class URSInventoryComponent* OwningInventory;
 
 
 protected:
-	virtual void BeginPlay() override;
-
 	//충돌 영역 (픽업 감지용)
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	USphereComponent* Collision;
@@ -38,8 +36,10 @@ protected:
 	//실제 아이템 데이터 객체 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	URSItemBase* ItemInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	FRSItemData ItemData;
 public:	
-	virtual void Tick(float DeltaTime) override;
 
 	//아이템 데이터 초기화 
 	void InitializeItem(const FRSItemData& Data);
