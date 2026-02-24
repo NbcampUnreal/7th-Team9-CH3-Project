@@ -1,45 +1,74 @@
 ﻿#include "RSPlayerHUD.h"
 
 #include "Actor/Character/RSPlayer.h"
+#include "Actor/Character/Component/RSRifleComponent.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
 void URSPlayerHUD::NativeConstruct()
 {
     Super::NativeConstruct();
-	PlayerCharacter = nullptr;
-
     // 플레이어 캐릭터 가져오기
     PlayerCharacter = Cast<ARSPlayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
     if (PlayerCharacter)
     {
-        DisplayHp = PlayerCharacter->GetCurrentHP(); // C++ 플레이어 클래스에 CurrentHp가 있어야 함
-		DisplayEXP = PlayerCharacter->GetCurrentEXP(); // C++ 플레이어 클래스에 CurrentEXP가 있어야 함
-
+        DisplayHp = PlayerCharacter->GetCurrentHP();
+        DisplayEXP = PlayerCharacter->GetCurrentEXP();
+        // EXP 델리게이트 바인딩
         PlayerCharacter->OnEXPChanged.AddDynamic(this, &URSPlayerHUD::OnEXPUpdated);
+        // 탄약 델리게이트 바인딩
+        if (URSRifleComponent* Rifle = PlayerCharacter->FindComponentByClass<URSRifleComponent>())
+        {
+            Rifle->OnAmmoChanged.AddDynamic(this, &URSPlayerHUD::UpdateAmmoText);
+            UpdateAmmoText(Rifle->AmmoInClip, Rifle->MaxAmmoInClip);
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("HUD Constructed: %s"), *GetNameSafe(this));
     }
 }
-
 void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
-
     if (!PlayerCharacter) return;
-
-    // 현재 HP 가져오기
-    float TargetHp = PlayerCharacter->GetCurrentHP();
-
-    // 보간해서 DisplayHp 갱신
-    DisplayHp = FMath::FInterpTo(DisplayHp, TargetHp, InDeltaTime, 7.0f);
-
-    // 현재 EXP 가져오기
-    float TargetEXP = PlayerCharacter->GetCurrentEXP();
-
-    // 보간
-    DisplayEXP = FMath::FInterpTo(DisplayEXP, TargetEXP, InDeltaTime, 7.0f);
+    // Rifle 보정 처리 (뒤늦게 붙었을 때도 델리게이트 자동 등록)
+    static bool bAmmoBound = false;
+    if (!bAmmoBound)
+    {
+        if (URSRifleComponent* Rifle = PlayerCharacter->FindComponentByClass<URSRifleComponent>())
+        {
+            if (Rifle->OnAmmoChanged.IsBound() == false)
+            {
+                Rifle->OnAmmoChanged.AddDynamic(this, &URSPlayerHUD::UpdateAmmoText);
+                UpdateAmmoText(Rifle->AmmoInClip, Rifle->MaxAmmoInClip);
+                bAmmoBound = true;
+            }
+        }
+    }
+    // HP / EXP 보간 갱신
+    DisplayHp = FMath::FInterpTo(DisplayHp, PlayerCharacter->GetCurrentHP(), InDeltaTime, 7.0f);
+    DisplayEXP = FMath::FInterpTo(DisplayEXP, PlayerCharacter->GetCurrentEXP(), InDeltaTime, 7.0f);
 }
-
 void URSPlayerHUD::OnEXPUpdated()
 {
     if (!PlayerCharacter) return;
     DisplayEXP = PlayerCharacter->GetCurrentEXP();
+}
+FText URSPlayerHUD::GetAmmoText() const
+{
+    APawn* Pawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (!Pawn) return FText::FromString("0 / 0");
+
+    URSRifleComponent* Rifle = Pawn->FindComponentByClass<URSRifleComponent>();
+    if (!Rifle) return FText::FromString("0 / 0");
+
+    const FString AmmoString = FString::Printf(TEXT("%d / %d"), Rifle->AmmoInClip, Rifle->MaxAmmoInClip);
+    return FText::FromString(AmmoString);
+}
+void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
+{
+    if (!AmmoTextBlock) return;
+    const FString AmmoString = FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo);
+
+    AmmoTextBlock->SetText(FText::FromString(AmmoString));
+    UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *AmmoString);
 }
