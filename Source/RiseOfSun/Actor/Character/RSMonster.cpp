@@ -1,5 +1,6 @@
 ﻿#include "RSMonster.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Widget/RSMonsterWidget.h"
 
 ARSMonster::ARSMonster()
@@ -69,6 +70,9 @@ void ARSMonster::BeginPlay()
 {
     Super::BeginPlay();
 
+    //몬스터의 기본 속력
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+    
     if (HPWidgetComponent)
     {
         UUserWidget* Widget = HPWidgetComponent->GetUserWidgetObject();
@@ -127,4 +131,41 @@ void ARSMonster::HideDamageUI()
     {
         HPWidgetComponent->SetVisibility(false);
     }
+}
+
+void ARSMonster::RestoreSpeed()
+{
+    if (!GetCharacterMovement())
+    {
+        return;
+    }
+    
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+}
+
+void ARSMonster::SlowEffect()
+{
+    if (!GetCharacterMovement())
+    {
+        return;
+    }
+    
+    GetCharacterMovement()->MaxWalkSpeed = SlowMovementSpeed;
+    
+    GetWorldTimerManager().ClearTimer(SlowTimerHandle);
+    
+    GetWorldTimerManager().SetTimer(
+        SlowTimerHandle,
+        this,
+        &ARSMonster::RestoreSpeed,
+        SlowDuration,
+        false
+    );
+}
+
+void ARSMonster::DamageEffect()
+{
+    Super::DamageEffect();
+    
+    SlowEffect();
 }
