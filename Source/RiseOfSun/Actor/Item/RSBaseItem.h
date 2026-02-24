@@ -6,9 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "Data/RSItemData.h"
 #include "RSBaseItem.generated.h"
 
-struct FRSItemData;
 class URSItemBase;
 
 UCLASS()
@@ -21,7 +21,7 @@ public:
 
 	// 월드 정보
 	UPROPERTY(Transient)
-	class UWorld* World = GetWorld();
+	class UWorld* World;
 	UPROPERTY()
 	class URSInventoryComponent* OwningInventory;
 
