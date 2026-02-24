@@ -1,0 +1,45 @@
+﻿#include "RSPlayerHUD.h"
+
+#include "Actor/Character/RSPlayer.h"
+#include "Kismet/GameplayStatics.h"
+
+void URSPlayerHUD::NativeConstruct()
+{
+    Super::NativeConstruct();
+	PlayerCharacter = nullptr;
+
+    // 플레이어 캐릭터 가져오기
+    PlayerCharacter = Cast<ARSPlayer>(UGameplayStatics::GetPlayerCharacter(this, 0));
+    if (PlayerCharacter)
+    {
+        DisplayHp = PlayerCharacter->GetCurrentHP(); // C++ 플레이어 클래스에 CurrentHp가 있어야 함
+		DisplayEXP = PlayerCharacter->GetCurrentEXP(); // C++ 플레이어 클래스에 CurrentEXP가 있어야 함
+
+        PlayerCharacter->OnEXPChanged.AddDynamic(this, &URSPlayerHUD::OnEXPUpdated);
+    }
+}
+
+void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry, InDeltaTime);
+
+    if (!PlayerCharacter) return;
+
+    // 현재 HP 가져오기
+    float TargetHp = PlayerCharacter->GetCurrentHP();
+
+    // 보간해서 DisplayHp 갱신
+    DisplayHp = FMath::FInterpTo(DisplayHp, TargetHp, InDeltaTime, 7.0f);
+
+    // 현재 EXP 가져오기
+    float TargetEXP = PlayerCharacter->GetCurrentEXP();
+
+    // 보간
+    DisplayEXP = FMath::FInterpTo(DisplayEXP, TargetEXP, InDeltaTime, 7.0f);
+}
+
+void URSPlayerHUD::OnEXPUpdated()
+{
+    if (!PlayerCharacter) return;
+    DisplayEXP = PlayerCharacter->GetCurrentEXP();
+}
