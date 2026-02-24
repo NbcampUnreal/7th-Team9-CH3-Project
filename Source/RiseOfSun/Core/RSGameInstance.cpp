@@ -49,20 +49,21 @@ void URSGameInstance::Init()
         nullptr,
         TEXT("/Game/Data/DT_ItemData.DT_ItemData")
     );
-    if (ItemManager) 
+    if (!ItemManager->ItemDataTable)
     {
+        UE_LOG(LogTemp, Error, TEXT("아이템 데이터 테이블 로드 실패!"));
+        return;
+    }
+    // 테스트용 데이터 로드
+    if (ItemManager && ItemManager->ItemDataTable)
+    {
+        //RowName -> 데이터 테이블에서 맞춤
         URSItemBase* RifleItem = ItemManager->SpawnItem(FName("Rifle"), this);
         if (RifleItem)
         {
             UE_LOG(LogTemp, Log, TEXT("아이템 이름: %s, 공격력: %d"),
                 *RifleItem->GetItemName(),
                 RifleItem->GetAttackPower());
-        }
-
-        if (!ItemManager->ItemDataTable)
-        {
-            UE_LOG(LogTemp, Error, TEXT("아이템 데이터 테이블 로드 실패!"));
-            return;
         }
     }
 }
