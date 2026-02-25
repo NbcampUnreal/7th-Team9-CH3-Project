@@ -76,7 +76,7 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 		// Attack 이후에도 유효한지 다시 체크
 		if (IsValid(Target) && Target->IsDead())
 		{
-			Target->Destroy();
+			Target->Die();
 		}
 	}
 

@@ -39,6 +39,11 @@ ARSMonster::ARSMonster()
 
 bool ARSMonster::CanAttack(ACharacter* Target)
 {
+    if (bIsDead)
+    {
+        return false;
+    }
+    
     if (!Target) return false;
 
     FVector ActorLocation = GetActorLocation();  //몬스터 위치
@@ -178,5 +183,16 @@ void ARSMonster::DamageEffect()
             GetActorLocation(),
             GetActorRotation()
             );
+    }
+}
+
+void ARSMonster::Die()
+{
+    Super::Die();
+    
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (DieMontage)
+    {
+        AnimInstance->Montage_Play(DieMontage);
     }
 }

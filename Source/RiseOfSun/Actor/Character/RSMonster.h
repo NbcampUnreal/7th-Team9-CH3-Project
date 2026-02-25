@@ -41,7 +41,7 @@ public:
 	virtual FDamageResult Attack(ARSCharacter* Target) override;;
 	//몬스터가 피해를 입으면 발동하는 효과
 	virtual void DamageEffect() override;
-	
+	virtual void Die()override;
 	float GetAttackRange() const { return AttackRange; }
 
 	//몬스터의 기본 속도
@@ -59,7 +59,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	
+
 private:
 	float AttackRange;
 

@@ -37,8 +37,8 @@ void ARSCharacter::Die()
 	bIsDead = true;
 
 	SetActorEnableCollision(false);
-	SetActorHiddenInGame(true);
-	SetLifeSpan(2.0f);
+	
+	SetLifeSpan(1.8f);
 }
 
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
