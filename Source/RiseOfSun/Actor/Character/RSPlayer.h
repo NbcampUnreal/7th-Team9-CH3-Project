@@ -150,4 +150,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Items")
     void UseItem(class URSItemBase* Item);
+    
+	UPROPERTY(EditAnywhere, Category = "Reload")
+	class UAnimMontage* ReloadMontage;
 };

@@ -99,6 +99,8 @@ ARSPlayer::ARSPlayer()
 
 	RifleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RifleMeshComp"));
 	RifleMeshComp->SetupAttachment(RifleComp);
+	
+
 
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
@@ -112,9 +114,9 @@ ARSPlayer::ARSPlayer()
 		
 		
 		//총을 손에 붙이기
-		/*RifleComp->SetupAttachment(GetMesh(), FName("hand_rSocket"));*/
-		RifleComp->SetRelativeLocation(FVector(0, 0, 0));
-		RifleComp->SetRelativeRotation(FRotator(0, 0, 0));
+		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("riflesocket"));
+		//RifleComp->SetRelativeLocation(FVector(0, 0, 0));
+		//RifleMeshComp->SetRelativeRotation(FRotator(0, 0, 0));
 	}
 	//---------- EXP 초기값 ----------
 	Level = 1;
@@ -303,6 +305,15 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (ReloadMontage)
+		{
+			AnimInstance->Montage_Play(ReloadMontage);
+		}
+	}
 	RifleComp->Reload();
 }
 void ARSPlayer::AddEXP(float  ExpAmount)
