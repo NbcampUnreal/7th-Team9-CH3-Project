@@ -37,7 +37,7 @@ protected:
     class UCameraComponent* Camera;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-    class URSInventoryComponent* Inventory;
+    class URSInventoryComponent* InventoryComponent;
 
     
 
@@ -138,6 +138,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     TObjectPtr<class URSRifleComponent> RifleComp;
 
+    UUserWidget* GetPlayerHUD() const { return PlayerHUD; }
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
 	TObjectPtr<class UStaticMeshComponent> RifleMeshComp;
@@ -147,9 +148,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     class UNiagaraSystem* MuzzleFlashSystem;
-
-    UFUNCTION(BlueprintCallable, Category = "Items")
-    void UseItem(class URSItemBase* Item);
     
 	UPROPERTY(EditAnywhere, Category = "Reload")
 	class UAnimMontage* ReloadMontage;

@@ -2,10 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/RSItemData.h"
 #include "RSInventoryComponent.generated.h"
 
-// UI 업데이트
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
+USTRUCT(BlueprintType)
+struct FInventorySlot
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory Slot")
+	FName ItemID;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RISEOFSUN_API URSInventoryComponent : public UActorComponent
@@ -15,26 +22,27 @@ class RISEOFSUN_API URSInventoryComponent : public UActorComponent
 public:	
 	URSInventoryComponent();
 
-	// 아이템 추가
-	bool AddItem(class URSItemBase* Item);
-	// 아이템 제거
-	bool RemoveItem(class URSItemBase* Item);
-	// 기본적으로 주어지는 아이템
-	UPROPERTY(EditDefaultsOnly, Instanced)
-	TArray<class URSItemBase*> DefaultItems;
-	// 아이템 개수
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
-	int32 Capacity;
-	UPROPERTY(BlueprintAssignable, Category = "Inventory")
-	FOnInventoryUpdated OnInventoryUpdated;
-	// 인벤토리에 있는 아이템
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-	TArray<class URSItemBase*> Items;
-
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
+public:
+	// 아이템슬롯을 TArray배열로 만들어서 여러 슬롯을 가진 아이템 배열 완성
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Inventory")
+	TArray<FInventorySlot> Items;
+	
+	// 인벤토리 크기
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 InventorySize = 10;
 
+	// 인벤토리를 시각화 하기위해서 어떤 위젯을 사용할지 담는 변수
+	UPROPERTY(EditAnywhere, Category = "Inventory|UI")
+	TSubclassOf<UUserWidget> InventoryWidgetClass;
+	
+	// 우리가 아까 만든 데이터 테이블을 저장할 변수 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory|UI")
+	UDataTable* ItemDataTable;
 
+	// 아이템 줍는 함수, 위젯 블루프린트에서 호출(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItem(FName ItemID);
 };
