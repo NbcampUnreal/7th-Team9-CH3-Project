@@ -16,6 +16,12 @@ public:
 	ARSGrenadeItem();
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Grenade")
+	UParticleSystem* ExplosionEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Grenade")
+	USoundBase* ExplosionSound;
+
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp,
 		AActor* OtherActor,
