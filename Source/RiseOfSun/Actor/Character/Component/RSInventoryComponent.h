@@ -16,12 +16,12 @@ public:
 	URSInventoryComponent();
 
 	// 아이템 추가
-	bool AddItem(class ARSBaseItem* Item);
+	bool AddItem(class URSItemBase* Item);
 	// 아이템 제거
-	bool RemoveItem(class ARSBaseItem* Item);
+	bool RemoveItem(class URSItemBase* Item);
 	// 기본적으로 주어지는 아이템
 	UPROPERTY(EditDefaultsOnly, Instanced)
-	TArray<class ARSBaseItem*> DefaultItems;
+	TArray<class URSItemBase*> DefaultItems;
 	// 아이템 개수
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
 	int32 Capacity;
@@ -29,7 +29,7 @@ public:
 	FOnInventoryUpdated OnInventoryUpdated;
 	// 인벤토리에 있는 아이템
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-	TArray<class ARSBaseItem*> Items;
+	TArray<class URSItemBase*> Items;
 
 protected:
 	// Called when the game starts

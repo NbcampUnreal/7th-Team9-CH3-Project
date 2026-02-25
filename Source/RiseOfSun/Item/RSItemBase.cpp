@@ -4,7 +4,8 @@
 
 URSItemBase::URSItemBase()
 {
-    // 필요 시 기본값 세팅 가능
+    ItemDisplayName = FText::FromString("Item");
+    UseActionText = FText::FromString("Use");
 }
 
 // 데이터 세팅
