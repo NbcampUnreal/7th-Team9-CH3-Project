@@ -16,6 +16,7 @@
 #include "Controller/RSPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Item/RSItemBase.h"
+#include <Widget/RSPlayerHUD.h>
 
 ARSPlayer::ARSPlayer()
 {
@@ -105,9 +106,6 @@ ARSPlayer::ARSPlayer()
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
 
-	Inventory = CreateDefaultSubobject<URSInventoryComponent>("Inventory");
-	Inventory->Capacity = 20;
-
 
 	if (RifleComp)
 	{
@@ -144,7 +142,7 @@ void ARSPlayer::BeginPlay()
 
 	if (HUDWidgetclass)
 	{
-		PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		PlayerHUD = CreateWidget<URSPlayerHUD>(GetWorld(), HUDWidgetclass);
 
 		if (PlayerHUD)
 		{
@@ -255,23 +253,12 @@ void ARSPlayer::HandleFire()
 	
 
 }
+
 void ARSPlayer::ToggleInventoryInput()
 {
-	/*if (HUDWidgetclass)
-	{
-		FName const FunctionName = TEXT("ToggleInventoryWindow");
 
-		if (UFunction* Function = 	)
-	}*/
 }
-void ARSPlayer::UseItem(URSItemBase* Item)
-{
-	if (Item)
-	{
-		Item->Use(this);
-		Item->OnUse(this);
-	}
-}
+
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
 	if (bIsFiring) 

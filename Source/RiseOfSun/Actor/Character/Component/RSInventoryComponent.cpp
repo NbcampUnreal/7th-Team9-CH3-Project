@@ -1,88 +1,47 @@
 ﻿#include "RSInventoryComponent.h"
 #include "Item/RSItemBase.h"
+#include "Blueprint/UserWidget.h"
+#include "Actor/Character/RSPlayer.h"
 
 URSInventoryComponent::URSInventoryComponent()
 {
-	Capacity = 20;
-
+    PrimaryComponentTick.bCanEverTick = false;
 }
-
-bool URSInventoryComponent::AddItem(URSItemBase* Item)
-{	
-	//널 포인터 방지
-	if (!Item)
-		return false;
-
-	int32 RemainingStack = Item->StackCount;
-
-	// ① 기존 슬롯 먼저 채우기 (이중 for 제거)
-	for (URSItemBase* ExistingItem : Items)
-	{
-		if (!ExistingItem)
-			continue;
-
-		if (ExistingItem->GetItemID() == Item->GetItemID() &&
-			ExistingItem->IsStackable())
-		{
-			int32 MaxStack = ExistingItem->ItemData.MaxStack;
-			int32 SpaceLeft = MaxStack - ExistingItem->StackCount;
-
-			if (SpaceLeft <= 0)
-				continue;
-
-			int32 AddAmount = FMath::Min(SpaceLeft, RemainingStack);
-
-			ExistingItem->StackCount += AddAmount;
-			RemainingStack -= AddAmount;
-
-			if (RemainingStack <= 0)
-			{
-				OnInventoryUpdated.Broadcast();
-				return true;
-			}
-		}
-	}
-
-	// 인벤토리 용량 제한, 아이템인지 확인
-	if (Items.Num() >= Capacity || !Item)
-	{
-		return false;
-	}
-
-	Item->OwningInventory = this;
-	Item->World = GetWorld();
-	Items.Add(Item);
-
-	OnInventoryUpdated.Broadcast();
-
-	return true;
-}
-
-bool URSInventoryComponent::RemoveItem(URSItemBase* Item)
-{
-	if (Item)
-	{
-		Item->OwningInventory = nullptr;
-		Item->World = nullptr;
-		Items.RemoveSingle(Item);
-		OnInventoryUpdated.Broadcast();
-		return true;
-	}
-	return false;
-}
-
-
 
 void URSInventoryComponent::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	for (auto& Item : DefaultItems)
-	{
-		AddItem(Item);
-	}
+    Items.SetNum(InventorySize); // 인벤토리 크기를 InventorySize인 10만큼 생성합니다
+
 
 }
 
+void URSInventoryComponent::AddItem(FName ItemID)
+{
+    if (ItemID == NAME_None)
+    {
+        return;
+    }
 
+    for (int32 i = 0; i < Items.Num(); i++)
+    {
+        if (Items[i].ItemID == NAME_None)
+        {
+            Items[i].ItemID = ItemID;
 
+            if (GEngine)
+            {
+                FString const Msg = FString::Printf(TEXT("아이템 저장! [ %d번 ] 슬롯에 [ %s ] 저장!"), i, *ItemID.ToString());
+                GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, Msg);
+            }
+
+            return;
+        }
+    }
+
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("[비상!] 인벤토리가 모두 찼습니다!"));
+    }
+}

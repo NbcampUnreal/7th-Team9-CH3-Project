@@ -4,8 +4,7 @@
 
 URSItemBase::URSItemBase()
 {
-    ItemDisplayName = FText::FromString("Item");
-    UseActionText = FText::FromString("Use");
+    
 }
 
 // 데이터 세팅
