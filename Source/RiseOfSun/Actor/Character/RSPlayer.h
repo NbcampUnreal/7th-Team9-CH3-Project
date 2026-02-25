@@ -58,7 +58,7 @@ private:
 	//카메라 중앙에 조준점 계산함수
     void AimStart();
     void HandleFire();
-
+    void ToggleInventoryInput();
 
 
 
@@ -88,6 +88,9 @@ private:
 	// HUD 업데이트 위해 PlayerHUD 참조
     UPROPERTY()
     UUserWidget* PlayerHUD;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction* InventoryAction;
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -145,6 +148,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     class UNiagaraSystem* MuzzleFlashSystem;
 
+    UFUNCTION(BlueprintCallable, Category = "Items")
+    void UseItem(class URSItemBase* Item);
+    
 	UPROPERTY(EditAnywhere, Category = "Reload")
 	class UAnimMontage* ReloadMontage;
 };

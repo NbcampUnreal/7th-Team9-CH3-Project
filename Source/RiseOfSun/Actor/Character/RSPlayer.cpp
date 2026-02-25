@@ -1,4 +1,4 @@
-#include "RSPlayer.h"
+﻿#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -15,6 +15,7 @@
 #include "Components/SceneComponent.h"
 #include "Controller/RSPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Item/RSItemBase.h"
 
 ARSPlayer::ARSPlayer()
 {
@@ -190,6 +191,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::ToggleInventoryInput);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -252,6 +254,23 @@ void ARSPlayer::HandleFire()
 
 	
 
+}
+void ARSPlayer::ToggleInventoryInput()
+{
+	/*if (HUDWidgetclass)
+	{
+		FName const FunctionName = TEXT("ToggleInventoryWindow");
+
+		if (UFunction* Function = 	)
+	}*/
+}
+void ARSPlayer::UseItem(URSItemBase* Item)
+{
+	if (Item)
+	{
+		Item->Use(this);
+		Item->OnUse(this);
+	}
 }
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
