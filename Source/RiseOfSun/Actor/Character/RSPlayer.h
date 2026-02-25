@@ -145,4 +145,6 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     class UNiagaraSystem* MuzzleFlashSystem;
 
+	UPROPERTY(EditAnywhere, Category = "Reload")
+	class UAnimMontage* ReloadMontage;
 };

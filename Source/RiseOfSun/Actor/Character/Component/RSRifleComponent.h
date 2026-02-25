@@ -31,7 +31,7 @@ public:
 	float FireDebugDuration = 1.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	float ReloadDuration = 0.1f;
+	float ReloadDuration = 2.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	int32 AmmoInClip = 30;
