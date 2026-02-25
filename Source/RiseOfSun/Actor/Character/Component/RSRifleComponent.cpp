@@ -18,6 +18,11 @@ URSRifleComponent::URSRifleComponent()
 
 void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd)
 {
+	if (bIsReloading)
+	{
+		return;
+	}
+
 	if (AmmoInClip <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Ammo"));
@@ -82,6 +87,8 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 		EAttachLocation::SnapToTarget, true);
 
 	AmmoInClip--;
+
+	OnAmmoChanged.Broadcast(AmmoInClip, MaxAmmoInClip);
 }
 
 
@@ -91,7 +98,7 @@ void URSRifleComponent::Reload()
 	{
 		return;
 	}
-	if (AmmoInClip == 30)
+	if (AmmoInClip == MaxAmmoInClip)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Clip Full"));
 		return;
@@ -108,7 +115,9 @@ void URSRifleComponent::Reload()
 
 void URSRifleComponent::ReloadComplete()
 {
-	AmmoInClip = 30;
-	bCanFire = true;
+	AmmoInClip = MaxAmmoInClip;// Fill out your copyright notice in the Description page of Project Settings.
+	bCanFire = true; 
 	bIsReloading = false;
+
+	OnAmmoChanged.Broadcast(AmmoInClip, MaxAmmoInClip);
 }
