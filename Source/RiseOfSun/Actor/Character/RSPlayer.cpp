@@ -1,4 +1,4 @@
-#include "RSPlayer.h"
+﻿#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -15,6 +15,7 @@
 #include "Components/SceneComponent.h"
 #include "Controller/RSPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Item/RSItemBase.h"
 
 ARSPlayer::ARSPlayer()
 {
@@ -98,6 +99,8 @@ ARSPlayer::ARSPlayer()
 
 	RifleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RifleMeshComp"));
 	RifleMeshComp->SetupAttachment(RifleComp);
+	
+
 
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
@@ -111,9 +114,9 @@ ARSPlayer::ARSPlayer()
 		
 		
 		//총을 손에 붙이기
-		/*RifleComp->SetupAttachment(GetMesh(), FName("hand_rSocket"));*/
-		RifleComp->SetRelativeLocation(FVector(0, 0, 0));
-		RifleComp->SetRelativeRotation(FRotator(0, 0, 0));
+		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("riflesocket"));
+		//RifleComp->SetRelativeLocation(FVector(0, 0, 0));
+		//RifleMeshComp->SetRelativeRotation(FRotator(0, 0, 0));
 	}
 	//---------- EXP 초기값 ----------
 	Level = 1;
@@ -188,6 +191,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::ToggleInventoryInput);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -251,6 +255,23 @@ void ARSPlayer::HandleFire()
 	
 
 }
+void ARSPlayer::ToggleInventoryInput()
+{
+	/*if (HUDWidgetclass)
+	{
+		FName const FunctionName = TEXT("ToggleInventoryWindow");
+
+		if (UFunction* Function = 	)
+	}*/
+}
+void ARSPlayer::UseItem(URSItemBase* Item)
+{
+	if (Item)
+	{
+		Item->Use(this);
+		Item->OnUse(this);
+	}
+}
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
 	if (bIsFiring) 
@@ -284,6 +305,15 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (ReloadMontage)
+		{
+			AnimInstance->Montage_Play(ReloadMontage);
+		}
+	}
 	RifleComp->Reload();
 }
 void ARSPlayer::AddEXP(float  ExpAmount)

@@ -1,6 +1,5 @@
 ﻿#include "RSInventoryComponent.h"
-
-#include "Actor/Item/RSBaseItem.h"
+#include "Item/RSItemBase.h"
 
 URSInventoryComponent::URSInventoryComponent()
 {
@@ -8,7 +7,7 @@ URSInventoryComponent::URSInventoryComponent()
 
 }
 
-bool URSInventoryComponent::AddItem(ARSBaseItem* Item)
+bool URSInventoryComponent::AddItem(URSItemBase* Item)
 {	// 인벤토리 용량 제한, 아이템인지 확인
 	if (Items.Num() >= Capacity || !Item)
 	{
@@ -24,7 +23,7 @@ bool URSInventoryComponent::AddItem(ARSBaseItem* Item)
 	return true;
 }
 
-bool URSInventoryComponent::RemoveItem(ARSBaseItem* Item)
+bool URSInventoryComponent::RemoveItem(URSItemBase* Item)
 {
 	if (Item)
 	{
