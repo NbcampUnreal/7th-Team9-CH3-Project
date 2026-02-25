@@ -1,5 +1,5 @@
 ﻿#include "RSMonster.h"
-
+#include "Component/RSRifleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Widget/RSMonsterWidget.h"
 
@@ -163,9 +163,20 @@ void ARSMonster::SlowEffect()
     );
 }
 
+// 피격 시 이동속도 감소효과, 피 튀기는 효과
 void ARSMonster::DamageEffect()
 {
     Super::DamageEffect();
     
     SlowEffect();
+    
+    if (HitBloodEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            HitBloodEffect,
+            GetActorLocation(),
+            GetActorRotation()
+            );
+    }
 }

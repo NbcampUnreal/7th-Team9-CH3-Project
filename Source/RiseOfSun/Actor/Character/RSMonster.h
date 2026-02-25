@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "RSCharacter.h"
 #include "Components/WidgetComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "RSMonster.generated.h"
 
 class USphereComponent;
@@ -24,6 +26,9 @@ public:
 
 	UFUNCTION()
 	void HideDamageUI();
+	
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	UNiagaraSystem* HitBloodEffect;
 	
 	//몬스터를 느려지게하는 효과
 	void SlowEffect();
