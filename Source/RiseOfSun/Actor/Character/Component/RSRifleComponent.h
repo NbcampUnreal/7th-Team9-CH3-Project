@@ -6,6 +6,7 @@
 #include "Components/SceneComponent.h"
 #include "RSRifleComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChanged, int32, AmmoInClip, int32, MaxAmmoInClip);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RISEOFSUN_API URSRifleComponent : public USceneComponent
@@ -34,6 +35,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	int32 AmmoInClip = 30;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	int32 MaxAmmoInClip = 30;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAmmoChanged OnAmmoChanged;
 
 protected:
 	void ReloadComplete();
