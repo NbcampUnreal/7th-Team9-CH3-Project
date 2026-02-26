@@ -55,7 +55,7 @@ struct FRSItemData : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 MaxStack = 1;       // 슬롯 최대 수량
 
-    // --- 확장 기능 ---
+
     FText GetCategoryAsText() const;
     bool IsValidItem() const;
 

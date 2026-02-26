@@ -30,11 +30,13 @@ void URSInventoryComponent::AddItem(FName ItemID)
         {
             Items[i].ItemID = ItemID;
 
+
             if (GEngine)
             {
                 FString const Msg = FString::Printf(TEXT("아이템 저장! [ %d번 ] 슬롯에 [ %s ] 저장!"), i, *ItemID.ToString());
                 GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, Msg);
             }
+            OnInventoryUpdated.Broadcast(Items);
 
             return;
         }

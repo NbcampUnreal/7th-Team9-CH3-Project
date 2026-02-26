@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "RSCharacter.h"
+#include "Widget/RSPlayerHUD.h"
 #include "InputActionValue.h"
 #include "RSPlayer.generated.h"
 
@@ -58,7 +59,9 @@ private:
 	//카메라 중앙에 조준점 계산함수
     void AimStart();
     void HandleFire();
-    void ToggleInventoryInput();
+
+    //인벤토리
+    void HandleToggleInventory();
 
 
 
@@ -87,7 +90,7 @@ private:
 
 	// HUD 업데이트 위해 PlayerHUD 참조
     UPROPERTY()
-    UUserWidget* PlayerHUD;
+    URSPlayerHUD* PlayerHUD;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     UInputAction* InventoryAction;

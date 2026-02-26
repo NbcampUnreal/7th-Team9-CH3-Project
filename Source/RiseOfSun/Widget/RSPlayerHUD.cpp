@@ -5,6 +5,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/PanelWidget.h"
+#include "Actor/Character/Component/RSInventoryComponent.h"
 
 void URSPlayerHUD::NativeConstruct()
 {
@@ -26,18 +27,24 @@ void URSPlayerHUD::NativeConstruct()
 
         UE_LOG(LogTemp, Warning, TEXT("HUD Constructed: %s"), *GetNameSafe(this));
     }
+
+	//인벤토리 델리게이트 바인딩
+    InventoryComponent = PlayerCharacter->FindComponentByClass<URSInventoryComponent>();
+    if (InventoryComponent)
+    {
+        InventoryComponent->OnInventoryUpdated.AddDynamic(this, &URSPlayerHUD::UpdateInventoryUI);
+    }
 }
 void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
     if (!PlayerCharacter) return;
     // Rifle 보정 처리 (뒤늦게 붙었을 때도 델리게이트 자동 등록)
-    static bool bAmmoBound = false;
-    if (!bAmmoBound)
+    if (!bAmmoBound && PlayerCharacter)
     {
         if (URSRifleComponent* Rifle = PlayerCharacter->FindComponentByClass<URSRifleComponent>())
         {
-            if (Rifle->OnAmmoChanged.IsBound() == false)
+            if (!Rifle->OnAmmoChanged.IsBound())
             {
                 Rifle->OnAmmoChanged.AddDynamic(this, &URSPlayerHUD::UpdateAmmoText);
                 UpdateAmmoText(Rifle->AmmoInClip, Rifle->MaxAmmoInClip);
@@ -74,6 +81,41 @@ void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
     UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *AmmoString);
 }
 
+void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)
+{
+    if (!InventoryPanel || !PlayerCharacter) return;
+
+    // 인벤토리 컴포넌트 가져오기
+    URSInventoryComponent* Inventory = PlayerCharacter->FindComponentByClass<URSInventoryComponent>();
+    if (!Inventory) return;
+
+    // 패널 초기화 (기존 슬롯 제거)
+    InventoryPanel->ClearChildren();
+
+    // 아이템 슬롯 위젯 반복 생성
+    for (int32 i = 0; i < Inventory->Items.Num(); i++)
+    {
+        const FName ItemID = Inventory->Items[i].ItemID;
+        if (ItemID == NAME_None) continue;
+
+        //슬롯용 위젯 Blueprint 생성
+        if (InventorySlotWidgetClass) // UPROPERTY로 UUserWidget 클래스 지정
+        {
+            UUserWidget* SlotWidget = CreateWidget<UUserWidget>(GetWorld(), InventorySlotWidgetClass);
+            if (SlotWidget)
+            {
+                // 슬롯에 아이템 ID 같은 데이터 전달 가능
+                // 예: SlotWidget->SetItemID(ItemID); // 블루프린트에서 구현
+
+                InventoryPanel->AddChild(SlotWidget);
+            }
+        }
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Inventory UI Updated!"));
+}
+
+//껐다 켰다 하는 기능.
 void URSPlayerHUD::ToggleInventory()
 {
     if (!InventoryPanel) return;

@@ -1,4 +1,5 @@
 ﻿#include "RSPlayer.h"
+#include "Widget/RSPlayerHUD.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -11,12 +12,12 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/HUD.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Controller/RSPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Item/RSItemBase.h"
-#include <Widget/RSPlayerHUD.h>
 
 ARSPlayer::ARSPlayer()
 {
@@ -181,6 +182,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
+	if (!EnhancedInputComponent) return;
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ARSPlayer::Fire);
@@ -189,7 +191,9 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
-	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::ToggleInventoryInput);
+
+	// I 키 Inventory 토글
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::HandleToggleInventory);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -251,11 +255,6 @@ void ARSPlayer::HandleFire()
 
 
 	
-
-}
-
-void ARSPlayer::ToggleInventoryInput()
-{
 
 }
 
@@ -394,3 +393,14 @@ void ARSPlayer::AimStart()
 		LastAimPoint = bIsHit ? Hit.ImpactPoint : TraceEnd;
 		bHasAimPoint = true;
 }
+
+//바인딩 함수
+void ARSPlayer::HandleToggleInventory()
+{
+	if (PlayerHUD) // PlayerHUD는 BeginPlay에서 생성
+	{
+		PlayerHUD->ToggleInventory();
+	}
+}
+
+
