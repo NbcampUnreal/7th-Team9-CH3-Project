@@ -114,7 +114,7 @@ ARSPlayer::ARSPlayer()
 		
 		
 		//총을 손에 붙이기
-		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("weaponSocket"));
+		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("riflesocket"));
 		//RifleComp->SetRelativeLocation(FVector(0, 0, 0));
 		//RifleMeshComp->SetRelativeRotation(FRotator(0, 0, 0));
 	} 
