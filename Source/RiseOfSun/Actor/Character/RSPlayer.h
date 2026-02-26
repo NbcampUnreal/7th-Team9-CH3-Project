@@ -37,7 +37,7 @@ protected:
     class UCameraComponent* Camera;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-    class URSInventoryComponent* Inventory;
+    class URSInventoryComponent* InventoryComponent;
 
     
 
@@ -58,9 +58,10 @@ private:
 	//카메라 중앙에 조준점 계산함수
     void AimStart();
     void HandleFire();
-	void PlayFireSound();
+   	void PlayFireSound();
     void ResetFireSound();
     virtual void Die() override;
+    void ToggleInventoryInput();
 
 
 
@@ -90,6 +91,9 @@ private:
 	// HUD 업데이트 위해 PlayerHUD 참조
     UPROPERTY()
     UUserWidget* PlayerHUD;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction* InventoryAction;
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -140,6 +144,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     TObjectPtr<class URSRifleComponent> RifleComp;
 
+    UUserWidget* GetPlayerHUD() const { return PlayerHUD; }
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TObjectPtr<class USoundCue> FireSoundCue;
@@ -152,7 +157,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
     class UNiagaraSystem* MuzzleFlashSystem;
-
+    
 	UPROPERTY(EditAnywhere, Category = "Reload")
 	class UAnimMontage* ReloadMontage;
 	
