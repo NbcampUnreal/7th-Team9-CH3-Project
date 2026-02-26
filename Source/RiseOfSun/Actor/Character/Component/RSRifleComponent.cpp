@@ -9,6 +9,8 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Actor/Character/RSCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values for this component's properties
 URSRifleComponent::URSRifleComponent()
@@ -18,6 +20,7 @@ URSRifleComponent::URSRifleComponent()
 
 void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd)
 {
+	
 	if (bIsReloading)
 	{
 		return;
@@ -25,7 +28,7 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 
 	if (AmmoInClip <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No Ammo"));
+	
 		bCanFire = false;
 		return;
 	}
@@ -88,9 +91,15 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 
 	AmmoInClip--;
 
+	
+	
 	OnAmmoChanged.Broadcast(AmmoInClip, MaxAmmoInClip);
 }
-
+bool URSRifleComponent::CanFire() const
+{
+	UE_LOG(LogTemp, Warning, TEXT("[Rifle] CanFire Ammo=%d Reload=%d"), AmmoInClip, bIsReloading);
+	return AmmoInClip > 0;
+}
 
 void URSRifleComponent::Reload()
 {
@@ -103,6 +112,8 @@ void URSRifleComponent::Reload()
 		UE_LOG(LogTemp, Warning, TEXT("Clip Full"));
 		return;
 	}
+	
+	
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
@@ -111,6 +122,12 @@ void URSRifleComponent::Reload()
 		ReloadDuration,
 		false
 	);
+	
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		ReloadSoundCue,
+		GetComponentLocation());
+	
 }
 
 void URSRifleComponent::ReloadComplete()
