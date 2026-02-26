@@ -2,9 +2,13 @@
 
 #include "Actor/Character/RSPlayer.h"
 #include "Actor/Character/Component/RSRifleComponent.h"
+#include "InventorySlotWidget.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/PanelWidget.h"
+#include "Misc/OutputDeviceNull.h"
+#include "Components/GridPanel.h"
+#include "Components/GridSlot.h"
 #include "Actor/Character/Component/RSInventoryComponent.h"
 
 void URSPlayerHUD::NativeConstruct()
@@ -28,12 +32,22 @@ void URSPlayerHUD::NativeConstruct()
         UE_LOG(LogTemp, Warning, TEXT("HUD Constructed: %s"), *GetNameSafe(this));
     }
 
-	//인벤토리 델리게이트 바인딩
-    InventoryComponent = PlayerCharacter->FindComponentByClass<URSInventoryComponent>();
-    if (InventoryComponent)
+// 인벤토리 델리게이트 바인딩
+    if (PlayerCharacter)
     {
-        InventoryComponent->OnInventoryUpdated.AddDynamic(this, &URSPlayerHUD::UpdateInventoryUI);
+        InventoryComponent = PlayerCharacter->FindComponentByClass<URSInventoryComponent>();
+
+        if (InventoryComponent)
+        {
+            InventoryComponent->OnInventoryUpdated.AddDynamic(
+                this,
+                &URSPlayerHUD::UpdateInventoryUI
+            );
+
+            InventoryComponent->InitializeSlots();
+        }
     }
+
 }
 void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -83,31 +97,45 @@ void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
 
 void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)
 {
-    if (!InventoryPanel || !PlayerCharacter) return;
+    if (!InventoryGrid || !PlayerCharacter) return;
 
-    // 인벤토리 컴포넌트 가져오기
-    URSInventoryComponent* Inventory = PlayerCharacter->FindComponentByClass<URSInventoryComponent>();
-    if (!Inventory) return;
+    InventoryGrid->ClearChildren();
 
-    // 패널 초기화 (기존 슬롯 제거)
-    InventoryPanel->ClearChildren();
+    const int32 MaxColumns = 5; // 가로 5칸
 
-    // 아이템 슬롯 위젯 반복 생성
-    for (int32 i = 0; i < Inventory->Items.Num(); i++)
+    for (int32 i = 0; i < Slots.Num(); i++)
     {
-        const FName ItemID = Inventory->Items[i].ItemID;
-        if (ItemID == NAME_None) continue;
+        const FInventorySlot& InventorySlot = Slots[i];
 
-        //슬롯용 위젯 Blueprint 생성
-        if (InventorySlotWidgetClass) // UPROPERTY로 UUserWidget 클래스 지정
+        if (InventorySlotWidgetClass)
         {
-            UUserWidget* SlotWidget = CreateWidget<UUserWidget>(GetWorld(), InventorySlotWidgetClass);
+            //UUserWidget* SlotWidget =
+            //    CreateWidget<UUserWidget>(GetWorld(), InventorySlotWidgetClass);
+
+            UInventorySlotWidget* SlotWidget =
+                CreateWidget<UInventorySlotWidget>(GetWorld());
+
             if (SlotWidget)
             {
-                // 슬롯에 아이템 ID 같은 데이터 전달 가능
-                // 예: SlotWidget->SetItemID(ItemID); // 블루프린트에서 구현
+                // 🔹 Grid 위치 계산
+                int32 Row = i / MaxColumns;
+                int32 Column = i % MaxColumns;
 
-                InventoryPanel->AddChild(SlotWidget);
+                UGridSlot* GridSlot = InventoryGrid->AddChildToGrid(SlotWidget);
+                GridSlot->SetRow(Row);
+                GridSlot->SetColumn(Column);
+
+                // 🔹 아이템 데이터 전달
+                //FOutputDeviceNull Ar;
+                //FString Cmd = FString::Printf(
+                //    TEXT("SetItemData \"%s\" %d"),
+                //    *InventorySlot.ItemID.ToString(),
+                //    InventorySlot.StackCount
+                //);
+
+                //SlotWidget->CallFunctionByNameWithArguments(*Cmd, Ar, nullptr, true);
+				SlotWidget->SetItemData(InventorySlot.ItemID, InventorySlot.StackCount);
+                
             }
         }
     }

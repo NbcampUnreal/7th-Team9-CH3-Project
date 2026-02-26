@@ -1,4 +1,4 @@
-﻿#include "RSPlayer.h"
+﻿#include "Actor/Character/RSPlayer.h" 
 #include "Widget/RSPlayerHUD.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -96,6 +96,7 @@ ARSPlayer::ARSPlayer()
 		ShootingAction = InputShooting.Object;
 	}
 
+	InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>(TEXT("InventoryComponent"));
 	RifleComp = CreateDefaultSubobject<URSRifleComponent>(TEXT("RifleComp"));
 	RifleComp->SetupAttachment(RootComponent);
 
@@ -150,6 +151,7 @@ void ARSPlayer::BeginPlay()
 			PlayerHUD->AddToViewport();
 		}
 	}
+
 }
 
 void ARSPlayer::Tick(float DeltaTime)
@@ -202,6 +204,30 @@ FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
 	return result;
 }
 
+// 아이템 줍기/사용 함수
+void ARSPlayer::PickUpItem(FName ItemID, int32 Count)
+{
+	if (InventoryComponent)
+	{
+		bool bAdded = InventoryComponent->AddItem(ItemID, Count);
+		if (!bAdded)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 꽉참! 아이템 [%s] 추가 실패"), *ItemID.ToString());
+		}
+	}
+}
+
+void ARSPlayer::UseItem(FName ItemID)
+{
+	if (InventoryComponent)
+	{
+		bool bRemoved = InventoryComponent->RemoveItem(ItemID, 1);
+		if (!bRemoved)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("아이템 [%s] 사용 실패"), *ItemID.ToString());
+		}
+	}
+}
 
 void ARSPlayer::Move(const FInputActionValue& Value)
 {

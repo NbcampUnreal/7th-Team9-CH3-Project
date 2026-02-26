@@ -39,9 +39,18 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 InventorySize = 10;
 
-	// 아이템 줍는 함수, 위젯 블루프린트에서 호출(BlueprintCallable)
+	// 아이템 추가
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItem(FName ItemID);
+	bool AddItem(FName ItemID, int32 Count = 1);
+
+	// 아이템 제거
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool RemoveItem(FName ItemID, int32 Count = 1);
+
+	// 슬롯 초기화
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void InitializeSlots();
+
 
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnInventoryUpdatedSlot OnInventoryUpdated;
