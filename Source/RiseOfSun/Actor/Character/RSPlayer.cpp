@@ -301,7 +301,7 @@ void ARSPlayer::Die()
 			AnimInstance->Montage_Play(DieMontage);
 		}
 	}
-	
+}
 
 void ARSPlayer::ToggleInventoryInput()
 {
