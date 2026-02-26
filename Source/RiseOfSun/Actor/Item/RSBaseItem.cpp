@@ -42,3 +42,4 @@ int32 ARSBaseItem::GetAttackPower() const
 	return 0;
 }
 
+

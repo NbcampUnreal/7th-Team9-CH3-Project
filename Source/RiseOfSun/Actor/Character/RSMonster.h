@@ -31,6 +31,7 @@ public:
 
 	float GetAttackRange() const { return AttackRange; }
 
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

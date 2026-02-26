@@ -30,16 +30,17 @@ public:
 	int32 MaxSpawnCount = 30;
 	// 순차적으로 스폰해주는 함수
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void SpawnNextMonster();
+	AActor* SpawnNextMonster();
 	UFUNCTION()
 	void OnMonsterDestroyed(AActor* DestroyedActor);
 	// 몬스터 정보를 하나 선택하는 함수
 	FMonsterSpawnRow* GetRandomMonster() const;
 	// 전달받은 몬스터 클래스를 실제 월드에 생성하는 함수
-	void SpawnMonster(TSubclassOf<ARSMonster> MonsterClass);
+	AActor* SpawnMonster(TSubclassOf<ARSMonster> MonsterClass);
 	// 몬스터가 생성될 좌표를 정함
 	FVector GetRandomPointVolume() const;
 	
+
 
 protected:
 	// 몬스터 수
@@ -49,11 +50,14 @@ protected:
 	// 데이터 테이블의 내용을 미리 복사해둘 배열
 	TArray<FMonsterSpawnRow*> CachedMonsterRows;
 	
-	FTimerHandle SpawnTimerHandle;
+
 	// 현재 살아있는 몬스터
 	int32 ActiveMonsterCount = 0;
 	// 레벨
 	int32 CurrentLevel = 1;
 	// 레벨업
 	void LevelUp();
+
+public:
+	FTimerHandle SpawnTimerHandle;
 };

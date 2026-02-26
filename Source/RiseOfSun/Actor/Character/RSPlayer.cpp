@@ -1,4 +1,4 @@
-#include "RSPlayer.h"
+﻿#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -113,10 +113,10 @@ ARSPlayer::ARSPlayer()
 		
 		
 		//총을 손에 붙이기
-		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("riflesocket"));
+		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("weaponSocket"));
 		//RifleComp->SetRelativeLocation(FVector(0, 0, 0));
 		//RifleMeshComp->SetRelativeRotation(FRotator(0, 0, 0));
-	}
+	} 
 	//---------- EXP 초기값 ----------
 	Level = 1;
 

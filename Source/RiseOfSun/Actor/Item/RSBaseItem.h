@@ -52,4 +52,5 @@ public:
 	/** 공격력 반환 */
 	int32 GetAttackPower() const;
 
+
 };
