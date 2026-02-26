@@ -4,13 +4,14 @@
 
 URSItemBase::URSItemBase()
 {
-    // 필요 시 기본값 세팅 가능
+    
 }
 
 // 데이터 세팅
 void URSItemBase::SetItemData(const FRSItemData& Data)
 {
     ItemData = Data;
+    StackCount = Data.DefaultStack;
 }
 
 // 공격력 반환
@@ -25,8 +26,18 @@ bool URSItemBase::IsWeapon() const
     return ItemData.Category == EItemCategory::Weapon;
 }
 
+FName URSItemBase::GetItemID() const
+{
+    return ItemData.ItemID;
+}
+
 // 아이템 이름 반환
 FString URSItemBase::GetItemName() const
 {
     return ItemData.ItemName;
+}
+
+bool URSItemBase::IsStackable() const
+{
+    return ItemData.MaxStack > 1;
 }

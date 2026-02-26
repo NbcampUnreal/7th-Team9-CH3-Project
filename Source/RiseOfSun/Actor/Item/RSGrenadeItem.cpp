@@ -3,16 +3,14 @@
 
 ARSGrenadeItem::ARSGrenadeItem()
 {
-	//물리 엔진이 직접 움직이게 함.
+	PrimaryActorTick.bCanEverTick = false;
 	Mesh->SetSimulatePhysics(true);
-	Mesh->SetCollisionProfileName(TEXT("PhysicsActor")); // 충돌 성격을 물리 오브젝트로 설정
-
-	//충돌 이벤트 활성화
 	Mesh->SetNotifyRigidBodyCollision(true);
-	Mesh->SetEnableGravity(true);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Mesh->SetCollisionObjectType(ECC_PhysicsBody);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Block);
 	Mesh->SetLinearDamping(0.2f);
 	Mesh->SetAngularDamping(0.1f);
-
 	Mesh->OnComponentHit.AddDynamic(this, &ARSGrenadeItem::OnHit);
 }
 
@@ -26,7 +24,7 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 		// 반경 데미지 (예시)
 		UGameplayStatics::ApplyRadialDamage(
 			this,
-			100.f,                         // 데미지
+			ItemData.AttackPower,                        // 데미지
 			GetActorLocation(),            // 위치
 			300.f,                         // 반경
 			nullptr, // 어떤 종류의 데미지인지 지정하는 자리
@@ -36,11 +34,10 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 			true
 		);
 
-<<<<<<< Updated upstream
-=======
 		if (ExplosionEffect)
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+
 				GetWorld(),
 				ExplosionEffect,
 				GetActorLocation()
@@ -55,8 +52,6 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 			);
 		}
 
-
->>>>>>> Stashed changes
 		Destroy();
 	}
 }

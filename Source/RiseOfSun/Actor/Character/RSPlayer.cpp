@@ -1,4 +1,4 @@
-#include "RSPlayer.h"
+﻿#include "RSPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -17,7 +17,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Sound/SoundCue.h"
-
+#include "Item/RSItemBase.h"
+#include <Widget/RSPlayerHUD.h>
 
 ARSPlayer::ARSPlayer()
 {
@@ -107,9 +108,6 @@ ARSPlayer::ARSPlayer()
 	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
 	MuzzlePoint->SetupAttachment(RifleMeshComp);
 
-	Inventory = CreateDefaultSubobject<URSInventoryComponent>("Inventory");
-	Inventory->Capacity = 20;
-
 
 	if (RifleComp)
 	{
@@ -147,7 +145,7 @@ void ARSPlayer::BeginPlay()
 
 	if (HUDWidgetclass)
 	{
-		PlayerHUD = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetclass);
+		PlayerHUD = CreateWidget<URSPlayerHUD>(GetWorld(), HUDWidgetclass);
 
 		if (PlayerHUD)
 		{
@@ -194,6 +192,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Started, this, &ARSPlayer::Reloading);
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::ToggleInventoryInput);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -284,10 +283,12 @@ void ARSPlayer::PlayFireSound()
 	);
 
 }
+
 void ARSPlayer::ResetFireSound()
 {
 	bCanPlayFireSound = true;
 }
+
 void ARSPlayer::Die()
 {
 	Super::Die();
@@ -301,6 +302,10 @@ void ARSPlayer::Die()
 		}
 	}
 	
+
+void ARSPlayer::ToggleInventoryInput()
+{
+
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)

@@ -26,6 +26,9 @@ public:
     UFUNCTION()
     void UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo);
 
+    UFUNCTION()
+    void ToggleInventory();
+
 protected:
     // 현재 표시할 HP
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
@@ -39,8 +42,14 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UTextBlock* AmmoTextBlock;
 
+    UPROPERTY(meta = (BindWidget))
+    UPanelWidget* InventoryPanel;
+
 private:
     // 참조할 플레이어 캐릭터
     UPROPERTY()
     ARSPlayer* PlayerCharacter;
+
+    UPROPERTY()
+    bool bInventoryVisible = false;
 };
