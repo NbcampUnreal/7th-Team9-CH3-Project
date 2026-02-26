@@ -37,7 +37,6 @@ void ARSCharacter::Die()
 	bIsDead = true;
 
 	SetActorEnableCollision(false);
-	SetActorHiddenInGame(true);//죽을때 안보임
 	SetLifeSpan(2.0f);
 }
 

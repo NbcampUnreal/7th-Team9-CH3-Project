@@ -21,5 +21,31 @@ FText FRSItemData::GetCategoryAsText() const
 // 아이템 데이터 유효성 검사
 bool FRSItemData::IsValidItem() const
 {
-    return !ItemID.IsNone() && !ItemName.IsEmpty();
+    if (Category == EItemCategory::Weapon)
+    {
+        if (WeaponType == EWeaponType::None)
+            return false;
+
+        if (AttackPower <= 0)
+            return false;
+
+        // 무기는 보통 스택 불가
+        if (MaxStack != 1)
+            return false;
+    }
+
+    // 3️⃣ 스택형 아이템 검사
+    if (Category == EItemCategory::Consumable ||
+        Category == EItemCategory::Material)
+    {
+        if (MaxStack < 1)
+            return false;
+
+        if (DefaultStack < 1)
+            return false;
+
+        if (DefaultStack > MaxStack)
+            return false;
+    }
+    return true;
 }

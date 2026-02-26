@@ -19,13 +19,6 @@ class RISEOFSUN_API ARSBaseItem : public AActor
 public:	
 	ARSBaseItem();
 
-	// 월드 정보
-	UPROPERTY(Transient)
-	class UWorld* World;
-	UPROPERTY()
-	class URSInventoryComponent* OwningInventory;
-
-
 protected:
 	//충돌 영역 (픽업 감지용)
 	UPROPERTY(VisibleAnywhere, Category = "Item")
