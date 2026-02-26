@@ -2,7 +2,6 @@
 
 #include "Actor/Character/RSPlayer.h"
 #include "Actor/Character/Component/RSRifleComponent.h"
-#include "Widget/InventorySlotWidget"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/PanelWidget.h"

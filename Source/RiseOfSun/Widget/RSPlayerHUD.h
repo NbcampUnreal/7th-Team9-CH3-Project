@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/GridPanel.h"
 #include "RSPlayerHUD.generated.h"
 
 class ARSPlayer;
@@ -49,6 +50,9 @@ protected:
     // **블루프린트 TextBlock과 바인딩**
     UPROPERTY(meta = (BindWidget))
     UTextBlock* AmmoTextBlock;
+
+    UPROPERTY(meta = (BindWidget))
+    UGridPanel* InventoryGrid;
 
     UPROPERTY(meta = (BindWidget))
     UPanelWidget* InventoryPanel;

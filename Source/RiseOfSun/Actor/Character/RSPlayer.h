@@ -30,6 +30,9 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FOnEXPChanged OnEXPChanged;
+    
+    //인벤토리 컴포넌트 게터
+    URSInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 protected:
     UPROPERTY(EditAnywhere)
     class USpringArmComponent* SpringArm;
@@ -37,10 +40,16 @@ protected:
     UPROPERTY(EditAnywhere)
     class UCameraComponent* Camera;
 
+    // 인벤토리 컴포넌트 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-    class URSInventoryComponent* InventoryComponent;
+    TObjectPtr<class URSInventoryComponent> InventoryComponent;
 
-    
+    // 아이템 줍기/사용 함수
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    void PickUpItem(FName ItemID, int32 Count = 1);
+
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void UseItem(FName ItemID);
 
 private:
 
@@ -66,6 +75,7 @@ private:
 
 
 private:
+    //매핑
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class UInputMappingContext* DefaultContext;
 
@@ -96,6 +106,7 @@ private:
     UInputAction* InventoryAction;
 
 public:
+    //캐릭터 설정값
 	UPROPERTY(EditAnywhere)
 	float mouseSpeed = 30.0f;
 
@@ -109,6 +120,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
     int32 Level;
 
+    //에임 위치
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
     FVector LastAimPoint = FVector::ZeroVector;
 
@@ -126,6 +138,7 @@ public:
     float FireDebugDuration = 1.0f;
 	//카메라 중앙에 조준점 계산할 때 사용할 트레이스 채널
     TEnumAsByte<ECollisionChannel> CamTraceChannel = ECC_Visibility;
+
     // Getter: 현재 EXP
     UFUNCTION(BlueprintPure, Category = "Player Stats")
     float GetCurrentEXP() const { return CurrentEXP; }
