@@ -4,6 +4,7 @@
 #include "Actor/Character/Component/RSRifleComponent.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/PanelWidget.h"
 
 void URSPlayerHUD::NativeConstruct()
 {
@@ -71,4 +72,16 @@ void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
 
     AmmoTextBlock->SetText(FText::FromString(AmmoString));
     UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *AmmoString);
+}
+
+void URSPlayerHUD::ToggleInventory()
+{
+    if (!InventoryPanel) return;
+
+    bInventoryVisible = !bInventoryVisible;
+    
+    InventoryPanel->SetVisibility(
+        bInventoryVisible ? ESlateVisibility::Visible
+        : ESlateVisibility::Hidden
+    );
 }
