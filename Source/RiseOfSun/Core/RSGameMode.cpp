@@ -5,6 +5,7 @@
 
 #include "Actor/Character/RSPlayer.h"
 #include "Actor/Character/Controller/RSPlayerController.h"
+#include "RSGameState.h"
 
 ARSGameMode::ARSGameMode()
 {
@@ -17,4 +18,7 @@ ARSGameMode::ARSGameMode()
 		
 	}
 	PlayerControllerClass = ARSPlayerController::StaticClass();
+	DefaultPawnClass = ARSPlayerController::StaticClass();
+	GameStateClass = ARSGameMode::StaticClass();
 }
+

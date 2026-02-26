@@ -27,7 +27,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 private:
-	void ChangeState(AIState NewState);
+	void SetChangeState(AIState NewState);
 
 	void TickChase(float DeltaTime);
 	void TickAttack(float DeltaTime);

@@ -27,10 +27,11 @@ public:
 
 	// 몬스터 범위 내 플레이어가 있는지
 	bool CanAttack(ACharacter* Target);
-	virtual FDamageResult Attack(ARSCharacter* Target) override;;
+	virtual FDamageResult Attack(ARSCharacter* Target) override;
 
 	float GetAttackRange() const { return AttackRange; }
 
+	virtual void Die() override;
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
