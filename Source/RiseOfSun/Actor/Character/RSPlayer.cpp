@@ -14,7 +14,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Controller/RSPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Sound/SoundCue.h"
 #include "Item/RSItemBase.h"
 #include <Widget/RSPlayerHUD.h>
 
@@ -130,7 +132,8 @@ ARSPlayer::ARSPlayer()
 void ARSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -188,7 +191,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ARSPlayer::StopFire);
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
-	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
+	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Started, this, &ARSPlayer::Reloading);
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::ToggleInventoryInput);
 }
 
@@ -240,19 +243,65 @@ void ARSPlayer::Shoot()
 
 void ARSPlayer::HandleFire()
 {
-	
+
 		AimStart();
 
-		if (!RifleComp || !bHasAimPoint)
+		if (!RifleComp || !bHasAimPoint || !RifleComp->CanFire())
 		{
+			
 			return;
 		}
+	
 		RifleComp->Fire(MuzzlePoint, MuzzleFlashSystem, LastAimPoint);
-
-
+	
+	PlayFireSound();
+	
+	
 	
 
 }
+
+void ARSPlayer::PlayFireSound()
+{
+
+	if (!bCanPlayFireSound)
+		return;
+
+	
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		FireSoundCue,
+		MuzzlePoint->GetComponentLocation()
+	);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FireSoundTimerHandle,
+		this,
+		&ARSPlayer::ResetFireSound,
+		0.1f,
+		true
+	);
+
+}
+
+void ARSPlayer::ResetFireSound()
+{
+	bCanPlayFireSound = true;
+}
+
+void ARSPlayer::Die()
+{
+	Super::Die();
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (DieMontage)
+		{
+			AnimInstance->Montage_Play(DieMontage);
+		}
+	}
+	
 
 void ARSPlayer::ToggleInventoryInput()
 {
@@ -266,9 +315,8 @@ void ARSPlayer::Fire(const FInputActionValue& Value)
 		return;
 	}
 	bIsFiring = true;
-
 	HandleFire();
-
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		FireTimerHandle,
 		this,
@@ -281,6 +329,7 @@ void ARSPlayer::Fire(const FInputActionValue& Value)
 void ARSPlayer::StopFire(const FInputActionValue& Value)
 {
 	bIsFiring = false;
+	bCanPlayFireSound = false;
 	GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
 }
 
@@ -302,7 +351,10 @@ void ARSPlayer::Reloading(const FInputActionValue& Value)
 		}
 	}
 	RifleComp->Reload();
+
+	
 }
+
 void ARSPlayer::AddEXP(float  ExpAmount)
 {
 	if (ExpAmount <= 0)

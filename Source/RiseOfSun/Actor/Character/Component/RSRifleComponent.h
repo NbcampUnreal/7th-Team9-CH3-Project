@@ -18,6 +18,7 @@ public:
 	
 public:
 	void Fire(USceneComponent* MuzzlePoint, class UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd);
+	bool CanFire() const;
 	void Reload();
 	
 	// 웨폰 트레이스
@@ -42,6 +43,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAmmoChanged OnAmmoChanged;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<class USoundCue> ReloadSoundCue;
 protected:
 	void ReloadComplete();
 
