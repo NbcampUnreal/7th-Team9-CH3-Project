@@ -59,13 +59,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
-private:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float AttackRange;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* HPWidgetComponent;
 
+private:
 
 	UPROPERTY(EditAnywhere, Category = "AttackAnim")
 	class UAnimMontage* AttackMontage;

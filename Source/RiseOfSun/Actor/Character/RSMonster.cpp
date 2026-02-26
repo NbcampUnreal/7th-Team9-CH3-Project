@@ -11,7 +11,6 @@ ARSMonster::ARSMonster()
 
     // HP Widget 생성
     HPWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPWidget"));
-
     // 블루프린트/코드 위젯 클래스 지정
     HPWidgetComponent->SetWidgetClass(URSMonsterWidget::StaticClass());
     HPWidgetComponent->SetupAttachment(GetMesh());
@@ -188,6 +187,9 @@ void ARSMonster::DamageEffect()
 
 void ARSMonster::Die()
 {
+    if (bIsDead)
+        return;
+    
     Super::Die();
     
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();

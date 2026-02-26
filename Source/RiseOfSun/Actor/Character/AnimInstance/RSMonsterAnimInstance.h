@@ -15,8 +15,6 @@ class RISEOFSUN_API URSMonsterAnimInstance : public UAnimInstance
 
 public:
 	URSMonsterAnimInstance();
-
-protected:
 	virtual void NativeInitializeAnimation() override; // 애니메이션이 생성되면 호출되는 함수.
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override; // 프레임마다 호출되는 함수.
@@ -35,4 +33,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	bool isFalling = false;
+	
+protected:
+
 };
