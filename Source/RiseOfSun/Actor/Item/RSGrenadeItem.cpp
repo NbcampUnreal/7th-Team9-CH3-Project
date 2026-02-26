@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "RSGrenadeItem.h"
+﻿#include "RSGrenadeItem.h"
 #include "Kismet/GameplayStatics.h"
 
 ARSGrenadeItem::ARSGrenadeItem()
@@ -39,6 +36,27 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 			true
 		);
 
+<<<<<<< Updated upstream
+=======
+		if (ExplosionEffect)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				ExplosionEffect,
+				GetActorLocation()
+			);
+		}
+		if (ExplosionSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+				this,
+				ExplosionSound,
+				GetActorLocation()
+			);
+		}
+
+
+>>>>>>> Stashed changes
 		Destroy();
 	}
 }
