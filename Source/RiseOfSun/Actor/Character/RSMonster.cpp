@@ -1,6 +1,8 @@
 ﻿#include "RSMonster.h"
 
 #include "Widget/RSMonsterWidget.h"
+#include "Core/RSGameState.h"
+
 
 ARSMonster::ARSMonster()
 {
@@ -63,6 +65,17 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
     }
 
     return result;
+}
+
+void ARSMonster::Die()
+{
+    Super::Die();
+    
+    ARSGameState* RSGameState = Cast<ARSGameState>(GetWorld()->GetGameState());
+    if (RSGameState)
+    {
+        RSGameState->OnMonsterKilled();
+    }
 }
 
 void ARSMonster::BeginPlay()
@@ -131,3 +144,6 @@ void ARSMonster::HideDamageUI()
     }
 }
 
+void Ondeath()
+{
+}

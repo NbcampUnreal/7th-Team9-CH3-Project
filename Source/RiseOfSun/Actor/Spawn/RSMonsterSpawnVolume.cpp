@@ -35,6 +35,7 @@ void ARSMonsterSpawnVolume::BeginPlay()
 
 AActor* ARSMonsterSpawnVolume::SpawnNextMonster()
 {
+	if (!bIsSpawning)return nullptr;
 	if (SpawnCount >= MaxSpawnCount)
 	{
 		// 타이머 멈춤

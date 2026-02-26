@@ -16,7 +16,7 @@ void ARSMonsterController::OnPossess(APawn* InPawn)
 	{
 		TargetPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-		ChangeState(AIState::Chase);
+		SetChangeState(AIState::Chase);
 	});
 }
 
@@ -46,7 +46,7 @@ static const TCHAR* StateToText(AIState S)
 	}
 }
 
-void ARSMonsterController::ChangeState(AIState NewState)
+void ARSMonsterController::SetChangeState(AIState NewState)
 {
 	if (CurrentState == NewState)
 		return;
@@ -123,7 +123,7 @@ void ARSMonsterController::TickChase(float DeltaTime)
 
 	if (IsPlayerInRange(Range))
 	{
-		ChangeState(AIState::Attack);
+		SetChangeState(AIState::Attack);
 		return;
 	}
 
@@ -138,7 +138,7 @@ void ARSMonsterController::TickAttack(float DeltaTime)
 	const float Range = Monster->GetAttackRange();
 	if (!IsPlayerInRange(Range))
 	{
-		ChangeState(AIState::Chase);
+		SetChangeState(AIState::Chase);
 		return;
 	}
 

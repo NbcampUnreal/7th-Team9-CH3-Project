@@ -42,9 +42,9 @@ void ARSGameState::StartLevel()
 
 	TArray<AActor*> FoundVolume;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
-
+	//-----------------------------------------------------------------------------------------------------
 	// 레벨별 몬스터 수 조절 로직
-	const int32 MonsterToSpawn = 1 + CurrentLevelIndex;
+	const int32 MonsterToSpawn = (CurrentLevelIndex + 1) * 10;
 	if (FoundVolume.Num() > 0)
 	{
 		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(FoundVolume[0]);
@@ -57,7 +57,7 @@ void ARSGameState::StartLevel()
 				if (SpawnedActor && SpawnedActor->IsA(ARSMonster::StaticClass()))
 				{
 					MonsterCount++;
-					//UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Spawned: %d"), CurrentLevelIndex + 1, MonsterCount);
+					UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Spawned: %d"), CurrentLevelIndex,MonsterCount);
 					// 몬스터 사망 시 OnMonsterDestroyed가 호출되도록 몬스터 클래스에서 처리 필요
 				}
 			}
@@ -88,6 +88,18 @@ void ARSGameState::EndLevelAndReward()
 	// 낮 시작: 해가 뜨는 연출(조명 Intensity 조절)을 여기에 넣으세요.
 	UpdateWorldLighting(3.0f); // 해가 뜸 (Intensity 3)
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Clear! Sun is rising..."), CurrentLevelIndex + 1);
+
+	//살아남은 모든 몬스터 제거
+	//해가 뜨면 남아있는 몬스터들을 타 죽거나 사라짐
+	
+	for (TActorIterator<ARSMonster> It(GetWorld()); It; ++It)
+	{
+		ARSMonster* RemainingMonster = *It;
+		if (RemainingMonster)
+		{
+			RemainingMonster->Destroy();//몬스터 즉시 제거
+		}
+	}
 
 	UWorld* World = GetWorld();
 	if (!World) return;

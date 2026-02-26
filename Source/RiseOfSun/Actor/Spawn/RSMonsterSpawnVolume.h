@@ -40,7 +40,8 @@ public:
 	// 몬스터가 생성될 좌표를 정함
 	FVector GetRandomPointVolume() const;
 	
-
+	// 스폰을 켜고 끄는 함수
+	void SetIsSpawning(bool bEnable) { bIsSpawning = bEnable; }
 
 protected:
 	// 몬스터 수
@@ -58,6 +59,8 @@ protected:
 	// 레벨업
 	void LevelUp();
 
+	UPROPERTY(VisibleAnywhere, Category = "Spawn")
+	bool bIsSpawning = true; // 기본값은 true
 public:
 	FTimerHandle SpawnTimerHandle;
 };
