@@ -1,4 +1,5 @@
-﻿#include "RSPlayer.h"
+﻿#include "Actor/Character/RSPlayer.h" 
+#include "Widget/RSPlayerHUD.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -11,6 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/HUD.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Controller/RSPlayerController.h"
@@ -18,7 +20,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Sound/SoundCue.h"
 #include "Item/RSItemBase.h"
-#include <Widget/RSPlayerHUD.h>
 
 #include "Core/RSGameMode.h"
 
@@ -99,6 +100,7 @@ ARSPlayer::ARSPlayer()
 		ShootingAction = InputShooting.Object;
 	}
 
+	InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>(TEXT("InventoryComponent"));
 	RifleComp = CreateDefaultSubobject<URSRifleComponent>(TEXT("RifleComp"));
 	RifleComp->SetupAttachment(RootComponent);
 
@@ -156,6 +158,7 @@ void ARSPlayer::BeginPlay()
 			PlayerHUD->AddToViewport();
 		}
 	}
+
 }
 
 void ARSPlayer::Tick(float DeltaTime)
@@ -188,6 +191,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
+	if (!EnhancedInputComponent) return;
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ARSPlayer::Fire);
@@ -195,8 +199,10 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ARSPlayer::StopFire);
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
-	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Started, this, &ARSPlayer::Reloading);
-	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::ToggleInventoryInput);
+	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
+
+	// I 키 Inventory 토글
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::HandleToggleInventory);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -205,6 +211,30 @@ FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
 	return result;
 }
 
+// 아이템 줍기/사용 함수
+void ARSPlayer::PickUpItem(FName ItemID, int32 Count)
+{
+	if (InventoryComponent)
+	{
+		bool bAdded = InventoryComponent->AddItem(ItemID, Count);
+		if (!bAdded)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 꽉참! 아이템 [%s] 추가 실패"), *ItemID.ToString());
+		}
+	}
+}
+
+void ARSPlayer::UseItem(FName ItemID)
+{
+	if (InventoryComponent)
+	{
+		bool bRemoved = InventoryComponent->RemoveItem(ItemID, 1);
+		if (!bRemoved)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("아이템 [%s] 사용 실패"), *ItemID.ToString());
+		}
+	}
+}
 
 void ARSPlayer::Move(const FInputActionValue& Value)
 {
@@ -315,11 +345,6 @@ void ARSPlayer::Die()
 			}
 		}
 	}
-}
-
-void ARSPlayer::ToggleInventoryInput()
-{
-
 }
 
 void ARSPlayer::HandleReloadStarted()
@@ -466,3 +491,14 @@ void ARSPlayer::AimStart()
 		LastAimPoint = bIsHit ? Hit.ImpactPoint : TraceEnd;
 		bHasAimPoint = true;
 }
+
+//바인딩 함수
+void ARSPlayer::HandleToggleInventory()
+{
+	if (PlayerHUD) // PlayerHUD는 BeginPlay에서 생성
+	{
+		PlayerHUD->ToggleInventory();
+	}
+}
+
+

@@ -12,6 +12,7 @@
 
 struct FRSItemData;
 class URSItemBase;
+class ARSPlayer;
 
 UCLASS()
 class RISEOFSUN_API ARSBaseItem : public AActor, public IItemInterface
@@ -22,6 +23,8 @@ public:
 	ARSBaseItem();
 
 protected:
+	//픽업 이벤트 연결 함수(OnpickedUp 호출)
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FName ItemType;
 
@@ -73,4 +76,9 @@ public:
 
 	/** 공격력 반환 */
 	int32 GetAttackPower() const;
+
+	// 플레이어가 접근했을 때 호출
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void OnPickedUp(ARSPlayer* Player);
+
 };

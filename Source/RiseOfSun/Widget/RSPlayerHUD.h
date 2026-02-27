@@ -2,9 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/GridPanel.h"
 #include "RSPlayerHUD.generated.h"
 
 class ARSPlayer;
+class URSInventoryComponent;
+class UPanelWidget;
+class UUserWidget;
 class UTextBlock;
 
 UCLASS()
@@ -29,6 +33,11 @@ public:
     UFUNCTION()
     void ToggleInventory();
 
+    // 인벤토리 UI 갱신 함수
+    UFUNCTION()
+    void UpdateInventoryUI(TArray<FInventorySlot> Slots);
+
+
 protected:
     // 현재 표시할 HP
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
@@ -43,12 +52,28 @@ protected:
     UTextBlock* AmmoTextBlock;
 
     UPROPERTY(meta = (BindWidget))
+    UGridPanel* InventoryGrid;
+
+    UPROPERTY(meta = (BindWidget))
     UPanelWidget* InventoryPanel;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+    UUserWidget* InventoryWidget;
+
+    UPROPERTY()
+    URSInventoryComponent* InventoryComponent;
+
+    // 슬롯 위젯 클래스 (블루프린트에서 지정)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+    TSubclassOf<UUserWidget> InventorySlotWidgetClass;
+
 
 private:
     // 참조할 플레이어 캐릭터
     UPROPERTY()
     ARSPlayer* PlayerCharacter;
+
+    bool bAmmoBound = false;
 
     UPROPERTY()
     bool bInventoryVisible = false;

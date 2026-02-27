@@ -12,7 +12,12 @@ struct FInventorySlot
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory Slot")
 	FName ItemID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory Slot")
+	int32 StackCount; // 현재 슬롯에 몇 개 들어있는지
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdatedSlot, TArray<FInventorySlot>, Slots);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RISEOFSUN_API URSInventoryComponent : public UActorComponent
@@ -34,15 +39,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 InventorySize = 10;
 
-	// 인벤토리를 시각화 하기위해서 어떤 위젯을 사용할지 담는 변수
-	UPROPERTY(EditAnywhere, Category = "Inventory|UI")
-	TSubclassOf<UUserWidget> InventoryWidgetClass;
-	
-	// 우리가 아까 만든 데이터 테이블을 저장할 변수 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory|UI")
-	UDataTable* ItemDataTable;
-
-	// 아이템 줍는 함수, 위젯 블루프린트에서 호출(BlueprintCallable)
+	// 아이템 추가
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItem(FName ItemID);
+	bool AddItem(FName ItemID, int32 Count = 1);
+
+	// 아이템 제거
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool RemoveItem(FName ItemID, int32 Count = 1);
+
+	// 슬롯 초기화
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void InitializeSlots();
+
+
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
+	FOnInventoryUpdatedSlot OnInventoryUpdated;
 };
