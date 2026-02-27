@@ -134,8 +134,10 @@ ARSPlayer::ARSPlayer()
 void ARSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
+	if (RifleComp)
+	{
+		RifleComp->OnReloadStarted.AddDynamic(this, &ARSPlayer::HandleReloadStarted);
+	}
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -270,11 +272,7 @@ void ARSPlayer::PlayFireSound()
 		return;
 
 	
-	UGameplayStatics::PlaySoundAtLocation(
-		this,
-		FireSoundCue,
-		MuzzlePoint->GetComponentLocation()
-	);
+	
 
 	GetWorld()->GetTimerManager().SetTimer(
 		FireSoundTimerHandle,
@@ -324,6 +322,19 @@ void ARSPlayer::ToggleInventoryInput()
 
 }
 
+void ARSPlayer::HandleReloadStarted()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (ReloadMontage)
+		{
+			AnimInstance->Montage_Play(ReloadMontage);
+		}
+	}
+}
+
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
 	if (bIsFiring) 
@@ -357,17 +368,10 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (AnimInstance)
+	if (RifleComp)
 	{
-		if (ReloadMontage)
-		{
-			AnimInstance->Montage_Play(ReloadMontage);
-		}
+		RifleComp->Reload();
 	}
-	RifleComp->Reload();
-
 	
 }
 

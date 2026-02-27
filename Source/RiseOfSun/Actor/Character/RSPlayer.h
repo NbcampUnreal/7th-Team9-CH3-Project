@@ -62,6 +62,8 @@ private:
     void ResetFireSound();
     virtual void Die() override;
     void ToggleInventoryInput();
+	UFUNCTION()
+	void HandleReloadStarted();
 
 
 
@@ -145,9 +147,6 @@ public:
     TObjectPtr<class URSRifleComponent> RifleComp;
 
     UUserWidget* GetPlayerHUD() const { return PlayerHUD; }
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	TObjectPtr<class USoundCue> FireSoundCue;
 	
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
 	TObjectPtr<class UStaticMeshComponent> RifleMeshComp;
