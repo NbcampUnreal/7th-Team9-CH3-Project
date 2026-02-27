@@ -68,12 +68,13 @@ AActor* ARSMonsterSpawnVolume::SpawnNextMonster()
 {
 	
 	if (!bIsSpawning)return nullptr;
-	if (SpawnCount >= MaxSpawnCount)
+	/*if (SpawnCount >= MaxSpawnCount)
 	{
 		// 타이머 멈춤
 		GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
 		return nullptr;
 	}
+	*/
 		// 데이터 테이블이 멀쩡한 지 확인
 	if (CachedMonsterRows.IsEmpty())
 	{

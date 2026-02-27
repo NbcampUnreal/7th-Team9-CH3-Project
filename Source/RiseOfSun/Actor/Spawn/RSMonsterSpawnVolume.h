@@ -48,6 +48,11 @@ public:
 	// 스폰을 켜고 끄는 함수
 	void SetIsSpawning(bool bEnable) { bIsSpawning = bEnable; }
 
+	void ResetSpawnCount() {
+		SpawnCount = 0;
+		CurrentSpawnIndex = 0;
+	}
+
 protected:
 	// 몬스터 수
 	int32 SpawnCount = 0;

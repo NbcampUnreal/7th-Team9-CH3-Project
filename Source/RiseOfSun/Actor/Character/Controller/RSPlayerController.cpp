@@ -2,8 +2,10 @@
 
 
 #include "RSPlayerController.h"
-
+#include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+
+
 
 void ARSPlayerController::BeginPlay()
 {
@@ -29,4 +31,14 @@ void ARSPlayerController::BeginPlay()
         SetInputMode(FInputModeGameOnly());
         bShowMouseCursor = false;
     }
+
+    if (HUDWidgetClass)
+    {
+        UUserWidget* RSHUDWidget = CreateWidget<UUserWidget>(this, HUDWidgetClass);
+        if (RSHUDWidget)
+        {
+            RSHUDWidget->AddToViewport();
+        }
+    }
 }
+
