@@ -16,8 +16,12 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Controller/RSPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Sound/SoundCue.h"
 #include "Item/RSItemBase.h"
+
+#include "Core/RSGameMode.h"
 
 ARSPlayer::ARSPlayer()
 {
@@ -117,7 +121,7 @@ ARSPlayer::ARSPlayer()
 		RifleComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("riflesocket"));
 		//RifleComp->SetRelativeLocation(FVector(0, 0, 0));
 		//RifleMeshComp->SetRelativeRotation(FRotator(0, 0, 0));
-	}
+	} 
 	//---------- EXP 초기값 ----------
 	Level = 1;
 
@@ -132,7 +136,10 @@ ARSPlayer::ARSPlayer()
 void ARSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	if (RifleComp)
+	{
+		RifleComp->OnReloadStarted.AddDynamic(this, &ARSPlayer::HandleReloadStarted);
+	}
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -158,8 +165,8 @@ void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
-	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+	//UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
 
 	static float DamageAccumulator = 0.f;
 	DamageAccumulator += DeltaTime;
@@ -270,18 +277,87 @@ void ARSPlayer::Shoot()
 
 void ARSPlayer::HandleFire()
 {
-	
+
 		AimStart();
 
-		if (!RifleComp || !bHasAimPoint)
+		if (!RifleComp || !bHasAimPoint || !RifleComp->CanFire())
 		{
+			
 			return;
 		}
+	
 		RifleComp->Fire(MuzzlePoint, MuzzleFlashSystem, LastAimPoint);
-
-
+	
+	PlayFireSound();
+	
+	
 	
 
+}
+
+void ARSPlayer::PlayFireSound()
+{
+
+	if (!bCanPlayFireSound)
+		return;
+
+	
+	
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FireSoundTimerHandle,
+		this,
+		&ARSPlayer::ResetFireSound,
+		0.1f,
+		true
+	);
+
+}
+
+void ARSPlayer::ResetFireSound()
+{
+	bCanPlayFireSound = true;
+}
+
+void ARSPlayer::Die()
+{
+	Super::Die();
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (DieMontage)
+		{
+			AnimInstance->Montage_Play(DieMontage);
+		}
+	}
+	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
+	{
+		ARSGameMode* RSGaneMode = Cast<ARSGameMode>(GameMode);
+		if (RSGaneMode)
+		{
+			RSGaneMode->OnPlayerDied();
+			ARSPlayerController* playerController = Cast<ARSPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (playerController)
+			{
+				playerController->bShowMouseCursor = true;
+				playerController->SetPause(true);
+			}
+		}
+	}
+}
+
+void ARSPlayer::HandleReloadStarted()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (ReloadMontage)
+		{
+			AnimInstance->Montage_Play(ReloadMontage);
+		}
+	}
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)
@@ -291,9 +367,8 @@ void ARSPlayer::Fire(const FInputActionValue& Value)
 		return;
 	}
 	bIsFiring = true;
-
 	HandleFire();
-
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		FireTimerHandle,
 		this,
@@ -306,6 +381,7 @@ void ARSPlayer::Fire(const FInputActionValue& Value)
 void ARSPlayer::StopFire(const FInputActionValue& Value)
 {
 	bIsFiring = false;
+	bCanPlayFireSound = false;
 	GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
 }
 
@@ -317,24 +393,20 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (AnimInstance)
+	if (RifleComp)
 	{
-		if (ReloadMontage)
-		{
-			AnimInstance->Montage_Play(ReloadMontage);
-		}
+		RifleComp->Reload();
 	}
-	RifleComp->Reload();
+	
 }
+
 void ARSPlayer::AddEXP(float  ExpAmount)
 {
 	if (ExpAmount <= 0)
 		return;
 
 	CurrentEXP += ExpAmount;
-	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+	//UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
 
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)

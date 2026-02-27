@@ -16,7 +16,7 @@ void ARSMonsterController::OnPossess(APawn* InPawn)
 	{
 		TargetPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-		ChangeState(AIState::Chase);
+		SetChangeState(AIState::Chase);
 	});
 }
 
@@ -46,7 +46,7 @@ static const TCHAR* StateToText(AIState S)
 	}
 }
 
-void ARSMonsterController::ChangeState(AIState NewState)
+void ARSMonsterController::SetChangeState(AIState NewState)
 {
 	if (CurrentState == NewState)
 		return;
@@ -54,22 +54,20 @@ void ARSMonsterController::ChangeState(AIState NewState)
 	AIState OldState = CurrentState;
 	CurrentState = NewState;
 
-	UE_LOG(LogTemp, Display, TEXT("[AI] State: %s -> %s"),
-	       StateToText(OldState), StateToText(NewState));
+	//UE_LOG(LogTemp, Display, TEXT("[AI] State: %s -> %s"),StateToText(OldState), StateToText(NewState));
 
 	if (NewState == AIState::Chase)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[AI] ENTER CHASE"));
+		//UE_LOG(LogTemp, Warning, TEXT("[AI] ENTER CHASE"));
 	}
 	else if (NewState == AIState::Attack)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[AI] ENTER ATTACK"));
+		//UE_LOG(LogTemp, Warning, TEXT("[AI] ENTER ATTACK"));
 	}
 
 	if (NewState == AIState::Attack)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("State changed: %d -> %d (ENTER ATTACK)"),
-		       (int32)OldState, (int32)NewState);
+		//UE_LOG(LogTemp, Warning, TEXT("State changed: %d -> %d (ENTER ATTACK)"),(int32)OldState, (int32)NewState);
 	}
 
 	switch (NewState)
@@ -108,7 +106,7 @@ void ARSMonsterController::TickChase(float DeltaTime)
 
 	float AttackRange = 10.f;
 	float Range = Monster->GetAttackRange();
-	UE_LOG(LogTemp, Warning, TEXT("Range=%.1f"), Range);
+	//UE_LOG(LogTemp, Warning, TEXT("Range=%.1f"), Range);
 
 	const float Dist = FVector::Dist(
 		GetPawn()->GetActorLocation(),
@@ -118,12 +116,12 @@ void ARSMonsterController::TickChase(float DeltaTime)
 
 	if (Dist <= Range)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IN RANGE -> TRY ATTACK"));
+		//UE_LOG(LogTemp, Warning, TEXT("IN RANGE -> TRY ATTACK"));
 	}
 
 	if (IsPlayerInRange(Range))
 	{
-		ChangeState(AIState::Attack);
+		SetChangeState(AIState::Attack);
 		return;
 	}
 
@@ -138,7 +136,7 @@ void ARSMonsterController::TickAttack(float DeltaTime)
 	const float Range = Monster->GetAttackRange();
 	if (!IsPlayerInRange(Range))
 	{
-		ChangeState(AIState::Chase);
+		SetChangeState(AIState::Chase);
 		return;
 	}
 

@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "RSGrenadeItem.h"
+﻿#include "RSGrenadeItem.h"
 #include "Kismet/GameplayStatics.h"
 
 ARSGrenadeItem::ARSGrenadeItem()
@@ -15,6 +12,7 @@ ARSGrenadeItem::ARSGrenadeItem()
 	Mesh->SetLinearDamping(0.2f);
 	Mesh->SetAngularDamping(0.1f);
 	Mesh->OnComponentHit.AddDynamic(this, &ARSGrenadeItem::OnHit);
+	ItemType = "Grenade";
 }
 
 void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -39,7 +37,8 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 
 		if (ExplosionEffect)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+
 				GetWorld(),
 				ExplosionEffect,
 				GetActorLocation()
@@ -53,7 +52,6 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 				GetActorLocation()
 			);
 		}
-
 
 		Destroy();
 	}

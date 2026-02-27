@@ -17,47 +17,95 @@ ARSMonsterSpawnVolume::ARSMonsterSpawnVolume()
 	MonsterDataTable = nullptr;
 }
 
+void ARSMonsterSpawnVolume::StopSpawning()
+{
+	bIsSpawning = false;
+
+	if (GetWorld())
+	{
+		GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Spawn Stopped"));
+}
+
 void ARSMonsterSpawnVolume::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (MonsterDataTable) 
 	{
+		TArray<FMonsterSpawnRow*> RowPtrs;
 		static const FString ContextString(TEXT("MonsterSpawnContext"));
-		MonsterDataTable->GetAllRows(ContextString, CachedMonsterRows);
+		MonsterDataTable->GetAllRows(ContextString, RowPtrs);
+		CachedMonsterRows.Reset();
+		for (FMonsterSpawnRow* RowPtr : RowPtrs)
+		{
+			if (RowPtr)
+			{
+				CachedMonsterRows.Add(*RowPtr); // ✅ 값 복사
+			}
+		}
+    
 	}
 	
-	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ARSMonsterSpawnVolume::SpawnNextMonster, 2.0f, true);
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, [this]()
+		{
+			SpawnNextMonster();
+		},2.0f, true);
 }
 
-void ARSMonsterSpawnVolume::SpawnNextMonster()
+void ARSMonsterSpawnVolume::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (SpawnCount >= MaxSpawnCount)
+	Super::EndPlay(EndPlayReason);
+	
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
+
+
+AActor* ARSMonsterSpawnVolume::SpawnNextMonster()
+{
+	
+	if (!bIsSpawning)return nullptr;
+	/*if (SpawnCount >= MaxSpawnCount)
 	{
 		// 타이머 멈춤
 		GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
-		return;
+		return nullptr;
 	}
+	*/
 		// 데이터 테이블이 멀쩡한 지 확인
-	if (CachedMonsterRows.IsEmpty()) return;
+	if (CachedMonsterRows.IsEmpty())
+	{
+		return nullptr;
+	}
+
 		// 인덱스 연결이 잘 됐나
-	if (CachedMonsterRows.IsValidIndex(CurrentSpawnIndex))
-	{	// 현재 인덱스의 데이터 가져오기
-		FMonsterSpawnRow* SelectedRow = CachedMonsterRows[CurrentSpawnIndex];
-		
-		if (SelectedRow && SelectedRow->MonsterClass)
-		{	// 실제 스폰 진행
-			SpawnMonster(SelectedRow->MonsterClass);
-			// 다음 몬스터
-			CurrentSpawnIndex++;
-			SpawnCount++;
-			// 다 소환되면 초기화
-			if (CurrentSpawnIndex >= CachedMonsterRows.Num())
-			{
-				CurrentSpawnIndex = 0;
+		if (CachedMonsterRows.IsValidIndex(CurrentSpawnIndex))
+		{	// 현재 인덱스의 데이터 가져오기
+			const FMonsterSpawnRow& SelectedRow = CachedMonsterRows[CurrentSpawnIndex];
+
+			if (SelectedRow.MonsterClass)
+			{	// 실제 스폰 진행
+				// 다음 몬스터
+				
+				const FMonsterSpawnRow& Row = CachedMonsterRows[CurrentSpawnIndex];
+				
+				CurrentSpawnIndex++;
+				SpawnCount++;
+				// 다 소환되면 초기화
+				if (CurrentSpawnIndex >= CachedMonsterRows.Num())
+				{
+					CurrentSpawnIndex = 0;
+				}
+				
+				return SpawnMonster(SelectedRow.MonsterClass);
 			}
 		}
-	}
+		return nullptr;
+		
+	
 }
 
 void ARSMonsterSpawnVolume::OnMonsterDestroyed(AActor* DestroyedActor)
@@ -75,9 +123,9 @@ FMonsterSpawnRow* ARSMonsterSpawnVolume::GetRandomMonster() const
 	return nullptr;
 }
 
-void ARSMonsterSpawnVolume::SpawnMonster(TSubclassOf<ARSMonster> MonsterClass)
+AActor* ARSMonsterSpawnVolume::SpawnMonster(TSubclassOf<ARSMonster> MonsterClass)
 {
-	if (!MonsterClass) return;
+	if (!MonsterClass) return nullptr;
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -95,6 +143,7 @@ void ARSMonsterSpawnVolume::SpawnMonster(TSubclassOf<ARSMonster> MonsterClass)
 
 		NewMonster->OnDestroyed.AddDynamic(this, &ARSMonsterSpawnVolume::OnMonsterDestroyed);
 	}
+	return NewMonster;
 }
 
 FVector ARSMonsterSpawnVolume::GetRandomPointVolume() const
@@ -118,5 +167,8 @@ void ARSMonsterSpawnVolume::LevelUp()
 	SpawnCount = 0;
 	CurrentSpawnIndex = 0;
 
-	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ARSMonsterSpawnVolume::SpawnNextMonster, 2.0f, true);
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, [this]()
+		{
+			SpawnNextMonster();
+		}, 2.0f, true);
 }

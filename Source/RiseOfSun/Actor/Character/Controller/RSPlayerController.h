@@ -14,6 +14,23 @@ class RISEOFSUN_API ARSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UUserWidget> StartMenuClass;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> StartMenu;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget>HUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget>HUDWidget;
+
+	//UFUNCTION(BlueprintCallable, Category = "HUD")
+	//UUserWidget* HUDWidget() const;
 protected:
 	virtual void BeginPlay() override;
+	
+	
 };

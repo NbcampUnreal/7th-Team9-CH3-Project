@@ -1,6 +1,9 @@
 ﻿#include "RSMonster.h"
-
+#include "Component/RSRifleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Widget/RSMonsterWidget.h"
+#include "Core/RSGameState.h"
+
 
 ARSMonster::ARSMonster()
 {
@@ -10,7 +13,6 @@ ARSMonster::ARSMonster()
 
     // HP Widget 생성
     HPWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPWidget"));
-
     // 블루프린트/코드 위젯 클래스 지정
     HPWidgetComponent->SetWidgetClass(URSMonsterWidget::StaticClass());
     HPWidgetComponent->SetupAttachment(GetMesh());
@@ -38,12 +40,17 @@ ARSMonster::ARSMonster()
 
 bool ARSMonster::CanAttack(ACharacter* Target)
 {
+    if (bIsDead)
+    {
+        return false;
+    }
+
     if (!Target) return false;
 
     FVector ActorLocation = GetActorLocation();  //몬스터 위치
     FVector PlayerLocation = Target->GetActorLocation();  //플레이어 위치
     const float DistSq = FVector::DistSquared2D(ActorLocation, PlayerLocation);
-    
+
     return DistSq <= AttackRange * AttackRange; // 공격범위
 }
 
@@ -65,9 +72,33 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
     return result;
 }
 
+void ARSMonster::Die()
+{
+    if (bIsDead)
+        return;
+
+
+    Super::Die();
+
+    ARSGameState* RSGameState = Cast<ARSGameState>(GetWorld()->GetGameState());
+    if (RSGameState)
+    {
+        RSGameState->OnMonsterKilled();
+    }
+
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (DieMontage)
+    {
+        AnimInstance->Montage_Play(DieMontage);
+    }
+}
+
 void ARSMonster::BeginPlay()
 {
     Super::BeginPlay();
+
+    //몬스터의 기본 속력
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
 
     if (HPWidgetComponent)
     {
@@ -102,6 +133,8 @@ void ARSMonster::Tick(float DeltaTime)
     }
 }
 
+
+
 void ARSMonster::ShowDamageUI()
 {
     if (!HPWidgetComponent) return;
@@ -127,4 +160,56 @@ void ARSMonster::HideDamageUI()
     {
         HPWidgetComponent->SetVisibility(false);
     }
+}
+
+void ARSMonster::RestoreSpeed()
+{
+    if (!GetCharacterMovement())
+    {
+        return;
+    }
+
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+}
+
+void ARSMonster::SlowEffect()
+{
+    if (!GetCharacterMovement())
+    {
+        return;
+    }
+
+    GetCharacterMovement()->MaxWalkSpeed = SlowMovementSpeed;
+
+    GetWorldTimerManager().ClearTimer(SlowTimerHandle);
+
+    GetWorldTimerManager().SetTimer(
+        SlowTimerHandle,
+        this,
+        &ARSMonster::RestoreSpeed,
+        SlowDuration,
+        false
+    );
+}
+
+// 피격 시 이동속도 감소효과, 피 튀기는 효과
+void ARSMonster::DamageEffect()
+{
+    Super::DamageEffect();
+
+    SlowEffect();
+
+    if (HitBloodEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            HitBloodEffect,
+            GetActorLocation(),
+            GetActorRotation()
+        );
+    }
+}
+
+void Ondeath()
+{
 }

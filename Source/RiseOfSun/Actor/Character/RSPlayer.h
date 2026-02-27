@@ -71,6 +71,12 @@ private:
 
     //인벤토리
     void HandleToggleInventory();
+    
+   	void PlayFireSound();
+    void ResetFireSound();
+    virtual void Die() override;
+	UFUNCTION()
+	void HandleReloadStarted();
 
 
 
@@ -129,6 +135,7 @@ public:
     float FireInterval = 0.1f; // 발사 간격 (초)
 
     bool bIsFiring;
+	bool bCanPlayFireSound = true;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
     bool bHasAimPoint = false;
@@ -136,6 +143,8 @@ public:
     float CamRange = 10000.0f;
     UPROPERTY(EditAnywhere, Category = "CameraTrace")
     float FireDebugDuration = 1.0f;
+	
+	FTimerHandle FireSoundTimerHandle;
 	//카메라 중앙에 조준점 계산할 때 사용할 트레이스 채널
     TEnumAsByte<ECollisionChannel> CamTraceChannel = ECC_Visibility;
 
@@ -155,7 +164,7 @@ public:
     TObjectPtr<class URSRifleComponent> RifleComp;
 
     UUserWidget* GetPlayerHUD() const { return PlayerHUD; }
-
+	
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RifleComp")
 	TObjectPtr<class UStaticMeshComponent> RifleMeshComp;
 
@@ -167,4 +176,7 @@ public:
     
 	UPROPERTY(EditAnywhere, Category = "Reload")
 	class UAnimMontage* ReloadMontage;
+	
+	UPROPERTY(EditAnywhere, Category = "Die")
+	class UAnimMontage* DieMontage;
 };
