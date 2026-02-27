@@ -7,7 +7,7 @@
 #include "RSRifleComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChanged, int32, AmmoInClip, int32, MaxAmmoInClip);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReloadStarted);
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RISEOFSUN_API URSRifleComponent : public USceneComponent
 {
@@ -15,7 +15,9 @@ class RISEOFSUN_API URSRifleComponent : public USceneComponent
 
 public:
 	URSRifleComponent();
-	
+
+	UPROPERTY(BlueprintAssignable)
+	FOnReloadStarted OnReloadStarted;
 public:
 	void Fire(USceneComponent* MuzzlePoint, class UNiagaraSystem* MuzzleFlashSystem, FVector AimEnd);
 	bool CanFire() const;
@@ -45,6 +47,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TObjectPtr<class USoundCue> ReloadSoundCue;
+	
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<class USoundCue> FireSoundCue;
 protected:
 	void ReloadComplete();
 
