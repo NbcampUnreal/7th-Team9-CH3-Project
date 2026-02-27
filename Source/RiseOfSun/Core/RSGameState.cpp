@@ -43,6 +43,16 @@ void ARSGameState::StartLevel()
 	TArray<AActor*> FoundVolume;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
 	//-----------------------------------------------------------------------------------------------------
+	// --- 추가: 밤이 되면 스폰 볼륨을 다시 켭니다 ---
+	for (AActor* VolumeActor : FoundVolume)
+	{
+		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(VolumeActor);
+		if (SpawnVolume)
+		{
+			SpawnVolume->SetIsSpawning(true);
+			SpawnVolume->ResetSpawnCount();
+		}
+	}
 	// 레벨별 몬스터 수 조절 로직
 	const int32 MonsterToSpawn = (CurrentLevelIndex + 1) * 10;
 	if (FoundVolume.Num() > 0)
@@ -64,6 +74,7 @@ void ARSGameState::StartLevel()
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Total Monsters: %d"), CurrentLevelIndex + 1, MonsterCount);
+
 }
 
 void ARSGameState::OnMonsterKilled()
@@ -91,14 +102,34 @@ void ARSGameState::EndLevelAndReward()
 
 	//살아남은 모든 몬스터 제거
 	//해가 뜨면 남아있는 몬스터들을 타 죽거나 사라짐
+	// --- 추가: 해가 뜨면 스폰 볼륨을 끕니다 ---
+	TArray<AActor*> FoundVolume;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
+	for (AActor* VolumeActor : FoundVolume)
+	{
+		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(VolumeActor);
+		if (SpawnVolume)
+		{
+			SpawnVolume->SetIsSpawning(false);
+		}
+	}
+	// ------------------------------------------
 	
 	for (TActorIterator<ARSMonster> It(GetWorld()); It; ++It)
 	{
-		ARSMonster* RemainingMonster = *It;
-		if (RemainingMonster)
+		
+		if (ARSMonster* RemainingMonster = *It)
 		{
 			RemainingMonster->Destroy();//몬스터 즉시 제거
 		}
+	}
+	// 다음 레벨 준비 (예: 60초 뒤에 다시 밤이 됨)
+	CurrentLevelIndex++;
+	if (CurrentLevelIndex >= 3)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("모든 레벨 클리어! 게임을 종료합니다."));
+		// 여기에 승리 UI 표시 기능을 넣으면 좋습니다.
+		return; // 더 이상 아래의 아이템 생성과 타이머를 실행하지 않고 끝냅니다.
 	}
 
 	UWorld* World = GetWorld();
@@ -126,9 +157,7 @@ void ARSGameState::EndLevelAndReward()
 		World->SpawnActor<AActor>(GrenadeClass, RandomLoc, FRotator::ZeroRotator, SpawnParams);
 	}
 
-	// 다음 레벨 준비 (예: 20초 뒤에 다시 밤이 됨)
-	CurrentLevelIndex++;
-	GetWorldTimerManager().SetTimer(LevelTransitionTimer, this, &ARSGameState::StartLevel, 50.0f, false);
+	GetWorldTimerManager().SetTimer(LevelTransitionTimer, this, &ARSGameState::StartLevel, 60.0f, false);
 }
 
 void ARSGameState::UpdateWorldLighting(float NewIntensity)

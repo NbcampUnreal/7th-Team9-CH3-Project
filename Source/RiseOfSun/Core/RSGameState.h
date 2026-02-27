@@ -61,6 +61,8 @@ public:
 
 	// 몬스터 클래스에서 호출할 함수
 	void OnMonsterKilled();
+
+
 protected:
 	// 월드의 메인 조명을 저장할 변수
 	UPROPERTY()
