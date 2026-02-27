@@ -60,12 +60,6 @@ void ARSBaseItem::DestroyItem()
 	Destroy();
 }
 
-void ARSBaseItem::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
 void ARSBaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

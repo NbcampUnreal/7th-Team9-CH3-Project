@@ -44,13 +44,13 @@ bool ARSMonster::CanAttack(ACharacter* Target)
     {
         return false;
     }
-    
+
     if (!Target) return false;
 
     FVector ActorLocation = GetActorLocation();  //몬스터 위치
     FVector PlayerLocation = Target->GetActorLocation();  //플레이어 위치
     const float DistSq = FVector::DistSquared2D(ActorLocation, PlayerLocation);
-    
+
     return DistSq <= AttackRange * AttackRange; // 공격범위
 }
 
@@ -74,12 +74,22 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
 
 void ARSMonster::Die()
 {
+    if (bIsDead)
+        return;
+
+
     Super::Die();
-    
+
     ARSGameState* RSGameState = Cast<ARSGameState>(GetWorld()->GetGameState());
     if (RSGameState)
     {
         RSGameState->OnMonsterKilled();
+    }
+
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (DieMontage)
+    {
+        AnimInstance->Montage_Play(DieMontage);
     }
 }
 
@@ -89,7 +99,7 @@ void ARSMonster::BeginPlay()
 
     //몬스터의 기본 속력
     GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
-    
+
     if (HPWidgetComponent)
     {
         UUserWidget* Widget = HPWidgetComponent->GetUserWidgetObject();
@@ -158,7 +168,7 @@ void ARSMonster::RestoreSpeed()
     {
         return;
     }
-    
+
     GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
 }
 
@@ -168,11 +178,11 @@ void ARSMonster::SlowEffect()
     {
         return;
     }
-    
+
     GetCharacterMovement()->MaxWalkSpeed = SlowMovementSpeed;
-    
+
     GetWorldTimerManager().ClearTimer(SlowTimerHandle);
-    
+
     GetWorldTimerManager().SetTimer(
         SlowTimerHandle,
         this,
@@ -186,9 +196,9 @@ void ARSMonster::SlowEffect()
 void ARSMonster::DamageEffect()
 {
     Super::DamageEffect();
-    
+
     SlowEffect();
-    
+
     if (HitBloodEffect)
     {
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -196,21 +206,7 @@ void ARSMonster::DamageEffect()
             HitBloodEffect,
             GetActorLocation(),
             GetActorRotation()
-            );
-    }
-}
-
-void ARSMonster::Die()
-{
-    if (bIsDead)
-        return;
-    
-    Super::Die();
-    
-    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-    if (DieMontage)
-    {
-        AnimInstance->Montage_Play(DieMontage);
+        );
     }
 }
 
