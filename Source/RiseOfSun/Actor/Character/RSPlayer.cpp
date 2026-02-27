@@ -20,6 +20,8 @@
 #include "Item/RSItemBase.h"
 #include <Widget/RSPlayerHUD.h>
 
+#include "Core/RSGameMode.h"
+
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -158,8 +160,8 @@ void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
-	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+	//UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
 
 	static float DamageAccumulator = 0.f;
 	DamageAccumulator += DeltaTime;
@@ -301,6 +303,20 @@ void ARSPlayer::Die()
 			AnimInstance->Montage_Play(DieMontage);
 		}
 	}
+	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
+	{
+		ARSGameMode* RSGaneMode = Cast<ARSGameMode>(GameMode);
+		if (RSGaneMode)
+		{
+			RSGaneMode->OnPlayerDied();
+			ARSPlayerController* playerController = Cast<ARSPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (playerController)
+			{
+				playerController->bShowMouseCursor = true;
+				playerController->SetPause(true);
+			}
+		}
+	}
 }
 
 void ARSPlayer::ToggleInventoryInput()
@@ -361,7 +377,7 @@ void ARSPlayer::AddEXP(float  ExpAmount)
 		return;
 
 	CurrentEXP += ExpAmount;
-	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+	//UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
 
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)

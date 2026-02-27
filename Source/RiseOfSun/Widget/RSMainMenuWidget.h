@@ -7,9 +7,14 @@
 #include "Components/Button.h"
 #include "RSMainMenuWidget.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class EMenuMode : uint8
+{
+	MainMenu,
+	GameOver
+};
+
+
 UCLASS()
 class RISEOFSUN_API URSMainMenuWidget : public UUserWidget
 {
@@ -20,10 +25,15 @@ public:
 	void OnStartClicked();
 
 	virtual bool Initialize() override;
-	
+	virtual void NativeConstruct() override;
 	UPROPERTY(meta = (BindWidget))
 	UButton* StartButton;
-	
-	UPROPERTY(BlueprintReadWrite)
-	UUserWidget* MainMenuWidget;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StartEndText;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TitleText;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Menu")
+	EMenuMode MenuMode = EMenuMode::MainMenu;
 };
