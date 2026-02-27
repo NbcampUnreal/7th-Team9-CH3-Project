@@ -12,6 +12,7 @@ ARSGrenadeItem::ARSGrenadeItem()
 	Mesh->SetLinearDamping(0.2f);
 	Mesh->SetAngularDamping(0.1f);
 	Mesh->OnComponentHit.AddDynamic(this, &ARSGrenadeItem::OnHit);
+	ItemType = "Grenade";
 }
 
 void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

@@ -9,11 +9,55 @@ ARSBaseItem::ARSBaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	SetRootComponent(Scene);
+
+	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	Collision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	Collision->SetupAttachment(Scene);
 	// 공통 메시 생성
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(Collision);
 
 	// 메시를 루트로 사용
-	RootComponent = Mesh;
+	//RootComponent = Mesh;
+	Collision->OnComponentBeginOverlap.AddDynamic(this, &ARSBaseItem::OnItemOverlap);
+	Collision->OnComponentEndOverlap.AddDynamic(this, &ARSBaseItem::OnItemEndOverlap);
+}
+
+void ARSBaseItem::OnItemOverlap(UPrimitiveComponent* OverlappedComp, 
+	AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex, 
+	bool bFromSweep, 
+	const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor->ActorHasTag("Player"))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Overlap!!")));
+		ActivateItem(OtherActor);
+	}
+}
+
+void ARSBaseItem::OnItemEndOverlap(UPrimitiveComponent* OverlappedComp, 
+	AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex)
+{
+}
+
+void ARSBaseItem::ActivateItem(AActor* Activator)
+{
+}
+
+FName ARSBaseItem::GetItemType() const
+{
+	return FName();
+}
+
+void ARSBaseItem::DestroyItem()
+{
+	Destroy();
 }
 
 void ARSBaseItem::BeginPlay()
