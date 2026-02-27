@@ -6,6 +6,10 @@
 #include "Actor/Character/RSPlayer.h"
 #include "Actor/Character/Controller/RSPlayerController.h"
 #include "RSGameState.h"
+#include "Actor/Spawn/RSMonsterSpawnVolume.h"
+#include "Kismet/GameplayStatics.h"
+#include "Widget/RSMainMenuWidget.h"
+
 
 ARSGameMode::ARSGameMode()
 {
@@ -20,5 +24,41 @@ ARSGameMode::ARSGameMode()
 	PlayerControllerClass = ARSPlayerController::StaticClass();
 	DefaultPawnClass = ARSPlayerController::StaticClass();
 	GameStateClass = ARSGameMode::StaticClass();
+}
+
+void  ARSGameMode::OnPlayerDied()
+{
+	if (!MenuClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("MenuClass is null"));
+		return;
+	}
+
+	URSMainMenuWidget* Widget = CreateWidget<URSMainMenuWidget>(GetWorld(), MenuClass);
+	if (!Widget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create menu widget"));
+		return;
+	}
+	// 게임오버 UI
+	TArray<AActor*> FoundVolumes;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(),
+		ARSMonsterSpawnVolume::StaticClass(),
+		FoundVolumes
+	);
+
+	for (AActor* Actor : FoundVolumes)
+	{
+		ARSMonsterSpawnVolume* Volume = Cast<ARSMonsterSpawnVolume>(Actor);
+		if (Volume)
+		{
+			Volume->StopSpawning();
+		}
+	}
+	
+
+	Widget->MenuMode = EMenuMode::GameOver;
+	Widget->AddToViewport();
 }
 

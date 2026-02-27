@@ -79,10 +79,13 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 		// Attack 이후에도 유효한지 다시 체크
 		if (IsValid(Target) && Target->IsDead())
 		{
-			Target->Destroy();
+			Target->Die();
 		}
 	}
-
+	UGameplayStatics::PlaySoundAtLocation(
+			this,
+			FireSoundCue,
+			MuzzlePoint->GetComponentLocation());
 	FRotator Rot = FRotator(0.f, -90.f, 0.f);
 	MuzzleFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		MuzzleFlashSystem, MuzzlePoint, NAME_None,
@@ -97,7 +100,7 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 }
 bool URSRifleComponent::CanFire() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("[Rifle] CanFire Ammo=%d Reload=%d"), AmmoInClip, bIsReloading);
+	
 	return AmmoInClip > 0;
 }
 
@@ -113,7 +116,7 @@ void URSRifleComponent::Reload()
 		return;
 	}
 	
-	
+	OnReloadStarted.Broadcast();
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,

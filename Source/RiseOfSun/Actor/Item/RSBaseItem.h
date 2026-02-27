@@ -10,6 +10,7 @@
 #include "Item/ItemInterface.h"
 #include "RSBaseItem.generated.h"
 
+struct FRSItemData;
 class URSItemBase;
 
 UCLASS()
@@ -62,6 +63,7 @@ protected:
 	virtual void DestroyItem();
 
 public:	
+	virtual void Tick(float DeltaTime) override;
 
 	//아이템 데이터 초기화 
 	void InitializeItem(const FRSItemData& Data);

@@ -37,7 +37,8 @@ void ARSCharacter::Die()
 	bIsDead = true;
 
 	SetActorEnableCollision(false);
-	SetLifeSpan(2.0f);
+	
+	SetLifeSpan(1.8f);
 }
 
 FDamageResult ARSCharacter::Attack(ARSCharacter* Target)
@@ -68,16 +69,18 @@ int32 ARSCharacter::HitDamage(int32 DamageAmount)
 
 	Stat.CurrentHealth -= Damage;
 	Stat.CurrentHealth = std::max(Stat.CurrentHealth, 0.0f);
-
+	
 	if (Stat.CurrentHealth <= 0)
 	{
 		Die();
 	}
 
 
-	// 데미지를 몬스터가 받는다면 UI 띄우기
+	// 몬스터가 데미지를 입으면 효과 발동,데미지를 몬스터가 받는다면 UI 띄우기
 	if (Damage > 0)
 	{
+		DamageEffect();
+		
 		if (ARSMonster* Monster = Cast<ARSMonster>(this))
 		{
 			// 공격자 여부 상관없이 데미지가 들어오면 UI 표시
@@ -86,4 +89,9 @@ int32 ARSCharacter::HitDamage(int32 DamageAmount)
 	}
 	
 	return Damage;
+}
+
+void ARSCharacter::DamageEffect()
+{
+	
 }

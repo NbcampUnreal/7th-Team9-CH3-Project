@@ -20,6 +20,8 @@
 #include "Item/RSItemBase.h"
 #include <Widget/RSPlayerHUD.h>
 
+#include "Core/RSGameMode.h"
+
 ARSPlayer::ARSPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -132,8 +134,10 @@ ARSPlayer::ARSPlayer()
 void ARSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
+	if (RifleComp)
+	{
+		RifleComp->OnReloadStarted.AddDynamic(this, &ARSPlayer::HandleReloadStarted);
+	}
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -158,8 +162,8 @@ void ARSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
-	UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
+	//UE_LOG(LogTemp, Warning, TEXT("CurrentHp: %f"), Stat.CurrentHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("CurrentEXP: %f"), CurrentEXP);
 
 	static float DamageAccumulator = 0.f;
 	DamageAccumulator += DeltaTime;
@@ -268,11 +272,7 @@ void ARSPlayer::PlayFireSound()
 		return;
 
 	
-	UGameplayStatics::PlaySoundAtLocation(
-		this,
-		FireSoundCue,
-		MuzzlePoint->GetComponentLocation()
-	);
+	
 
 	GetWorld()->GetTimerManager().SetTimer(
 		FireSoundTimerHandle,
@@ -301,11 +301,38 @@ void ARSPlayer::Die()
 			AnimInstance->Montage_Play(DieMontage);
 		}
 	}
+	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
+	{
+		ARSGameMode* RSGaneMode = Cast<ARSGameMode>(GameMode);
+		if (RSGaneMode)
+		{
+			RSGaneMode->OnPlayerDied();
+			ARSPlayerController* playerController = Cast<ARSPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (playerController)
+			{
+				playerController->bShowMouseCursor = true;
+				playerController->SetPause(true);
+			}
+		}
+	}
 }
 
 void ARSPlayer::ToggleInventoryInput()
 {
 
+}
+
+void ARSPlayer::HandleReloadStarted()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		if (ReloadMontage)
+		{
+			AnimInstance->Montage_Play(ReloadMontage);
+		}
+	}
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)
@@ -341,17 +368,10 @@ void ARSPlayer::Aim(const FInputActionValue& Value)
 
 void ARSPlayer::Reloading(const FInputActionValue& Value)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (AnimInstance)
+	if (RifleComp)
 	{
-		if (ReloadMontage)
-		{
-			AnimInstance->Montage_Play(ReloadMontage);
-		}
+		RifleComp->Reload();
 	}
-	RifleComp->Reload();
-
 	
 }
 
@@ -361,7 +381,7 @@ void ARSPlayer::AddEXP(float  ExpAmount)
 		return;
 
 	CurrentEXP += ExpAmount;
-	UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
+	//UE_LOG(LogTemp, Warning, TEXT("Current EXP: %f / %d"), CurrentEXP, MaxEXP);
 
 	// 여러 레벨업 가능성까지 고려
 	while (CurrentEXP >= MaxEXP)

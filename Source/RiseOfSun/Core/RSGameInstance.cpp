@@ -47,9 +47,9 @@ void URSGameInstance::Init()
     ItemManager = NewObject<URSItemManager>(this);
     // 3) DataTable 로드
     ItemManager->ItemDataTable = LoadObject<UDataTable>(
-        nullptr,
-        TEXT("/Game/Data/DT_ItemData.DT_ItemData")
-    );
+      nullptr, 
+      TEXT("/Game/Data/DT_ItemData.DT_ItemData"));
+
     // 4) DataTable 로드 확인 (이게 중요)
     if (!ItemManager->ItemDataTable)
     {
