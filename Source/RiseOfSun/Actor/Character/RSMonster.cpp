@@ -1,5 +1,6 @@
 ﻿#include "RSMonster.h"
-
+#include "Component/RSRifleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Widget/RSMonsterWidget.h"
 #include "Core/RSGameState.h"
 
@@ -12,7 +13,6 @@ ARSMonster::ARSMonster()
 
     // HP Widget 생성
     HPWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPWidget"));
-
     // 블루프린트/코드 위젯 클래스 지정
     HPWidgetComponent->SetWidgetClass(URSMonsterWidget::StaticClass());
     HPWidgetComponent->SetupAttachment(GetMesh());
@@ -40,6 +40,11 @@ ARSMonster::ARSMonster()
 
 bool ARSMonster::CanAttack(ACharacter* Target)
 {
+    if (bIsDead)
+    {
+        return false;
+    }
+    
     if (!Target) return false;
 
     FVector ActorLocation = GetActorLocation();  //몬스터 위치
@@ -82,6 +87,9 @@ void ARSMonster::BeginPlay()
 {
     Super::BeginPlay();
 
+    //몬스터의 기본 속력
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+    
     if (HPWidgetComponent)
     {
         UUserWidget* Widget = HPWidgetComponent->GetUserWidgetObject();
@@ -141,6 +149,68 @@ void ARSMonster::HideDamageUI()
     if (HPWidgetComponent)
     {
         HPWidgetComponent->SetVisibility(false);
+    }
+}
+
+void ARSMonster::RestoreSpeed()
+{
+    if (!GetCharacterMovement())
+    {
+        return;
+    }
+    
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+}
+
+void ARSMonster::SlowEffect()
+{
+    if (!GetCharacterMovement())
+    {
+        return;
+    }
+    
+    GetCharacterMovement()->MaxWalkSpeed = SlowMovementSpeed;
+    
+    GetWorldTimerManager().ClearTimer(SlowTimerHandle);
+    
+    GetWorldTimerManager().SetTimer(
+        SlowTimerHandle,
+        this,
+        &ARSMonster::RestoreSpeed,
+        SlowDuration,
+        false
+    );
+}
+
+// 피격 시 이동속도 감소효과, 피 튀기는 효과
+void ARSMonster::DamageEffect()
+{
+    Super::DamageEffect();
+    
+    SlowEffect();
+    
+    if (HitBloodEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            HitBloodEffect,
+            GetActorLocation(),
+            GetActorRotation()
+            );
+    }
+}
+
+void ARSMonster::Die()
+{
+    if (bIsDead)
+        return;
+    
+    Super::Die();
+    
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (DieMontage)
+    {
+        AnimInstance->Montage_Play(DieMontage);
     }
 }
 

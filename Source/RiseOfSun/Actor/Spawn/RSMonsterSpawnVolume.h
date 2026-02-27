@@ -15,7 +15,10 @@ class RISEOFSUN_API ARSMonsterSpawnVolume : public AActor
 public:	
 	ARSMonsterSpawnVolume();
 	
+	void StopSpawning();
+	
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	// 스폰 볼륨의 중심
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	USceneComponent* Scene;
@@ -31,6 +34,8 @@ public:
 	// 순차적으로 스폰해주는 함수
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	AActor* SpawnNextMonster();
+	
+	
 	UFUNCTION()
 	void OnMonsterDestroyed(AActor* DestroyedActor);
 	// 몬스터 정보를 하나 선택하는 함수
@@ -54,7 +59,7 @@ protected:
 	// 현재 어떤 인덱스를 스폰할지 저장
 	int32 CurrentSpawnIndex = 0;
 	// 데이터 테이블의 내용을 미리 복사해둘 배열
-	TArray<FMonsterSpawnRow*> CachedMonsterRows;
+	TArray<FMonsterSpawnRow> CachedMonsterRows;
 	
 
 	// 현재 살아있는 몬스터

@@ -7,12 +7,14 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Data/RSItemData.h"
+#include "Item/ItemInterface.h"
 #include "RSBaseItem.generated.h"
 
+struct FRSItemData;
 class URSItemBase;
 
 UCLASS()
-class RISEOFSUN_API ARSBaseItem : public AActor
+class RISEOFSUN_API ARSBaseItem : public AActor, public IItemInterface
 {
 	GENERATED_BODY()
 	
@@ -20,12 +22,18 @@ public:
 	ARSBaseItem();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	FName ItemType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	USceneComponent* Scene;
+
 	//충돌 영역 (픽업 감지용)
-	UPROPERTY(VisibleAnywhere, Category = "Item")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	USphereComponent* Collision;
 
 	//아이템 메시 
-	UPROPERTY(VisibleAnywhere, Category = "Item")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	UStaticMeshComponent* Mesh;
 
 	//실제 아이템 데이터 객체 
@@ -34,7 +42,28 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FRSItemData ItemData;
+
+	virtual void OnItemOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	) override;
+	virtual void OnItemEndOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex
+	) override;
+	virtual void ActivateItem(AActor* Activator) override;
+	virtual FName GetItemType() const override;
+
+	virtual void DestroyItem();
+
 public:	
+	virtual void Tick(float DeltaTime) override;
 
 	//아이템 데이터 초기화 
 	void InitializeItem(const FRSItemData& Data);
@@ -44,6 +73,4 @@ public:
 
 	/** 공격력 반환 */
 	int32 GetAttackPower() const;
-
-
 };
