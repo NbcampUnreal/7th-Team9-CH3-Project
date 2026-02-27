@@ -53,7 +53,10 @@ public:
 	virtual FDamageResult Attack(ARSCharacter* Target);
 
 	// 받는 피해
-	int32 HitDamage(int32 DamageAmount);
+	virtual int32 HitDamage(int32 DamageAmount);
+	
+	// 피해를 받으면 이벤트 발동
+	virtual void DamageEffect();
 
 	// 스탯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")

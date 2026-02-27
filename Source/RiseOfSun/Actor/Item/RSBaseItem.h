@@ -6,9 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
-#include "Data/RSItemData.h"
 #include "RSBaseItem.generated.h"
 
+struct FRSItemData;
 class URSItemBase;
 
 UCLASS()
@@ -20,6 +20,8 @@ public:
 	ARSBaseItem();
 
 protected:
+	virtual void BeginPlay() override;
+
 	//충돌 영역 (픽업 감지용)
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	USphereComponent* Collision;
@@ -31,10 +33,8 @@ protected:
 	//실제 아이템 데이터 객체 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	URSItemBase* ItemInstance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	FRSItemData ItemData;
 public:	
+	virtual void Tick(float DeltaTime) override;
 
 	//아이템 데이터 초기화 
 	void InitializeItem(const FRSItemData& Data);
