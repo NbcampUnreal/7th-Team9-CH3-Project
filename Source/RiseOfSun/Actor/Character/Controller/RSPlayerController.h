@@ -14,6 +14,14 @@ class RISEOFSUN_API ARSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UUserWidget> StartMenuClass;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> StartMenu;
 protected:
 	virtual void BeginPlay() override;
+	
+	
 };

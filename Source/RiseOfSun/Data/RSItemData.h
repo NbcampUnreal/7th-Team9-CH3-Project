@@ -4,6 +4,8 @@
 #include "Engine/DataTable.h"
 #include "RSItemData.generated.h"
 
+class ARSBaseItem;
+
 UENUM(BlueprintType)
 enum class EItemCategory : uint8
 {
@@ -31,6 +33,12 @@ struct FRSItemData : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString ItemName;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Data")
+    UTexture2D* Thumbnail; // 인벤토리에서 보여줄 아이템 썸네일
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Data")
+    TSubclassOf<ARSBaseItem> ItemActorClass; // 아이템의 설계도, 아이템 드롭에서 사용
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     EItemCategory Category;
 
@@ -41,11 +49,15 @@ struct FRSItemData : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 AttackPower = 0;
 
-    // 소모품 개수용
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 StackCount = 1;
+    int32 DefaultStack = 1;   // 생성 시 기본 수량
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 MaxStack = 1;       // 슬롯 최대 수량
 
     // --- 확장 기능 ---
     FText GetCategoryAsText() const;
     bool IsValidItem() const;
+
+
 };

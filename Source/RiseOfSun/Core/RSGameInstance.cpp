@@ -43,27 +43,27 @@ void URSGameInstance::Init()
         }
     }
     //UPROPERTY에 연결된 매니저 생성 (GC 추적 보장)
-    // GameInstance Init()에서 한 번 실행됨
+// 2) 아이템 매니저 생성
     ItemManager = NewObject<URSItemManager>(this);
+    // 3) DataTable 로드
     ItemManager->ItemDataTable = LoadObject<UDataTable>(
-        nullptr,
-        TEXT("/Game/Data/DT_ItemData.DT_ItemData")
-    );
+      nullptr, 
+      TEXT("/Game/Data/DT_ItemData.DT_ItemData"));
+
+    // 4) DataTable 로드 확인 (이게 중요)
     if (!ItemManager->ItemDataTable)
     {
         UE_LOG(LogTemp, Error, TEXT("아이템 데이터 테이블 로드 실패!"));
         return;
     }
-    // 테스트용 데이터 로드
-    if (ItemManager && ItemManager->ItemDataTable)
+    UE_LOG(LogTemp, Log, TEXT("데이터 테이블 로드 성공, Row 수: %d"),
+        ItemManager->ItemDataTable->GetRowMap().Num());
+    // 5) 아이템 테스트 생성
+    URSItemBase* RifleItem = ItemManager->SpawnItem(FName("Rifle"), this);
+    if (RifleItem)
     {
-        //RowName -> 데이터 테이블에서 맞춤
-        URSItemBase* RifleItem = ItemManager->SpawnItem(FName("Rifle"), this);
-        if (RifleItem)
-        {
-            UE_LOG(LogTemp, Log, TEXT("아이템 이름: %s, 공격력: %d"),
-                *RifleItem->GetItemName(),
-                RifleItem->GetAttackPower());
-        }
+        UE_LOG(LogTemp, Log, TEXT("아이템 이름: %s, 공격력: %d"),
+            *RifleItem->GetItemName(),
+            RifleItem->GetAttackPower());
     }
 }

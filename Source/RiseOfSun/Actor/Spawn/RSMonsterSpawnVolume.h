@@ -15,7 +15,10 @@ class RISEOFSUN_API ARSMonsterSpawnVolume : public AActor
 public:	
 	ARSMonsterSpawnVolume();
 	
+	void StopSpawning();
+	
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	// 스폰 볼륨의 중심
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	USceneComponent* Scene;
@@ -30,16 +33,20 @@ public:
 	int32 MaxSpawnCount = 30;
 	// 순차적으로 스폰해주는 함수
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void SpawnNextMonster();
+	AActor* SpawnNextMonster();
+	
+	
 	UFUNCTION()
 	void OnMonsterDestroyed(AActor* DestroyedActor);
 	// 몬스터 정보를 하나 선택하는 함수
 	FMonsterSpawnRow* GetRandomMonster() const;
 	// 전달받은 몬스터 클래스를 실제 월드에 생성하는 함수
-	void SpawnMonster(TSubclassOf<ARSMonster> MonsterClass);
+	AActor* SpawnMonster(TSubclassOf<ARSMonster> MonsterClass);
 	// 몬스터가 생성될 좌표를 정함
 	FVector GetRandomPointVolume() const;
 	
+	// 스폰을 켜고 끄는 함수
+	void SetIsSpawning(bool bEnable) { bIsSpawning = bEnable; }
 
 protected:
 	// 몬스터 수
@@ -47,13 +54,18 @@ protected:
 	// 현재 어떤 인덱스를 스폰할지 저장
 	int32 CurrentSpawnIndex = 0;
 	// 데이터 테이블의 내용을 미리 복사해둘 배열
-	TArray<FMonsterSpawnRow*> CachedMonsterRows;
+	TArray<FMonsterSpawnRow> CachedMonsterRows;
 	
-	FTimerHandle SpawnTimerHandle;
+
 	// 현재 살아있는 몬스터
 	int32 ActiveMonsterCount = 0;
 	// 레벨
 	int32 CurrentLevel = 1;
 	// 레벨업
 	void LevelUp();
+
+	UPROPERTY(VisibleAnywhere, Category = "Spawn")
+	bool bIsSpawning = true; // 기본값은 true
+public:
+	FTimerHandle SpawnTimerHandle;
 };

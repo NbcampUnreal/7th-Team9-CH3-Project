@@ -51,3 +51,4 @@ int32 ARSBaseItem::GetAttackPower() const
     return ItemInstance ? ItemInstance->GetAttackPower() : 0;
 }
 
+

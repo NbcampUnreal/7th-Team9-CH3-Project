@@ -2,6 +2,8 @@
 #include "Component/RSRifleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Widget/RSMonsterWidget.h"
+#include "Core/RSGameState.h"
+
 
 ARSMonster::ARSMonster()
 {
@@ -70,6 +72,17 @@ FDamageResult ARSMonster::Attack(ARSCharacter* Target)
     return result;
 }
 
+void ARSMonster::Die()
+{
+    Super::Die();
+    
+    ARSGameState* RSGameState = Cast<ARSGameState>(GetWorld()->GetGameState());
+    if (RSGameState)
+    {
+        RSGameState->OnMonsterKilled();
+    }
+}
+
 void ARSMonster::BeginPlay()
 {
     Super::BeginPlay();
@@ -109,6 +122,8 @@ void ARSMonster::Tick(float DeltaTime)
         }
     }
 }
+
+
 
 void ARSMonster::ShowDamageUI()
 {
@@ -197,4 +212,8 @@ void ARSMonster::Die()
     {
         AnimInstance->Montage_Play(DieMontage);
     }
+}
+
+void Ondeath()
+{
 }

@@ -1,5 +1,4 @@
 ﻿#include "RSItemManager.h"
-
 #include "Data/RSItemData.h"
 #include "Item/RSItemBase.h"
 
@@ -8,20 +7,20 @@ FRSItemData URSItemManager::GetItemDataByID(FName ItemID) const
 {
     if (!ItemDataTable)
     {
-        UE_LOG(LogTemp, Warning, TEXT("ItemDataTable이 설정되지 않았습니다."));
+        UE_LOG(LogTemp, Warning, TEXT("ItemDataTable이 비어 있음."));
         return FRSItemData();
     }
     static const FString ContextString(TEXT("Item Context"));
-    FRSItemData* FoundData = ItemDataTable->FindRow<FRSItemData>(ItemID, ContextString);
-    if (FoundData)
+    FRSItemData* Row = ItemDataTable->FindRow<FRSItemData>(ItemID, ContextString);
+    if (!Row)
     {
-        return *FoundData;
+        UE_LOG(LogTemp, Error, TEXT("ItemID '%s' 없음"), *ItemID.ToString());
+        return FRSItemData();
     }
-    UE_LOG(LogTemp, Warning, TEXT("해당 ItemID가 DataTable에 없습니다: %s"), *ItemID.ToString());
-    return FRSItemData();
+    return *Row;
 }
 
-URSItemBase* URSItemManager::SpawnItem(FName ItemID, UObject* Outer) 
+URSItemBase* URSItemManager::SpawnItem(FName ItemID, UObject* Outer)
 {
     FRSItemData Data = GetItemDataByID(ItemID);
     if (!Data.IsValidItem())
@@ -29,7 +28,11 @@ URSItemBase* URSItemManager::SpawnItem(FName ItemID, UObject* Outer)
         UE_LOG(LogTemp, Warning, TEXT("유효하지 않은 아이템 ID: %s"), *ItemID.ToString());
         return nullptr;
     }
-
+    if (!Outer)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Outer 없음 → GetTransientPackage 사용"));
+        Outer = GetTransientPackage();
+    }
     URSItemBase* NewItem = NewObject<URSItemBase>(Outer);
     if (NewItem)
     {
