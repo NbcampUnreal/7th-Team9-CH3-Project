@@ -21,7 +21,10 @@ public class RiseOfSun : ModuleRules
 			"InputCore",
 			"EnhancedInput",
 			"Niagara",
-			"UMG"
+			"UMG",
+			"AIModule",
+			"Slate", 
+			"SlateCore"  
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

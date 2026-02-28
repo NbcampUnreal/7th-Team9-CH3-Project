@@ -6,19 +6,30 @@
 void UInventorySlotWidget::NativeConstruct()
 {
     Super::NativeConstruct();
+
+    if (StackText)
+    {
+        StackText->SetText(FText::GetEmpty());
+    }
 }
 
-void UInventorySlotWidget::SetItemData(FName ItemID, int32 StackCount)
+void UInventorySlotWidget::SetItemData(UTexture2D* ItemIconTexture, int32 StackCount)
+{
+    ItemIcon->SetBrushFromTexture(ItemIconTexture);
+
+    const FText Text = GetStackCountText(StackCount);
+    StackText->SetText(Text);
+}
+
+FText UInventorySlotWidget::GetStackCountText(int32 StackCount) const
 {
     if (StackText)
     {
         if (StackCount > 1)
         {
-            StackText->SetText(FText::AsNumber(StackCount));
-        }
-        else
-        {
-            StackText->SetText(FText::GetEmpty()); // 1개면 숨김
+            return FText::AsNumber(StackCount);
         }
     }
+
+    return FText::GetEmpty();
 }

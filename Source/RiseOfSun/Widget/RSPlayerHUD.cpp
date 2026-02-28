@@ -3,13 +3,11 @@
 #include "Actor/Character/RSPlayer.h"
 #include "Actor/Character/Component/RSRifleComponent.h"
 #include "InventorySlotWidget.h"
+#include "InventoryWidget.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/PanelWidget.h"
-#include "Misc/OutputDeviceNull.h"
-#include "Components/GridPanel.h"
-#include "Components/GridSlot.h"
 #include "Actor/Character/Component/RSInventoryComponent.h"
+#include "Core/RSGameInstance.h"
 
 void URSPlayerHUD::NativeConstruct()
 {
@@ -36,9 +34,9 @@ void URSPlayerHUD::NativeConstruct()
     if (PlayerCharacter)
     {
         InventoryComponent = PlayerCharacter->FindComponentByClass<URSInventoryComponent>();
-
         if (InventoryComponent)
         {
+            InventoryWidget->InitSlot(InventoryComponent->InventorySize);
             InventoryComponent->OnInventoryUpdated.AddDynamic(
                 this,
                 &URSPlayerHUD::UpdateInventoryUI
@@ -97,47 +95,18 @@ void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
 
 void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)
 {
-    if (!InventoryGrid || !PlayerCharacter) return;
+    if (!InventoryWidget) return;
+    URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetGameInstance());
+    if (!RSGameInstance) return;
+    
+    check(RSGameInstance->ItemManager);
 
-    InventoryGrid->ClearChildren();
-
-    const int32 MaxColumns = 5; // 가로 5칸
-
+    URSItemManager* ItemManager = RSGameInstance->ItemManager;
     for (int32 i = 0; i < Slots.Num(); i++)
     {
         const FInventorySlot& InventorySlot = Slots[i];
-
-        if (InventorySlotWidgetClass)
-        {
-            //UUserWidget* SlotWidget =
-            //    CreateWidget<UUserWidget>(GetWorld(), InventorySlotWidgetClass);
-
-            UInventorySlotWidget* SlotWidget =
-                CreateWidget<UInventorySlotWidget>(GetWorld());
-
-            if (SlotWidget)
-            {
-                // 🔹 Grid 위치 계산
-                int32 Row = i / MaxColumns;
-                int32 Column = i % MaxColumns;
-
-                UGridSlot* GridSlot = InventoryGrid->AddChildToGrid(SlotWidget);
-                GridSlot->SetRow(Row);
-                GridSlot->SetColumn(Column);
-
-                // 🔹 아이템 데이터 전달
-                //FOutputDeviceNull Ar;
-                //FString Cmd = FString::Printf(
-                //    TEXT("SetItemData \"%s\" %d"),
-                //    *InventorySlot.ItemID.ToString(),
-                //    InventorySlot.StackCount
-                //);
-
-                //SlotWidget->CallFunctionByNameWithArguments(*Cmd, Ar, nullptr, true);
-				SlotWidget->SetItemData(InventorySlot.ItemID, InventorySlot.StackCount);
-                
-            }
-        }
+        const FRSItemData& ItemData = ItemManager->GetItemDataByID(InventorySlot.ItemID);
+        InventoryWidget->SetItemByIndex(i, ItemData.Thumbnail, InventorySlot.StackCount);
     }
 
     UE_LOG(LogTemp, Log, TEXT("Inventory UI Updated!"));
@@ -146,12 +115,9 @@ void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)
 //껐다 켰다 하는 기능.
 void URSPlayerHUD::ToggleInventory()
 {
-    if (!InventoryPanel) return;
-
     bInventoryVisible = !bInventoryVisible;
-    
-    InventoryPanel->SetVisibility(
-        bInventoryVisible ? ESlateVisibility::Visible
-        : ESlateVisibility::Hidden
-    );
+    if (InventoryWidget)
+    {
+        InventoryWidget->SetVisibilityWithBool(bInventoryVisible);
+    }
 }
