@@ -1,8 +1,6 @@
 ﻿#include "RSPlayerHUD.h"
-
 #include "Actor/Character/RSPlayer.h"
 #include "Actor/Character/Component/RSRifleComponent.h"
-#include "InventorySlotWidget.h"
 #include "InventoryWidget.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"

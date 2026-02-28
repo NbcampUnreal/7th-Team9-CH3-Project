@@ -1,9 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Widget/InventoryWidget.h"
-
-#include "InventorySlotWidget.h"
 #include "ItemSlotWidget.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
