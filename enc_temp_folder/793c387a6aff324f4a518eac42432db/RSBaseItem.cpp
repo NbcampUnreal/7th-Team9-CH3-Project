@@ -2,10 +2,8 @@
 
 //실제 객체를 담는 클래스(월드에 존재하는 아이템)(몸통)
 #include "RSBaseItem.h"
-#include "Engine/World.h"
 #include "Actor/Character/Component/RSInventoryComponent.h" 
 #include "Actor/Character/RSPlayer.h"
-#include "Kismet/GameplayStatics.h"
 #include "Item/RSItemBase.h"
 
 ARSBaseItem::ARSBaseItem()

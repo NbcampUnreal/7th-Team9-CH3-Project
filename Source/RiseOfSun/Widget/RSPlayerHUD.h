@@ -5,6 +5,7 @@
 #include "Components/GridPanel.h"
 #include "RSPlayerHUD.generated.h"
 
+class UInventoryWidget;
 class ARSPlayer;
 class URSInventoryComponent;
 class UPanelWidget;
@@ -39,8 +40,6 @@ public:
     // 인벤토리 UI 갱신 함수
     UFUNCTION()
     void UpdateInventoryUI(TArray<FInventorySlot> Slots);
-
-
 protected:
     // 현재 표시할 HP
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "PlayerHUD")
@@ -53,15 +52,9 @@ protected:
     // **블루프린트 TextBlock과 바인딩**
     UPROPERTY(meta = (BindWidget))
     UTextBlock* AmmoTextBlock;
-
-    UPROPERTY(meta = (BindWidget))
-    UGridPanel* InventoryGrid;
-
-    UPROPERTY(meta = (BindWidget))
-    UPanelWidget* InventoryPanel;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-    UUserWidget* InventoryWidget;
+    
+    UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Inventory")
+    UInventoryWidget* InventoryWidget;
 
     UPROPERTY()
     URSInventoryComponent* InventoryComponent;

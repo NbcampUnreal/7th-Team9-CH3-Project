@@ -6,6 +6,7 @@
 #include "NiagaraSystem.h"
 #include "RSGrenadeItem.generated.h"
 
+
 UCLASS()
 class RISEOFSUN_API ARSGrenadeItem : public ARSBaseItem
 {
@@ -13,7 +14,6 @@ class RISEOFSUN_API ARSGrenadeItem : public ARSBaseItem
 
 public:
 	ARSGrenadeItem();
-	void ActivateItem(AActor* Activator) override;
 
 protected:
 
@@ -29,7 +29,5 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse,
 		const FHitResult& Hit);
-
-private:
-
+	
 };

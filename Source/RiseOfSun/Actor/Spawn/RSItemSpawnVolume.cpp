@@ -1,4 +1,6 @@
 ﻿#include "Actor/Spawn/RSItemSpawnVolume.h"
+#include "Actor/Item/RSBaseItem.h"
+ 
 
 ARSItemSpawnVolume::ARSItemSpawnVolume()
 {
@@ -17,6 +19,20 @@ FVector ARSItemSpawnVolume::GetRandomPointInVolume() const
 
 void ARSItemSpawnVolume::SpawnItem(TSubclassOf<AActor> ItemClass)
 {
+	if (!GetWorld()) return;
 
+	FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 100.f);
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	GetWorld()->SpawnActor<ARSBaseItem>(
+		GetClass(),
+		SpawnLocation,
+		SpawnRotation,
+		SpawnParams
+	);
 }
 
