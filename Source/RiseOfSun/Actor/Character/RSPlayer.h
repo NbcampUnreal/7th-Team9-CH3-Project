@@ -4,9 +4,33 @@
 #include "RSCharacter.h"
 #include "Widget/RSPlayerHUD.h"
 #include "InputActionValue.h"
+#include "Actor/Item/RSBaseThrowable.h"
 #include "RSPlayer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEXPChanged); // EXP 변경 이벤트 델리게이트
+
+// Declare the delegate for the number of throwables in slot 1.
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGrenadeChanged, int, numThrowables);
+
+// Declare the delegate for the number of throwables in slot 2.
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatFlareChanged, int, numThrowables);
+
+USTRUCT(BlueprintType)
+struct FThrowableSlot
+{
+    GENERATED_BODY()
+
+    // The type of throwable in the slot.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwable slot")
+    EThrowableType throwableType;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwable slot")
+    TSubclassOf<ARSBaseThrowable> throwableClass;
+
+    // The number of throwables in the slot.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwable slot")
+    int numThrowables;
+};
 
 UCLASS()
 class RISEOFSUN_API ARSPlayer : public ARSCharacter
@@ -77,8 +101,12 @@ private:
     virtual void Die() override;
 	UFUNCTION()
 	void HandleReloadStarted();
-
-
+    // Use a throwable based on the type
+    void UseThrowable(TSubclassOf<ARSBaseThrowable> ThrowableClass);
+    // Use the throwable in Throwable Slot 1
+    void UseGrenade(const FInputActionValue& Value);
+    // Use the throwable in Throwable Slot 2
+    void UseCombatFlare(const FInputActionValue& Value);
 
 private:
     //매핑
@@ -110,6 +138,11 @@ private:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     UInputAction* InventoryAction;
+
+    UPROPERTY(EditAnywhere, Category = "Input")
+    UInputAction* GrenadeAction;
+    UPROPERTY(EditAnywhere, Category = "Input")
+    UInputAction* CombatFlareAction;
 
 public:
     //캐릭터 설정값
@@ -179,4 +212,20 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Die")
 	class UAnimMontage* DieMontage;
+
+    // The first throwable slot for the player.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwable Slot")
+    FThrowableSlot firstThrowableSlot;
+
+    // The second throwable slot for the player.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwable Slot")
+    FThrowableSlot secondThrowableSlot;
+
+    // The delegate for the number of throwables in slot 1.
+    UPROPERTY(BlueprintAssignable, Category = "Throwable Slot")
+    FOnGrenadeChanged onGrenadeChanged;
+
+    // The delegate for the number of throwables in slot 2.
+    UPROPERTY(BlueprintAssignable, Category = "Throwable Slot")
+    FOnCombatFlareChanged onCombatFlareChanged;
 };

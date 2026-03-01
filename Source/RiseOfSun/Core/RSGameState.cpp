@@ -39,7 +39,7 @@ void ARSGameState::StartLevel()
 	UpdateWorldLighting(0.0f); // 밤이 됨 (Intensity 0)
 	MonsterCount = 0;
 	KillMonsterCount = 0;
-
+	CurrentState = false;
 	TArray<AActor*> FoundVolume;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
 	//-----------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void ARSGameState::StartLevel()
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Total Monsters: %d"), CurrentLevelIndex + 1, MonsterCount);
-
+	
 }
 
 void ARSGameState::OnMonsterKilled()
@@ -84,6 +84,8 @@ void ARSGameState::OnMonsterKilled()
 	// 로그에 현재 진행 상황 출력
 	UE_LOG(LogTemp, Warning, TEXT("Monster Killed: %d / %d"), KillMonsterCount, MonsterCount);
 
+	OnZombieChanged.Broadcast(KillMonsterCount, MonsterCount);
+
 	// 모든 몬스터를 다 잡았다면 낮으로 전환
 	if (KillMonsterCount >= MonsterCount && MonsterCount > 0)
 	{
@@ -91,14 +93,13 @@ void ARSGameState::OnMonsterKilled()
 	}
 }
 
-
-
-
 void ARSGameState::EndLevelAndReward()
 {
 	// 낮 시작: 해가 뜨는 연출(조명 Intensity 조절)을 여기에 넣으세요.
 	UpdateWorldLighting(3.0f); // 해가 뜸 (Intensity 3)
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Clear! Sun is rising..."), CurrentLevelIndex + 1);
+
+	CurrentState = true;
 
 	//살아남은 모든 몬스터 제거
 	//해가 뜨면 남아있는 몬스터들을 타 죽거나 사라짐
@@ -120,7 +121,7 @@ void ARSGameState::EndLevelAndReward()
 		
 		if (ARSMonster* RemainingMonster = *It)
 		{
-			RemainingMonster->Destroy();//몬스터 즉시 제거
+			RemainingMonster->Die();//몬스터 즉시 제거
 		}
 	}
 	// 다음 레벨 준비 (예: 60초 뒤에 다시 밤이 됨)
