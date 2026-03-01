@@ -62,7 +62,7 @@ bool URSInventoryComponent::AddItem(FName ItemID, int32 Count)
 bool URSInventoryComponent::RemoveItem(FName ItemID, int32 Count)
 {
     if (ItemID == NAME_None || Count <= 0) return false;
-
+    
     for (FInventorySlot& Slot : Items)
     {
         if (Slot.ItemID == ItemID)

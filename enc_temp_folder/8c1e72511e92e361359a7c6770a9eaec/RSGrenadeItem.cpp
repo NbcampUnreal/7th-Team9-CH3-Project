@@ -56,7 +56,3 @@ void ARSGrenadeItem::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 		Destroy();
 	}
 }
-
-void ARSGrenadeItem::ActivateItem(AActor* Activator)
-{
-}
