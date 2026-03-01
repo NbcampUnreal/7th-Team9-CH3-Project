@@ -7,9 +7,9 @@
 #include "Engine/DirectionalLight.h"
 #include "Components/DirectionalLightComponent.h"
 #include "RSGameState.generated.h"
-/**
- * 
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnZombieChanged, int32, KillMonsterCount, int32, MonsterCount);
+
  // 클래스 전방 선언 (헤더가 무거워지는 것을 방지)
 class ADirectionalLight;
 
@@ -39,6 +39,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	int32 CurrentLevelIndex;
 
+	FOnZombieChanged OnZombieChanged;
+
 	// --- 보상 관련 추가 ---
 	UPROPERTY(EditAnywhere, Category = "Reward")
 	TSubclassOf<AActor> FlareClass; // 에디터에서 조명탄 할당
@@ -52,6 +54,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetScore() const;
 
+	int32 GetCurrentLevelIndex() { return CurrentLevelIndex; }
+
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddScore(int32 Amount);
 
@@ -61,6 +65,9 @@ public:
 
 	// 몬스터 클래스에서 호출할 함수
 	void OnMonsterKilled();
+
+	UPROPERTY()
+	bool CurrentState;
 
 
 protected:

@@ -58,6 +58,13 @@ public:
 	// 피해를 받으면 이벤트 발동
 	virtual void DamageEffect();
 
+	virtual float TakeDamage(
+		float DamageAmount,
+		FDamageEvent const& DamageEvenet,
+		AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
+
 	// 스탯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stat")
 	FRSStat Stat;

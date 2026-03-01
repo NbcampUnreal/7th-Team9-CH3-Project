@@ -30,7 +30,7 @@ public:
 	UDataTable* MonsterDataTable;
 	// 최대 몬스터 수
 	UPROPERTY(EditAnywhere, Category = "Spawning")
-	int32 MaxSpawnCount = 30;
+	int32 MaxSpawnCount = 10;
 	// 순차적으로 스폰해주는 함수
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	AActor* SpawnNextMonster();

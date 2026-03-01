@@ -95,3 +95,8 @@ void ARSCharacter::DamageEffect()
 {
 	
 }
+
+float ARSCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvenet, AController* EventInstigator, AActor* DamageCauser)
+{
+	return HitDamage((int32)DamageAmount);
+}

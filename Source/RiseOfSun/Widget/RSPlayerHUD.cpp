@@ -5,6 +5,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor/Character/Component/RSInventoryComponent.h"
+#include "Core/RSGameState.h"
 #include "Core/RSGameInstance.h"
 
 void URSPlayerHUD::NativeConstruct()
@@ -65,6 +66,28 @@ void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     // HP / EXP 보간 갱신
     DisplayHp = FMath::FInterpTo(DisplayHp, PlayerCharacter->GetCurrentHP(), InDeltaTime, 7.0f);
     DisplayEXP = FMath::FInterpTo(DisplayEXP, PlayerCharacter->GetCurrentEXP(), InDeltaTime, 7.0f);
+
+    if (!bZombieBound && PlayerCharacter)
+    {
+        if (ARSGameState* ZombieCount = GetWorld()->GetGameState<ARSGameState>())
+        {
+            if (ZombieCount->CurrentState)
+            {
+                Zombie->SetVisibility(ESlateVisibility::Hidden);
+            }
+            else
+            {
+                Zombie->SetVisibility(ESlateVisibility::Visible);
+            }
+
+            if (!ZombieCount->OnZombieChanged.IsBound())
+            {
+                ZombieCount->OnZombieChanged.AddDynamic(this, &URSPlayerHUD::UpdateCurrentZombie);
+                UpdateCurrentZombie(ZombieCount->KillMonsterCount, ZombieCount->MonsterCount);
+                bZombieBound = true;
+            }
+        }
+    }
 }
 void URSPlayerHUD::OnEXPUpdated()
 {
@@ -89,6 +112,23 @@ void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
 
     AmmoTextBlock->SetText(FText::FromString(AmmoString));
     UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *AmmoString);
+}
+
+void URSPlayerHUD::UpdateCurrentZombie(int32 ZombieKillCount, int32 SpawnZombie)
+{
+    if (!Zombie) return;
+
+    int32 CurrentZombie = SpawnZombie - ZombieKillCount;
+
+    if (CurrentZombie < 0)
+    {
+        CurrentZombie = 0;
+    }
+
+    const FString ZombieString = FString::Printf(TEXT("Zombie : %d"), CurrentZombie);
+
+    Zombie->SetText(FText::FromString(ZombieString));
+    UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *ZombieString);
 }
 
 void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)

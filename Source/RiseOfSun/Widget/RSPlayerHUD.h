@@ -32,6 +32,9 @@ public:
     void UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo);
 
     UFUNCTION()
+    void UpdateCurrentZombie(int32 SpawnZombie, int32 ZombieKillCount);
+
+    UFUNCTION()
     void ToggleInventory();
 
     // 인벤토리 UI 갱신 함수
@@ -56,6 +59,13 @@ protected:
     UPROPERTY()
     URSInventoryComponent* InventoryComponent;
 
+    // 슬롯 위젯 클래스 (블루프린트에서 지정)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+    TSubclassOf<UUserWidget> InventorySlotWidgetClass;
+
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Zombie;
+
 private:
     // 참조할 플레이어 캐릭터
     UPROPERTY()
@@ -65,4 +75,6 @@ private:
 
     UPROPERTY()
     bool bInventoryVisible = false;
+
+    bool bZombieBound = false;
 };

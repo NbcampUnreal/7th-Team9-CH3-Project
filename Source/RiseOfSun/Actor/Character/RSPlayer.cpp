@@ -20,7 +20,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Sound/SoundCue.h"
 #include "Item/RSItemBase.h"
-
+#include "Actor/Item/RSBaseThrowable.h"
 #include "Core/RSGameMode.h"
 
 ARSPlayer::ARSPlayer()
@@ -131,6 +131,12 @@ ARSPlayer::ARSPlayer()
 
 	Stat.AttackDamage = 250.0f;
 	Stat.Defense = 30.0f;
+
+	firstThrowableSlot.throwableType = EThrowableType::E_FragGrenade;
+	firstThrowableSlot.numThrowables = 2;
+
+	secondThrowableSlot.throwableType = EThrowableType::E_CombatFlare;
+	secondThrowableSlot.numThrowables = 3;
 }
 
 void ARSPlayer::BeginPlay()
@@ -200,9 +206,14 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
 	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
-
 	// I 키 Inventory 토글
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::HandleToggleInventory);
+
+	UE_LOG(LogTemp, Warning, TEXT("Binding Actions..."));
+	EnhancedInputComponent->BindAction(GrenadeAction, ETriggerEvent::Started, this, &ARSPlayer::UseGrenade);
+	EnhancedInputComponent->BindAction(CombatFlareAction, ETriggerEvent::Started, this, &ARSPlayer::UseCombatFlare);
+	//PlayerInputComponent->BindAction("UseThrowableSlot1", IE_Pressed, this, &ARSPlayer::UseGrenade);
+	//PlayerInputComponent->BindAction("UseThrowableSlot1", IE_Pressed, this, &ARSPlayer::UseCombatFlare);
 }
 
 FDamageResult ARSPlayer::Attack(ARSCharacter* Target)
@@ -357,6 +368,63 @@ void ARSPlayer::HandleReloadStarted()
 		{
 			AnimInstance->Montage_Play(ReloadMontage);
 		}
+	}
+}
+
+void ARSPlayer::UseThrowable(TSubclassOf<ARSBaseThrowable> ThrowableClass)
+{
+	if (!ThrowableClass) return;
+		
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FVector SpawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.0f) + (GetActorUpVector() * 50.0f);	
+		FRotator SpawnRotation = GetControlRotation();
+
+		FActorSpawnParameters throwableSpawnParams;
+		throwableSpawnParams.Owner = this;
+		throwableSpawnParams.Instigator = GetInstigator();
+		throwableSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		ARSBaseThrowable* SpawnedThrowable = World->SpawnActor<ARSBaseThrowable>(ThrowableClass, SpawnLocation, SpawnRotation, throwableSpawnParams);
+
+		if (SpawnedThrowable)
+		{
+			if (SpawnedThrowable->projectileMovement)
+			{
+				FVector LaunchDirection = SpawnRotation.Vector();
+				float LaunchSpeed = SpawnedThrowable->ThrowSpeed;
+
+				SpawnedThrowable->projectileMovement->Velocity = LaunchDirection * LaunchSpeed;
+			}
+
+			UE_LOG(LogTemp, Log, TEXT("Success : %s spawned and launched!"), *ThrowableClass->GetName());
+		}
+	}
+
+}
+
+void ARSPlayer::UseGrenade(const FInputActionValue& Value)
+{
+	if (firstThrowableSlot.numThrowables > 0)
+	{
+		UseThrowable(firstThrowableSlot.throwableClass);
+		--firstThrowableSlot.numThrowables;
+
+		// Broadcast the delegate for the number of throwable in Slot 1.
+		onGrenadeChanged.Broadcast(firstThrowableSlot.numThrowables);
+	}
+}
+
+void ARSPlayer::UseCombatFlare(const FInputActionValue& Value)
+{
+	if (secondThrowableSlot.numThrowables > 0)
+	{
+		UseThrowable(secondThrowableSlot.throwableClass);
+		--secondThrowableSlot.numThrowables;
+
+		// Broadcast the delegate for the number of throwable in Slot 2.
+		onCombatFlareChanged.Broadcast(secondThrowableSlot.numThrowables);
 	}
 }
 
