@@ -111,7 +111,6 @@ void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
     const FString AmmoString = FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo);
 
     AmmoTextBlock->SetText(FText::FromString(AmmoString));
-    UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *AmmoString);
 }
 
 void URSPlayerHUD::UpdateCurrentZombie(int32 ZombieKillCount, int32 SpawnZombie)
@@ -128,7 +127,6 @@ void URSPlayerHUD::UpdateCurrentZombie(int32 ZombieKillCount, int32 SpawnZombie)
     const FString ZombieString = FString::Printf(TEXT("Zombie : %d"), CurrentZombie);
 
     Zombie->SetText(FText::FromString(ZombieString));
-    UE_LOG(LogTemp, Log, TEXT("Ammo UI Updated: %s"), *ZombieString);
 }
 
 void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)

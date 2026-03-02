@@ -205,7 +205,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ARSPlayer::StopFire);
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
-	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Triggered, this, &ARSPlayer::Reloading);
+	EnhancedInputComponent->BindAction(ReloadingAction, ETriggerEvent::Started, this, &ARSPlayer::Reloading);
 	// I 키 Inventory 토글
 	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ARSPlayer::HandleToggleInventory);
 
@@ -397,8 +397,6 @@ void ARSPlayer::UseThrowable(TSubclassOf<ARSBaseThrowable> ThrowableClass)
 
 				SpawnedThrowable->projectileMovement->Velocity = LaunchDirection * LaunchSpeed;
 			}
-
-			UE_LOG(LogTemp, Log, TEXT("Success : %s spawned and launched!"), *ThrowableClass->GetName());
 		}
 	}
 
@@ -515,7 +513,6 @@ void ARSPlayer::AimStart()
 		PlayerController->GetViewportSize(SizeX, SizeY);
 		float ScreenX = SizeX * 0.5f;
 		float ScreenY = SizeY * 0.5f;
-		UE_LOG(LogTemp, Warning, TEXT("Viewport: %d %d"), SizeX, SizeY);
 		FVector CamStart = FVector::ZeroVector;
 		FVector CamDirection = FVector::ForwardVector;
 
@@ -526,9 +523,6 @@ void ARSPlayer::AimStart()
 			CamDirection
 		);
 		if (!bDeprojectOK) return;
-
-		UE_LOG(LogTemp, Warning, TEXT("Deproject OK=%d Screen(%.1f, %.1f) CamStart=%s CamDir=%s"),
-			bDeprojectOK, ScreenX, ScreenY, *CamStart.ToString(), *CamDirection.ToString());
 
 		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(CamTraceChannel);
 

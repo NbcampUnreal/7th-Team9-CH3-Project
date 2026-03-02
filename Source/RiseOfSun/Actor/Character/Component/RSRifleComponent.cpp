@@ -74,7 +74,6 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 		if (Target && Player)
 		{
 			Player->Attack(Target); // 실제 데미지 함수 호출
-			UE_LOG(LogTemp, Warning, TEXT("attack"));
 		}
 		// Attack 이후에도 유효한지 다시 체크
 		if (IsValid(Target) && Target->IsDead())
@@ -112,7 +111,6 @@ void URSRifleComponent::Reload()
 	}
 	if (AmmoInClip == MaxAmmoInClip)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Clip Full"));
 		return;
 	}
 	

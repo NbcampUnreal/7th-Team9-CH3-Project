@@ -49,10 +49,10 @@ void ARSMonsterSpawnVolume::BeginPlay()
     
 	}
 	
-	GetWorldTimerManager().SetTimer(SpawnTimerHandle, [this]()
+	/*GetWorldTimerManager().SetTimer(SpawnTimerHandle, [this]()
 		{
 			SpawnNextMonster();
-		},2.0f, true);
+		},2.0f, true);*/
 }
 
 void ARSMonsterSpawnVolume::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -112,10 +112,10 @@ void ARSMonsterSpawnVolume::OnMonsterDestroyed(AActor* DestroyedActor)
 {
 	ActiveMonsterCount--;
 
-	if (SpawnCount >= MaxSpawnCount && ActiveMonsterCount <= 0)
+	/*if (SpawnCount == MaxSpawnCount && ActiveMonsterCount == 0)
 	{
 		LevelUp();
-	}
+	}*/
 }
 
 FMonsterSpawnRow* ARSMonsterSpawnVolume::GetRandomMonster() const
@@ -162,13 +162,13 @@ FVector ARSMonsterSpawnVolume::GetRandomPointVolume() const
 void ARSMonsterSpawnVolume::LevelUp()
 {
 	CurrentLevel++;
-	MaxSpawnCount += 10;
+	MaxSpawnCount += 5;
 
 	SpawnCount = 0;
 	CurrentSpawnIndex = 0;
 
-	GetWorldTimerManager().SetTimer(SpawnTimerHandle, [this]()
+	/*GetWorldTimerManager().SetTimer(SpawnTimerHandle, [this]()
 		{
 			SpawnNextMonster();
-		}, 2.0f, true);
+		}, 2.0f, true);*/
 }

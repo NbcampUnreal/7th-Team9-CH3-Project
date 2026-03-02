@@ -13,6 +13,7 @@ ARSGameState::ARSGameState()
 	KillMonsterCount = 0;
 	CurrentLevelIndex = 0;
 	RewardSpawnLocation = FVector(0.f, 0.f, 100.f);
+	CurrentState = true;
 }
 
 void ARSGameState::BeginPlay()
@@ -35,44 +36,73 @@ void ARSGameState::AddScore(int32 Amount)
 
 void ARSGameState::StartLevel()
 {
+	if (CurrentState == false)
+	{
+		return;
+	}
+
+	CurrentState = false;
+
 	// 밤 시작: 조명을 어둡게 하는 로직을 여기에 넣으면 좋습니다.
 	UpdateWorldLighting(0.0f); // 밤이 됨 (Intensity 0)
 	MonsterCount = 0;
 	KillMonsterCount = 0;
-	CurrentState = false;
+
 	TArray<AActor*> FoundVolume;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
 	//-----------------------------------------------------------------------------------------------------
 	// --- 추가: 밤이 되면 스폰 볼륨을 다시 켭니다 ---
-	for (AActor* VolumeActor : FoundVolume)
-	{
-		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(VolumeActor);
-		if (SpawnVolume)
-		{
-			SpawnVolume->SetIsSpawning(true);
-			SpawnVolume->ResetSpawnCount();
-		}
-	}
-	// 레벨별 몬스터 수 조절 로직
-	const int32 MonsterToSpawn = (CurrentLevelIndex + 1) * 10;
+	//for (AActor* VolumeActor : FoundVolume)
+	//{
+	//	ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(VolumeActor);
+	//	if (SpawnVolume)
+	//	{
+	//		SpawnVolume->SetIsSpawning(true);
+	//		SpawnVolume->ResetSpawnCount();
+	//	}
+	//}
+	//// 레벨별 몬스터 수 조절 로직
+	//const int32 MonsterToSpawn = (CurrentLevelIndex + 1) * 10;
+	//if (FoundVolume.Num() > 0)
+	//{
+	//	ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(FoundVolume[0]);
+	//	if (SpawnVolume)
+	//	{
+	//		for (int32 i = 0; i < MonsterToSpawn; i++)
+	//		{
+	//			AActor* SpawnedActor = SpawnVolume->SpawnNextMonster();
+	//			// 스폰된 액터가 몬스터인지 확인하여 카운트 업
+	//			if (SpawnedActor && SpawnedActor->IsA(ARSMonster::StaticClass()))
+	//			{
+	//				MonsterCount++;
+	//				UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Spawned: %d"), CurrentLevelIndex,MonsterCount);
+	//				// 몬스터 사망 시 OnMonsterDestroyed가 호출되도록 몬스터 클래스에서 처리 필요
+	//			}
+	//		}
+	//	}
+	//}
+
 	if (FoundVolume.Num() > 0)
 	{
 		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(FoundVolume[0]);
 		if (SpawnVolume)
 		{
+			SpawnVolume->SetIsSpawning(true);
+			SpawnVolume->ResetSpawnCount();
+
+			const int32 MonsterToSpawn = (CurrentLevelIndex + 1) * 10;
+
 			for (int32 i = 0; i < MonsterToSpawn; i++)
 			{
 				AActor* SpawnedActor = SpawnVolume->SpawnNextMonster();
-				// 스폰된 액터가 몬스터인지 확인하여 카운트 업
 				if (SpawnedActor && SpawnedActor->IsA(ARSMonster::StaticClass()))
 				{
 					MonsterCount++;
-					UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Spawned: %d"), CurrentLevelIndex,MonsterCount);
-					// 몬스터 사망 시 OnMonsterDestroyed가 호출되도록 몬스터 클래스에서 처리 필요
 				}
 			}
 		}
 	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Total Monsters: %d"), CurrentLevelIndex + 1, MonsterCount);
 	
 }
@@ -80,9 +110,6 @@ void ARSGameState::StartLevel()
 void ARSGameState::OnMonsterKilled()
 {
 	KillMonsterCount++;
-
-	// 로그에 현재 진행 상황 출력
-	UE_LOG(LogTemp, Warning, TEXT("Monster Killed: %d / %d"), KillMonsterCount, MonsterCount);
 
 	OnZombieChanged.Broadcast(KillMonsterCount, MonsterCount);
 
@@ -95,11 +122,17 @@ void ARSGameState::OnMonsterKilled()
 
 void ARSGameState::EndLevelAndReward()
 {
+	if (CurrentState == true)
+	{
+		return;
+	}
+
+	CurrentState = true;
+
 	// 낮 시작: 해가 뜨는 연출(조명 Intensity 조절)을 여기에 넣으세요.
 	UpdateWorldLighting(3.0f); // 해가 뜸 (Intensity 3)
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Clear! Sun is rising..."), CurrentLevelIndex + 1);
 
-	CurrentState = true;
 
 	//살아남은 모든 몬스터 제거
 	//해가 뜨면 남아있는 몬스터들을 타 죽거나 사라짐

@@ -13,8 +13,13 @@ void UInventoryWidget::NativeConstruct()
 }
 
 void UInventoryWidget::InitSlot(int32 Count, int32 MaxColumns)
-{
-	InventoryGrid->ClearChildren();
+{	
+
+	if (InventoryGrid)
+	{
+		InventoryGrid->ClearChildren();
+	}
+
 	Slots.SetNum(Count);
 
 	for (int32 i = 0; i < Count; i++)
