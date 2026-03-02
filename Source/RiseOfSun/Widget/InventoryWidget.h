@@ -46,4 +46,5 @@ public:
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UItemSlotWidget>> Slots;
+
 };
