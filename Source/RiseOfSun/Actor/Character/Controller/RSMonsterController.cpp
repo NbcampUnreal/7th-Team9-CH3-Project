@@ -1,6 +1,10 @@
 ﻿#include "RSMonsterController.h"
+
+#include "Actor/Character/RSBossMonster.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor/Character/RSMonster.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Navigation/PathFollowingComponent.h"
 
 ARSMonsterController::ARSMonsterController()
 {
