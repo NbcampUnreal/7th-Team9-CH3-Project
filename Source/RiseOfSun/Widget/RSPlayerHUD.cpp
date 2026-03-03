@@ -67,28 +67,40 @@ void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     DisplayHp = FMath::FInterpTo(DisplayHp, PlayerCharacter->GetCurrentHP(), InDeltaTime, 7.0f);
     DisplayEXP = FMath::FInterpTo(DisplayEXP, PlayerCharacter->GetCurrentEXP(), InDeltaTime, 7.0f);
 
-    if (!bZombieBound && PlayerCharacter)
+    if (ARSGameState* ZombieCount = GetWorld()->GetGameState<ARSGameState>())
     {
-        if (ARSGameState* ZombieCount = GetWorld()->GetGameState<ARSGameState>())
+        if (ZombieCount->CurrentState)
         {
-            if (ZombieCount->CurrentState)
-            {
+            if (Zombie->GetVisibility() != ESlateVisibility::Hidden)
                 Zombie->SetVisibility(ESlateVisibility::Hidden);
-            }
-            else
-            {
+        }
+        else
+        {
+            if (Zombie->GetVisibility() != ESlateVisibility::Visible)
                 Zombie->SetVisibility(ESlateVisibility::Visible);
-            }
+        }
 
-            if (!ZombieCount->OnZombieChanged.IsBound())
-            {
-                ZombieCount->OnZombieChanged.AddDynamic(this, &URSPlayerHUD::UpdateCurrentZombie);
-                UpdateCurrentZombie(ZombieCount->KillMonsterCount, ZombieCount->MonsterCount);
-                bZombieBound = true;
-            }
+        if (!bZombieBound)
+        {
+            ZombieCount->OnZombieChanged.AddDynamic(this, &URSPlayerHUD::UpdateCurrentZombie);
+            UpdateCurrentZombie(ZombieCount->KillMonsterCount, ZombieCount->MonsterCount);
+            bZombieBound = true;
         }
     }
+
+    if (ARSGameState* CurrentLevel = GetWorld()->GetGameState<ARSGameState>())
+    {
+        if (!bLevelBound)
+        {
+            CurrentLevel->OnLevelChanged.AddDynamic(this, &URSPlayerHUD::UpdateLevel);
+            UpdateLevel(CurrentLevel->CurrentLevelIndex + 1);
+            bLevelBound = true;
+        }
+    }
+
+    UpdateTimer();
 }
+
 void URSPlayerHUD::OnEXPUpdated()
 {
     if (!PlayerCharacter) return;
@@ -105,6 +117,7 @@ FText URSPlayerHUD::GetAmmoText() const
     const FString AmmoString = FString::Printf(TEXT("%d / %d"), Rifle->AmmoInClip, Rifle->MaxAmmoInClip);
     return FText::FromString(AmmoString);
 }
+
 void URSPlayerHUD::UpdateAmmoText(int32 CurrentAmmo, int32 MaxAmmo)
 {
     if (!AmmoTextBlock) return;
@@ -127,6 +140,40 @@ void URSPlayerHUD::UpdateCurrentZombie(int32 ZombieKillCount, int32 SpawnZombie)
     const FString ZombieString = FString::Printf(TEXT("Zombie : %d"), CurrentZombie);
 
     Zombie->SetText(FText::FromString(ZombieString));
+}
+
+void URSPlayerHUD::UpdateLevel(int32 currentLevel)
+{
+    if (!Level) return;
+
+    const FString LevelString = FString::Printf(TEXT("Level %d"), currentLevel);
+
+    Level->SetText(FText::FromString(LevelString));
+}
+
+void URSPlayerHUD::UpdateTimer()
+{
+    if (!Timer) return;
+
+    if (ARSGameState* CurrentTimer = GetWorld()->GetGameState<ARSGameState>()) 
+    {
+        float RemainingTime = CurrentTimer->GetWorldTimerManager().GetTimerRemaining(CurrentTimer->LevelTransitionTimer);
+
+        if (RemainingTime > 0.0f)
+        {
+            int32 Seconds = FMath::FloorToInt(RemainingTime);
+
+            const FString TimerString = FString::Printf(TEXT("Timer : %d"), Seconds);
+            Timer->SetText(FText::FromString(TimerString));
+
+            Timer->SetVisibility(ESlateVisibility::Visible);
+        }
+        else
+        {
+            Timer->SetVisibility(ESlateVisibility::Hidden);
+        }
+    }
+    
 }
 
 void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)

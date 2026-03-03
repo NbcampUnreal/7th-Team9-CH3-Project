@@ -57,6 +57,9 @@ public:
     
     //인벤토리 컴포넌트 게터
     URSInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+
+    void AddThrowable(EThrowableType ItemType);
+
 protected:
     UPROPERTY(EditAnywhere)
     class USpringArmComponent* SpringArm;

@@ -35,6 +35,12 @@ public:
     void UpdateCurrentZombie(int32 SpawnZombie, int32 ZombieKillCount);
 
     UFUNCTION()
+    void UpdateLevel(int32 currentLevel);
+
+    UFUNCTION()
+    void UpdateTimer();
+
+    UFUNCTION()
     void ToggleInventory();
 
     // 인벤토리 UI 갱신 함수
@@ -66,6 +72,12 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UTextBlock* Zombie;
 
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Level;
+
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Timer;
+
 private:
     // 참조할 플레이어 캐릭터
     UPROPERTY()
@@ -77,4 +89,8 @@ private:
     bool bInventoryVisible = false;
 
     bool bZombieBound = false;
+
+    bool bLevelBound = false;
+
+    bool bTimerBound = false;
 };

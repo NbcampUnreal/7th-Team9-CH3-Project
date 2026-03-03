@@ -4,6 +4,7 @@
 #include "RSBaseItem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
+#include "RSBaseThrowable.h"
 #include "RSGrenadeItem.generated.h"
 
 UCLASS()
@@ -13,6 +14,7 @@ class RISEOFSUN_API ARSGrenadeItem : public ARSBaseItem
 
 public:
 	ARSGrenadeItem();
+
 	void ActivateItem(AActor* Activator) override;
 
 protected:
@@ -23,12 +25,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Grenade")
 	USoundBase* ExplosionSound;
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp,
+	EThrowableType type;
+
+	void OnItemOverlap(
+		UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
-		FVector NormalImpulse,
-		const FHitResult& Hit);
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	) override;
 
 private:
 

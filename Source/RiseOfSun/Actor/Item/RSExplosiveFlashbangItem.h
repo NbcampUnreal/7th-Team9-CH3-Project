@@ -21,11 +21,5 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "FlashGrenade")
 	USoundBase* ExplosiveFlashbangSound;
 
-	UFUNCTION()
-	void Hit(UPrimitiveComponent* HitComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		FVector NomalImpulse,
-		const FHitResult& Hit
-	);
+	
 };

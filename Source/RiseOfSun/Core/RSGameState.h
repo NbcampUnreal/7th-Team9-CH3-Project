@@ -1,6 +1,4 @@
-﻿
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
@@ -9,6 +7,8 @@
 #include "RSGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnZombieChanged, int32, KillMonsterCount, int32, MonsterCount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChanged, int32, CurrentLevelIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimerChanged, FTimerHandle, LevelTransitionTimer);
 
  // 클래스 전방 선언 (헤더가 무거워지는 것을 방지)
 class ADirectionalLight;
@@ -18,7 +18,6 @@ class RISEOFSUN_API ARSGameState : public AGameState
 {
 	GENERATED_BODY()
 	
-
 public:
 	ARSGameState();
 
@@ -33,6 +32,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	int32 KillMonsterCount;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
+	int32 MaxMonster;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	float LevelDuration;
 
@@ -40,6 +42,10 @@ public:
 	int32 CurrentLevelIndex;
 
 	FOnZombieChanged OnZombieChanged;
+
+	FOnLevelChanged OnLevelChanged;
+
+	FOnTimerChanged OnTimerChanged;
 
 	// --- 보상 관련 추가 ---
 	UPROPERTY(EditAnywhere, Category = "Reward")
@@ -66,9 +72,15 @@ public:
 	// 몬스터 클래스에서 호출할 함수
 	void OnMonsterKilled();
 
+	UFUNCTION()
+	void SpawnOneMonster();
+
 	UPROPERTY()
 	bool CurrentState;
 
+	FTimerHandle MonsterSpawnTimerHandle;
+
+	FTimerHandle LevelTransitionTimer;
 
 protected:
 	// 월드의 메인 조명을 저장할 변수
@@ -81,5 +93,5 @@ protected:
 	// BeginPlay에서 라이트를 찾는 함수
 	void FindMainLight();
 
-	FTimerHandle LevelTransitionTimer;
+	
 };
