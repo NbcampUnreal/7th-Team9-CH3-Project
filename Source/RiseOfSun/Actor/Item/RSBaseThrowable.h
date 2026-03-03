@@ -5,6 +5,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
+#include "RSBaseItem.h"
 #include "RSBaseThrowable.generated.h"
 
 UENUM(BlueprintType)

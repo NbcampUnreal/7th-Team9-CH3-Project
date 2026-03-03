@@ -48,8 +48,8 @@ void ARSGameState::StartLevel()
 	MonsterCount = 0;
 	KillMonsterCount = 0;
 
-	TArray<AActor*> FoundVolume;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
+	/*TArray<AActor*> FoundVolume;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);*/
 	//-----------------------------------------------------------------------------------------------------
 	// --- 추가: 밤이 되면 스폰 볼륨을 다시 켭니다 ---
 	//for (AActor* VolumeActor : FoundVolume)
@@ -82,7 +82,7 @@ void ARSGameState::StartLevel()
 	//	}
 	//}
 
-	if (FoundVolume.Num() > 0)
+	/*if (FoundVolume.Num() > 0)
 	{
 		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(FoundVolume[0]);
 		if (SpawnVolume)
@@ -101,10 +101,16 @@ void ARSGameState::StartLevel()
 				}
 			}
 		}
-	}
+	}*/
+
+	MaxMonster = (CurrentLevelIndex + 1) * 10;
+
+	OnZombieChanged.Broadcast(KillMonsterCount, MaxMonster);
+	OnLevelChanged.Broadcast(CurrentLevelIndex);
+
+	GetWorldTimerManager().SetTimer(MonsterSpawnTimerHandle, this, &ARSGameState::SpawnOneMonster, 1.0f, true);
 
 	UE_LOG(LogTemp, Warning, TEXT("Level %d Night Start! Total Monsters: %d"), CurrentLevelIndex + 1, MonsterCount);
-	
 }
 
 void ARSGameState::OnMonsterKilled()
@@ -117,6 +123,39 @@ void ARSGameState::OnMonsterKilled()
 	if (KillMonsterCount >= MonsterCount && MonsterCount > 0)
 	{
 		EndLevelAndReward();
+	}
+}
+
+void ARSGameState::SpawnOneMonster()
+{
+	if (MonsterCount >= MaxMonster)
+	{
+		GetWorldTimerManager().ClearTimer(MonsterSpawnTimerHandle);
+		UE_LOG(LogTemp, Warning, TEXT("All monsters spawned for this level."));
+		return;
+	}
+
+	TArray<AActor*> FoundVolume;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
+
+	if (FoundVolume.Num() > 0)
+	{
+		int32 RandomIdx = FMath::RandRange(0, FoundVolume.Num() - 1);
+		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(FoundVolume[RandomIdx]);
+		if (SpawnVolume)
+		{
+			SpawnVolume->SetIsSpawning(true);
+			SpawnVolume->ResetSpawnCount();
+
+			// 한 마리 소환
+			AActor* SpawnedActor = SpawnVolume->SpawnNextMonster();
+			if (SpawnedActor && SpawnedActor->IsA(ARSMonster::StaticClass()))
+			{
+				MonsterCount++;
+				// 소환될 때마다 UI 갱신 (선택 사항: 숫자가 올라가는 게 보임)
+				OnZombieChanged.Broadcast(KillMonsterCount, MonsterCount);
+			}
+		}
 	}
 }
 

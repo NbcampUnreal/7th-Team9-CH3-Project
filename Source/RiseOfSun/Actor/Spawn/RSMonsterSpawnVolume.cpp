@@ -87,11 +87,7 @@ AActor* ARSMonsterSpawnVolume::SpawnNextMonster()
 			const FMonsterSpawnRow& SelectedRow = CachedMonsterRows[CurrentSpawnIndex];
 
 			if (SelectedRow.MonsterClass)
-			{	// 실제 스폰 진행
-				// 다음 몬스터
-				
-				const FMonsterSpawnRow& Row = CachedMonsterRows[CurrentSpawnIndex];
-				
+			{	
 				CurrentSpawnIndex++;
 				SpawnCount++;
 				// 다 소환되면 초기화

@@ -133,10 +133,10 @@ ARSPlayer::ARSPlayer()
 	Stat.Defense = 30.0f;
 
 	firstThrowableSlot.throwableType = EThrowableType::E_FragGrenade;
-	firstThrowableSlot.numThrowables = 2;
+	firstThrowableSlot.numThrowables = 5;
 
 	secondThrowableSlot.throwableType = EThrowableType::E_CombatFlare;
-	secondThrowableSlot.numThrowables = 3;
+	secondThrowableSlot.numThrowables = 1;
 }
 
 void ARSPlayer::BeginPlay()
@@ -417,9 +417,17 @@ void ARSPlayer::UseThrowable(TSubclassOf<ARSBaseThrowable> ThrowableClass)
 
 				SpawnedThrowable->projectileMovement->Velocity = LaunchDirection * LaunchSpeed;
 			}
+
+			float Delay = SpawnedThrowable->ExplosionDelay;
+			GetWorldTimerManager().SetTimer(
+				SpawnedThrowable->ExplosionTimer,
+				SpawnedThrowable,
+				&ARSBaseThrowable::Explode,
+				Delay,
+				false
+			);
 		}
 	}
-
 }
 
 void ARSPlayer::UseGrenade(const FInputActionValue& Value)
@@ -443,6 +451,18 @@ void ARSPlayer::UseCombatFlare(const FInputActionValue& Value)
 
 		// Broadcast the delegate for the number of throwable in Slot 2.
 		onCombatFlareChanged.Broadcast(secondThrowableSlot.numThrowables);
+	}
+}
+
+void ARSPlayer::AddThrowable(EThrowableType ItemType)
+{
+	if (firstThrowableSlot.throwableType == ItemType)
+	{
+		firstThrowableSlot.numThrowables++;
+	}
+	else if (secondThrowableSlot.throwableType == ItemType)
+	{
+		secondThrowableSlot.numThrowables++;
 	}
 }
 
