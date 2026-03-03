@@ -35,13 +35,13 @@ void ARSBaseThrowable::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(
+	/*GetWorld()->GetTimerManager().SetTimer(
 		ExplosionTimer,
 		this,
 		&ARSBaseThrowable::Explode,
 		ExplosionDelay,
 		false
-	);
+	);*/
 }
 
 void ARSBaseThrowable::Explode()
@@ -82,7 +82,3 @@ void ARSBaseThrowable::Explode()
 
 	Destroy();
 }
-
-
-
-
