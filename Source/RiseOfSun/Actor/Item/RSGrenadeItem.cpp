@@ -5,6 +5,8 @@
 ARSGrenadeItem::ARSGrenadeItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	type = EThrowableType::E_FragGrenade;
 }
 
 void ARSGrenadeItem::ActivateItem(AActor* Activator)
