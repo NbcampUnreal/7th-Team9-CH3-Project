@@ -1,8 +1,11 @@
 ﻿#include "RSMonster.h"
+
+#include "RSPlayer.h"
 #include "Component/RSRifleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Widget/RSMonsterWidget.h"
 #include "Core/RSGameState.h"
+#include "Kismet/GameplayStatics.h"
 
 
 ARSMonster::ARSMonster()
@@ -87,9 +90,19 @@ void ARSMonster::Die()
     }
 
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-    if (DieMontage)
+    if (AnimInstance)
     {
-        AnimInstance->Montage_Play(DieMontage);
+        if (DieMontage)
+        {
+            AnimInstance->Montage_Play(DieMontage);
+        }
+    }
+    
+    
+    if (ARSPlayer* Player =
+        Cast<ARSPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+    {
+        Player->AddEXP(Exp);
     }
 }
 
@@ -210,6 +223,7 @@ void ARSMonster::DamageEffect()
     }
 }
 
-void Ondeath()
+void ARSMonster::Ondeath()
 {
+   
 }

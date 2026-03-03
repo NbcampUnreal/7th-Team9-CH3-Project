@@ -187,8 +187,7 @@ void ARSPlayer::Tick(float DeltaTime)
 	{
 		Die();
 	}
-
-	AddEXP(1 * DeltaTime);
+	
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
