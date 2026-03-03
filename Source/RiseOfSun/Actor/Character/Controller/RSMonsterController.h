@@ -11,7 +11,8 @@ enum class AIState : uint8
 	Idle,
 	Patrol,
 	Chase,
-	Attack
+	Attack,
+	RangeAttack
 };
 
 UCLASS()
@@ -22,18 +23,17 @@ class RISEOFSUN_API ARSMonsterController : public AAIController
 public:
 	ARSMonsterController();
 	virtual void Tick(float DeltaTime) override;
-
-protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
-private:
 	void SetChangeState(AIState NewState);
 
 	void TickChase(float DeltaTime);
 	void TickAttack(float DeltaTime);
+	void TickRangeAttack(float DeltaTime);
 	bool IsPlayerInRange(float Range) const;
-
+	
 	AIState CurrentState = AIState::Idle;
+private:
 	
 	UPROPERTY()
 	APawn* TargetPlayer = nullptr;
