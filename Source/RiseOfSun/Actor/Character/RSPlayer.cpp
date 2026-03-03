@@ -94,7 +94,7 @@ ARSPlayer::ARSPlayer()
 		ReloadingAction = InputReloading.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction>InputShooting(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Shooting.IA_Shooting'"));
+	static ConstructorHelpers::FObjectFinder<UInputAction>InputShooting(TEXT("/Game/Input/Actions/IA_Shoot.IA_Shoot"));
 	if (InputShooting.Object != nullptr)
 	{
 		ShootingAction = InputShooting.Object;
@@ -187,8 +187,7 @@ void ARSPlayer::Tick(float DeltaTime)
 	{
 		Die();
 	}
-
-	AddEXP(1 * DeltaTime);
+	
 }
 
 void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -202,6 +201,7 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARSPlayer::Look);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ARSPlayer::Fire);
 	EnhancedInputComponent->BindAction(ShootingAction, ETriggerEvent::Started, this, &ARSPlayer::Shoot);
+	EnhancedInputComponent->BindAction(ShootingAction, ETriggerEvent::Started, this, &ARSPlayer::StopShoot);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ARSPlayer::StopFire);
 	//에임 구현 미정
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ARSPlayer::Aim);
@@ -258,14 +258,14 @@ void ARSPlayer::Move(const FInputActionValue& Value)
 	const FVector Right = UKismetMathLibrary::GetRightVector(YawOnly);
 
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-	if(Movement.Y!=-1)
-	{ 
-			MoveComp->bOrientRotationToMovement = true;
-	}
-	else
-	{
-		MoveComp->bOrientRotationToMovement = false;
-	}
+	// if(Movement.Y!=-1)
+	// { 
+	// 		MoveComp->bOrientRotationToMovement = true;
+	// }
+	// else
+	// {
+	// 	MoveComp->bOrientRotationToMovement = false;
+	// }
 	
 
 	AddMovementInput(Forward, Movement.Y);
@@ -283,8 +283,28 @@ void ARSPlayer::Look(const FInputActionValue& Value)
 
 void ARSPlayer::Shoot()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Shootmode"));
+	if (bIsShoot)
+	{
+		bIsShoot = false;
+	}
+	else
+	{
+		bIsShoot = true;
+	}
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	bUseControllerRotationYaw = true;
+
+MoveComp->bOrientRotationToMovement = false;
+	
 }
+
+void ARSPlayer::StopShoot()
+{
+	bUseControllerRotationYaw = false;
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+MoveComp->bOrientRotationToMovement = true;
+}
+
 
 void ARSPlayer::HandleFire()
 {
@@ -428,7 +448,7 @@ void ARSPlayer::UseCombatFlare(const FInputActionValue& Value)
 
 void ARSPlayer::Fire(const FInputActionValue& Value)
 {
-	if (bIsFiring) 
+	if (bIsFiring || !bIsShoot) 
 	{
 		return;
 	}

@@ -87,11 +87,13 @@ private:
     void StopFire(const FInputActionValue& Value);
 	void Aim(const FInputActionValue& Value);
     void Shoot();
+	void StopShoot();
     void Reloading(const FInputActionValue& Value);
     void LevelUp();
 	//카메라 중앙에 조준점 계산함수
     void AimStart();
     void HandleFire();
+	
 
     //인벤토리
     void HandleToggleInventory();
@@ -169,6 +171,7 @@ public:
 
     bool bIsFiring;
 	bool bCanPlayFireSound = true;
+	bool bIsShoot = false;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
     bool bHasAimPoint = false;

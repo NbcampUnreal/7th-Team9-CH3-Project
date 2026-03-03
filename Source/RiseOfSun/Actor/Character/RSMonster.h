@@ -12,6 +12,7 @@ class AController;
 class AActor;
 class ARSPlayer;
 
+
 UCLASS()
 class RISEOFSUN_API ARSMonster : public ARSCharacter
 {
@@ -41,6 +42,7 @@ public:
 	virtual FDamageResult Attack(ARSCharacter* Target) override;;
 	//몬스터가 피해를 입으면 발동하는 효과
 	virtual void DamageEffect() override;
+	void Ondeath();
 	virtual void Die()override;
 	float GetAttackRange() const { return AttackRange; }
 
@@ -62,7 +64,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float AttackRange;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Exp")
+	float Exp = 5.0;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* HPWidgetComponent;
 
