@@ -46,6 +46,18 @@ void ARSBaseThrowable::BeginPlay()
 
 void ARSBaseThrowable::Explode()
 {
+	TArray<AActor*> IgnoreActor;
+	IgnoreActor.Add(this);
+
+	if (type == EThrowableType::E_CombatFlare)
+	{
+		APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		if (PlayerPawn)
+		{
+			IgnoreActor.Add(PlayerPawn);
+		}
+	}
+
 	APawn* InstigatorPawn = GetInstigator();
 	AController* InstigatorController =
 		InstigatorPawn ? InstigatorPawn->GetController() : nullptr;
@@ -56,7 +68,7 @@ void ARSBaseThrowable::Explode()
 		GetActorLocation(),
 		ExplosionRadius,
 		nullptr,
-		TArray<AActor*>(),
+		IgnoreActor,
 		this,
 		InstigatorController,
 		true
