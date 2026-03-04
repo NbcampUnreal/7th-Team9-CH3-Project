@@ -12,18 +12,19 @@ ARSBaseItem::ARSBaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	// 1. 최상위 루트 컴포넌트
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(Scene);
 
+	// 2. 콜리전 설정 (Scene에 부착)
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	Collision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	Collision->SetupAttachment(Scene);
-	// 공통 메시 생성
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(Collision);
+	Collision->SetupAttachment(Scene); // Scene에 직접 붙임
 
-	// 메시를 루트로 사용
-	//RootComponent = Mesh;
+	// 3. 메시 설정 (Collision이 아닌 Scene에 부착)
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(Scene);      // 중요: Collision 자식이 아니라 Scene의 자식으로!
+
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ARSBaseItem::OnItemOverlap);
 	Collision->OnComponentEndOverlap.AddDynamic(this, &ARSBaseItem::OnItemEndOverlap);
 }
@@ -118,5 +119,10 @@ void ARSBaseItem::OnPickedUp(ARSPlayer* Player)
 		// 실패 시 로그 출력
 		UE_LOG(LogTemp, Warning, TEXT("인벤토리 꽉참! 아이템 [%s] 추가 실패"), *ItemData.ItemID.ToString());
 	}
+}
+
+void ARSBaseItem::Use(AActor* Activator)
+{
+	ActivateItem(Activator);
 }
 

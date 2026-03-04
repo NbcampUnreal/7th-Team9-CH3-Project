@@ -21,6 +21,8 @@
 #include "Sound/SoundCue.h"
 #include "Item/RSItemBase.h"
 #include "Actor/Item/RSBaseThrowable.h"
+#include "Actor/Item/RSBaseItem.h"
+#include "Core/RSGameInstance.h"
 #include "Core/RSGameMode.h"
 
 ARSPlayer::ARSPlayer()
@@ -165,6 +167,18 @@ void ARSPlayer::BeginPlay()
 		}
 	}
 
+	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetGameInstance());
+	if (!RSGameInstance) return;
+	if (!RSGameInstance->ItemManager) return;
+	URSItemBase* ItemData = RSGameInstance->ItemManager->SpawnItem(FName("SmallHeal"), this);
+	if (!ItemData) return;
+	UWorld* World = GetWorld();
+	if (!World) return;
+	ARSBaseItem* Item =
+		World->SpawnActor<ARSBaseItem>(ItemData->ItemActorClass);
+	if (!Item) return;
+	Item->ActivateItem(this);
+
 }
 
 void ARSPlayer::Tick(float DeltaTime)
@@ -237,12 +251,11 @@ void ARSPlayer::PickUpItem(FName ItemID, int32 Count)
 
 void ARSPlayer::UseItem(FName ItemID)
 {
-	if (InventoryComponent)
+	if (InventoryComponent->RemoveItem(ItemID, 1))
 	{
-		bool bRemoved = InventoryComponent->RemoveItem(ItemID, 1);
-		if (!bRemoved)
+		if (ItemID == FName("SmallHeal"))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("아이템 [%s] 사용 실패"), *ItemID.ToString());
+			RecoverHealth(100.0f);
 		}
 	}
 }
@@ -466,6 +479,12 @@ void ARSPlayer::AddThrowable(EThrowableType ItemType)
 		secondThrowableSlot.numThrowables++;
 		onCombatFlareChanged.Broadcast(secondThrowableSlot.numThrowables);
 	}
+}
+
+void ARSPlayer::RecoverHealth(float Amount)
+{
+	Stat.CurrentHealth = FMath::Clamp(Stat.CurrentHealth + Amount, 0.0f, Stat.MaxHealth);
+	UE_LOG(LogTemp, Warning, TEXT("체력 회복: %.f / 현재 체력: %.f"), Amount, Stat.CurrentHealth);
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)

@@ -12,6 +12,9 @@ class RISEOFSUN_API URSItemBase : public UObject
 public:
     URSItemBase();
 
+    UPROPERTY(EditAnywhere)
+    TSubclassOf<ARSBaseItem> ItemActorClass;
+
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     int32 StackCount = 1;

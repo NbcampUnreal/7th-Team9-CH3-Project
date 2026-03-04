@@ -60,6 +60,15 @@ public:
 
     void AddThrowable(EThrowableType ItemType);
 
+    void RecoverHealth(float Amount);
+
+    // 아이템 줍기/사용 함수
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    void PickUpItem(FName ItemID, int32 Count = 1);
+
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    void UseItem(FName ItemID);
+
 protected:
     UPROPERTY(EditAnywhere)
     class USpringArmComponent* SpringArm;
@@ -70,14 +79,6 @@ protected:
     // 인벤토리 컴포넌트 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
     TObjectPtr<class URSInventoryComponent> InventoryComponent;
-
-    // 아이템 줍기/사용 함수
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
-    void PickUpItem(FName ItemID, int32 Count = 1);
-
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void UseItem(FName ItemID);
-
 private:
 
 
@@ -148,6 +149,9 @@ private:
     UInputAction* GrenadeAction;
     UPROPERTY(EditAnywhere, Category = "Input")
     UInputAction* CombatFlareAction;
+
+    UPROPERTY()
+    class URSGameInstance* GameInstanceRef;
 
 public:
     //캐릭터 설정값
@@ -233,5 +237,5 @@ public:
 
     // The delegate for the number of throwables in slot 2.
     UPROPERTY(BlueprintAssignable, Category = "Throwable Slot")
-    FOnCombatFlareChanged onCombatFlareChanged;
+    FOnCombatFlareChanged onCombatFlareChanged; 
 };
