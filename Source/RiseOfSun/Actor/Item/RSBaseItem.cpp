@@ -12,21 +12,19 @@ ARSBaseItem::ARSBaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	// 1. 최상위 루트 컴포넌트
-	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	SetRootComponent(Scene);
-
-	// 2. 콜리전 설정 (Scene에 부착)
+	// 1. 콜리전을 생성하고 바로 루트로 잡습니다. (수류탄 방식)
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	SetRootComponent(Collision);
+	Collision->InitSphereRadius(50.0f);
 	Collision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	Collision->SetupAttachment(Scene); // Scene에 직접 붙임
 
-	// 3. 메시 설정 (Collision이 아닌 Scene에 부착)
+	// 2. 메쉬를 생성하고 콜리전(Root)에 붙입니다.
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(Scene);      // 중요: Collision 자식이 아니라 Scene의 자식으로!
+	Mesh->SetupAttachment(RootComponent); // 이제 콜리전의 자식이 됩니다.
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	// 이벤트 바인딩
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ARSBaseItem::OnItemOverlap);
-	Collision->OnComponentEndOverlap.AddDynamic(this, &ARSBaseItem::OnItemEndOverlap);
 }
 
 void ARSBaseItem::OnItemOverlap(UPrimitiveComponent* OverlappedComp, 

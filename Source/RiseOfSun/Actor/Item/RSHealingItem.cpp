@@ -19,6 +19,7 @@ void ARSHealingItem::ActivateItem(AActor* Activator)
     // 2. 플레이어고, 태그가 Player라면 (안정성을 위해 체크)
     if (Player && Player->ActorHasTag("Player"))
     {
+        UE_LOG(LogTemp, Warning, TEXT("Healing Item Activated for: %s"), *Player->GetName());
         // 3. 인벤토리에 추가 시도!
         // ItemID는 "Heal" 같은 식별자
         Player->PickUpItem(FName("Heal"), 1);

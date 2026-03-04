@@ -253,10 +253,9 @@ void ARSPlayer::UseItem(FName ItemID)
 {
 	if (InventoryComponent->RemoveItem(ItemID, 1))
 	{
-		if (ItemID == FName("Heal"))
+		if (ItemID == FName("SmallHeal"))
 		{
 			RecoverHealth(100.0f);
-			UE_LOG(LogTemp, Warning, TEXT("체력 100 회복 완료!"));
 		}
 	}
 }
