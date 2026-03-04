@@ -72,11 +72,17 @@ public:
 	// 몬스터 클래스에서 호출할 함수
 	void OnMonsterKilled();
 
+	//보스몬스터 호출 함수
+	void SpawnBossMonster();
+	
 	UFUNCTION()
 	void SpawnOneMonster();
 
 	UPROPERTY()
 	bool CurrentState;
+	
+	//보스가 소환되었는지 체크
+	bool bIsBossSpawned = false;
 
 	FTimerHandle MonsterSpawnTimerHandle;
 
@@ -92,6 +98,13 @@ protected:
 
 	// BeginPlay에서 라이트를 찾는 함수
 	void FindMainLight();
+	
+	//보스몬스터를 죽일 시 호출하는 함수
+	void OnBossKilled();
+	
+	//블루프린트에서 보스 몬스터 클래스 할당
+	UPROPERTY(EditAnywhere, Category = "BossMonster")
+	TSubclassOf<class ARSBossMonster>BossMonsterClass;
 
 	
 };

@@ -5,6 +5,7 @@
 #include "Actor/Spawn/RSMonsterSpawnVolume.h"
 #include "Actor/Character/RSMonster.h"
 #include "EngineUtils.h"
+#include "Actor/Character/RSBossMonster.h"
 
 ARSGameState::ARSGameState()
 {
@@ -117,12 +118,17 @@ void ARSGameState::OnMonsterKilled()
 {
 	KillMonsterCount++;
 
-	OnZombieChanged.Broadcast(KillMonsterCount, MonsterCount);
+	OnZombieChanged.Broadcast(KillMonsterCount, MaxMonster);
 
-	// 모든 몬스터를 다 잡았다면 낮으로 전환
-	if (KillMonsterCount >= MonsterCount && MonsterCount > 0)
+	//2레벨까지는 몬스터를 다 잡으면 넘어감
+	if (CurrentLevelIndex < 2)
 	{
-		EndLevelAndReward();
+		// 모든 몬스터를 다 잡았다면 낮으로 전환
+		if (KillMonsterCount >= MaxMonster)
+		{
+			EndLevelAndReward();
+		}
+		//3레벨일때는 위의 조건이 맞지 않으므로 맨 아래의 OnBossKilled 함수가 레벨클리어를 담당함
 	}
 }
 
@@ -133,6 +139,14 @@ void ARSGameState::SpawnOneMonster()
 		GetWorldTimerManager().ClearTimer(MonsterSpawnTimerHandle);
 		UE_LOG(LogTemp, Warning, TEXT("All monsters spawned for this level."));
 		return;
+	}
+	
+	//레벨인덱스가 2이고, 보스몬스터가 소환되지 않았다면 실행
+	if (CurrentLevelIndex == 2 && !bIsBossSpawned)
+	{
+		SpawnBossMonster();
+		
+		bIsBossSpawned = true;
 	}
 
 	TArray<AActor*> FoundVolume;
@@ -250,3 +264,38 @@ void ARSGameState::FindMainLight()
 	}
 }
 
+void ARSGameState::SpawnBossMonster()
+{
+	if (!BossMonsterClass)
+	{
+		return;
+	}
+	//맵에 있는 스폰볼륨 찾기
+	TArray<AActor*> FoundVolume;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSMonsterSpawnVolume::StaticClass(), FoundVolume);
+	
+	if (FoundVolume.Num() > 0)
+	{
+		//맵에 있는 스폰볼륨 중 하나 선택
+		int32 RandomIdx = FMath::RandRange(0, FoundVolume.Num() - 1);
+		ARSMonsterSpawnVolume* SpawnVolume = Cast<ARSMonsterSpawnVolume>(FoundVolume[RandomIdx]);
+		
+		if (SpawnVolume)
+		{
+			//선택된  스폰볼륨의 위치와 회전값 가져오기
+			FVector SpawnLocation = SpawnVolume->GetActorLocation();
+			FRotator SpawnRotation = SpawnVolume->GetActorRotation();
+			
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			
+			//보스몬스터 스폰
+			ARSBossMonster* BossMonster = GetWorld()->SpawnActor<ARSBossMonster>(BossMonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
+		}
+	}
+}
+
+void ARSGameState::OnBossKilled()
+{
+	EndLevelAndReward();
+}

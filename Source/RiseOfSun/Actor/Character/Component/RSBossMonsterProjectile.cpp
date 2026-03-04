@@ -12,7 +12,7 @@ ARSBossMonsterProjectile::ARSBossMonsterProjectile()
     
     CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
     RootComponent = CollisionComp;
-    CollisionComp->InitSphereRadius(30.f);
+    CollisionComp->InitSphereRadius(80.f);
     
     CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly); 
     CollisionComp->SetCollisionObjectType(ECC_WorldDynamic);
