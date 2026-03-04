@@ -124,7 +124,7 @@ void ARSGameState::OnMonsterKilled()
 	OnZombieChanged.Broadcast(KillMonsterCount, MaxMonster);
 
 	//2레벨까지는 몬스터를 다 잡으면 넘어감
-	if (CurrentLevelIndex < 2)
+	if (CurrentLevelIndex < 3)
 	{
 		// 모든 몬스터를 다 잡았다면 낮으로 전환
 		if (KillMonsterCount >= MaxMonster)
@@ -144,7 +144,7 @@ void ARSGameState::SpawnOneMonster()
 	}
 	
 	//레벨인덱스가 2이고, 보스몬스터가 소환되지 않았다면 실행
-	if (CurrentLevelIndex == 2 && !bIsBossSpawned)
+	if (CurrentLevelIndex == 3 && !bIsBossSpawned)
 	{
 		SpawnBossMonster();
 		
@@ -215,7 +215,7 @@ void ARSGameState::EndLevelAndReward()
 	// 다음 레벨 준비 (예: 60초 뒤에 다시 밤이 됨)
 	CurrentLevelIndex++;
 	OnLevelChanged.Broadcast(CurrentLevelIndex);
-	if (CurrentLevelIndex >= 3)
+	if (CurrentLevelIndex > 3)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("모든 레벨 클리어! 게임을 종료합니다."));
 		if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
