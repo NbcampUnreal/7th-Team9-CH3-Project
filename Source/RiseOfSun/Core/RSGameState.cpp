@@ -3,6 +3,7 @@
 #include "RSGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor/Spawn/RSMonsterSpawnVolume.h"
+#include "Actor/Spawn/RSItemSpawnVolume.h"
 #include "Actor/Character/RSMonster.h"
 #include "EngineUtils.h"
 
@@ -207,27 +208,43 @@ void ARSGameState::EndLevelAndReward()
 
 	UWorld* World = GetWorld();
 	if (!World) return;
-
+	TArray<AActor*> FoundItemVolumes; // 변수 선언
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSItemSpawnVolume::StaticClass(), FoundItemVolumes);
 	// 레벨별 보상 개수 설정
 	// Level 1: 조명탄 10, 수류탄 20
 	// Level 2: 조명탄 20, 수류탄 30 ...
-	int32 FlareToSpawn = 10 + (CurrentLevelIndex * 10);
-	int32 GrenadeToSpawn = 20 + (CurrentLevelIndex * 10);
-
-	FActorSpawnParameters SpawnParams;
-
-	// 조명탄 스폰
-	for (int32 i = 0; i < FlareToSpawn; i++)
+	if (FoundItemVolumes.Num() > 0)
 	{
-		FVector RandomLoc = RewardSpawnLocation + FVector(FMath::RandRange(-500.f, 500.f), FMath::RandRange(-500.f, 500.f), 0.f);
-		World->SpawnActor<AActor>(FlareClass, RandomLoc, FRotator::ZeroRotator, SpawnParams);
+		// 레벨별 개수 설정 (0번 인덱스가 레벨 1이므로 이미 10, 20... 으로 계산됨)
+		int32 FlareToSpawn = CurrentLevelIndex * 10;
+		int32 GrenadeToSpawn = (CurrentLevelIndex * 10)+10;
+
+		// 조명탄 스폰 요청
+		for (int32 i = 0; i < FlareToSpawn; i++)
+		{
+			int32 Rnd = FMath::RandRange(0, FoundItemVolumes.Num() - 1);
+			ARSItemSpawnVolume* Vol = Cast<ARSItemSpawnVolume>(FoundItemVolumes[Rnd]);
+			if (Vol)
+			{
+				Vol->SpawnItem(FlareClass);
+			}// 볼륨에게 스폰을 시킴
+		}
+
+		// 수류탄 스폰 요청
+		for (int32 i = 0; i < GrenadeToSpawn; i++)
+		{
+			int32 Rnd = FMath::RandRange(0, FoundItemVolumes.Num() - 1);
+			ARSItemSpawnVolume* Vol = Cast<ARSItemSpawnVolume>(FoundItemVolumes[Rnd]);
+			if (Vol)
+			{
+				Vol->SpawnItem(GrenadeClass);// 볼륨에게 스폰을 시킴
+			}
+		}
 	}
-
-	// 수류탄 스폰
-	for (int32 i = 0; i < GrenadeToSpawn; i++)
+	else
 	{
-		FVector RandomLoc = RewardSpawnLocation + FVector(FMath::RandRange(-500.f, 500.f), FMath::RandRange(-500.f, 500.f), 0.f);
-		World->SpawnActor<AActor>(GrenadeClass, RandomLoc, FRotator::ZeroRotator, SpawnParams);
+		// 만약 볼륨이 하나도 없으면 경고 로그를 남깁니다.
+		UE_LOG(LogTemp, Error, TEXT("월드에 ARSItemSpawnVolume이 배치되지 않았습니다!"));
 	}
 
 	GetWorldTimerManager().SetTimer(LevelTransitionTimer, this, &ARSGameState::StartLevel, 60.0f, false);

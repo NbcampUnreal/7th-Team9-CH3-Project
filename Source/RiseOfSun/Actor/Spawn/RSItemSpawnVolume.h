@@ -16,6 +16,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	void SpawnRandomItem();
 	
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	void SpawnItem(TSubclassOf<AActor> ItemClass);
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	USceneComponent* Scene;
@@ -28,6 +30,6 @@ protected:
 
 	FVector GetRandomPointInVolume() const;
 	FRSItemData* GetRandomItem()const;
-	void SpawnItem(TSubclassOf<AActor> ItemClass);
+	//void SpawnItem(TSubclassOf<AActor> ItemClass);
 
 };
