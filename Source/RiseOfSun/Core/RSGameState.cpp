@@ -5,6 +5,8 @@
 #include "Actor/Spawn/RSMonsterSpawnVolume.h"
 #include "Actor/Character/RSMonster.h"
 #include "EngineUtils.h"
+#include "RSGameMode.h"
+#include "Actor/Character/Controller/RSPlayerController.h"
 
 ARSGameState::ARSGameState()
 {
@@ -201,6 +203,20 @@ void ARSGameState::EndLevelAndReward()
 	if (CurrentLevelIndex >= 3)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("모든 레벨 클리어! 게임을 종료합니다."));
+		if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
+		{
+			ARSGameMode* RSGaneMode = Cast<ARSGameMode>(GameMode);
+			if (RSGaneMode)
+			{
+				RSGaneMode->GameClear();
+				ARSPlayerController* playerController = Cast<ARSPlayerController>(GetWorld()->GetFirstPlayerController());
+				if (playerController)
+				{
+					playerController->bShowMouseCursor = true;
+					playerController->SetPause(true);
+				}
+			}
+		}
 		// 여기에 승리 UI 표시 기능을 넣으면 좋습니다.
 		return; // 더 이상 아래의 아이템 생성과 타이머를 실행하지 않고 끝냅니다.
 	}
