@@ -47,11 +47,11 @@ void UInventoryWidget::InitSlot(int32 Count, int32 MaxColumns)
 	}
 }
 
-void UInventoryWidget::SetItemByIndex(int32 Index, UTexture2D* Texture, int32 StackCount)
+void UInventoryWidget::SetItemByIndex(int32 Index, FName ItemID, UTexture2D* Texture, int32 StackCount)
 {
 	if (Slots[Index])
 	{
-		Slots[Index]->SetItemData(Texture, StackCount);
+		Slots[Index]->SetItemData(ItemID, Texture, StackCount);
 	}
 }
 

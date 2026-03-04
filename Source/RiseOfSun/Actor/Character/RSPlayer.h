@@ -79,6 +79,36 @@ protected:
     // 인벤토리 컴포넌트 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
     TObjectPtr<class URSInventoryComponent> InventoryComponent;
+
+    // 1~0번까지 10개의 슬롯 액션 (에디터에서 할당)
+    UPROPERTY(EditAnywhere, Category = "Input")
+    class UInputAction* QuickSlotActions[10];
+
+    void QuickSlot(int32 Index);
+    void QuickSlotInput(int32 SlotIndex);
+
+    // 각 키에 바인딩할 함수들
+    UFUNCTION()
+    void OnQuickSlot1(const FInputActionValue& Value) { QuickSlotInput(0); }
+    UFUNCTION()
+    void OnQuickSlot2(const FInputActionValue& Value) { QuickSlotInput(1); }
+    UFUNCTION()
+    void OnQuickSlot3(const FInputActionValue& Value) { QuickSlotInput(2); }
+    UFUNCTION()
+    void OnQuickSlot4(const FInputActionValue& Value) { QuickSlotInput(3); }
+    UFUNCTION()
+    void OnQuickSlot5(const FInputActionValue& Value) { QuickSlotInput(4); }
+    UFUNCTION()
+    void OnQuickSlot6(const FInputActionValue& Value) { QuickSlotInput(5); }
+    UFUNCTION()
+    void OnQuickSlot7(const FInputActionValue& Value) { QuickSlotInput(6); }
+    UFUNCTION()
+    void OnQuickSlot8(const FInputActionValue& Value) { QuickSlotInput(7); }
+    UFUNCTION()
+    void OnQuickSlot9(const FInputActionValue& Value) { QuickSlotInput(8); }
+    UFUNCTION()
+    void OnQuickSlot0(const FInputActionValue& Value) { QuickSlotInput(9); }
+
 private:
 
 
