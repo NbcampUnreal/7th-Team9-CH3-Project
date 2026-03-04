@@ -93,7 +93,7 @@ void URSPlayerHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
         if (!bLevelBound)
         {
             CurrentLevel->OnLevelChanged.AddDynamic(this, &URSPlayerHUD::UpdateLevel);
-            UpdateLevel(CurrentLevel->CurrentLevelIndex + 1);
+            UpdateLevel(CurrentLevel->CurrentLevelIndex);
             bLevelBound = true;
         }
     }

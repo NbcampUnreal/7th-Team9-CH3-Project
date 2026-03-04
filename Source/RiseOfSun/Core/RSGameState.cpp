@@ -15,7 +15,7 @@ ARSGameState::ARSGameState()
 	Score = 0;
 	MonsterCount = 0;
 	KillMonsterCount = 0;
-	CurrentLevelIndex = 0;
+	CurrentLevelIndex = 1;
 	RewardSpawnLocation = FVector(0.f, 0.f, 100.f);
 	CurrentState = true;
 }
@@ -107,7 +107,7 @@ void ARSGameState::StartLevel()
 		}
 	}*/
 
-	MaxMonster = (CurrentLevelIndex + 1) * 10;
+	MaxMonster = (CurrentLevelIndex) * 10;
 
 	OnZombieChanged.Broadcast(KillMonsterCount, MaxMonster);
 	OnLevelChanged.Broadcast(CurrentLevelIndex);
@@ -214,6 +214,7 @@ void ARSGameState::EndLevelAndReward()
 	}
 	// 다음 레벨 준비 (예: 60초 뒤에 다시 밤이 됨)
 	CurrentLevelIndex++;
+	OnLevelChanged.Broadcast(CurrentLevelIndex);
 	if (CurrentLevelIndex >= 3)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("모든 레벨 클리어! 게임을 종료합니다."));
