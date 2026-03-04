@@ -27,11 +27,12 @@ struct FRSItemData : public FTableRowBase
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FName ItemID;
+    
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString ItemName;
+
+    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Data")
     UTexture2D* Thumbnail; // 인벤토리에서 보여줄 아이템 썸네일
@@ -59,5 +60,13 @@ struct FRSItemData : public FTableRowBase
     FText GetCategoryAsText() const;
     bool IsValidItem() const;
 
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName ItemID;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TSubclassOf <AActor>ItemClass;
+
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    float SpawnChance;
 };
