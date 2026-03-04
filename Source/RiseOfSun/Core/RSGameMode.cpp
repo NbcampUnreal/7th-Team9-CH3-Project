@@ -62,3 +62,13 @@ void  ARSGameMode::OnPlayerDied()
 	Widget->AddToViewport();
 }
 
+void ARSGameMode::GameClear()
+{
+	URSMainMenuWidget* Widget = CreateWidget<URSMainMenuWidget>(GetWorld(), MenuClass);
+	
+	Widget->MenuMode = EMenuMode::GameClear;
+	Widget->AddToViewport();
+	
+	
+}
+
