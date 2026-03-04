@@ -21,6 +21,9 @@
 #include "Sound/SoundCue.h"
 #include "Item/RSItemBase.h"
 #include "Actor/Item/RSBaseThrowable.h"
+#include "Actor/Item/RSBaseItem.h"
+#include "Core/RSGameInstance.h"
+#include "InputAction.h"
 #include "Core/RSGameMode.h"
 
 ARSPlayer::ARSPlayer()
@@ -165,6 +168,18 @@ void ARSPlayer::BeginPlay()
 		}
 	}
 
+	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetGameInstance());
+	if (!RSGameInstance) return;
+	if (!RSGameInstance->ItemManager) return;
+	URSItemBase* ItemData = RSGameInstance->ItemManager->SpawnItem(FName("SmallHeal"), this);
+	if (!ItemData) return;
+	UWorld* World = GetWorld();
+	if (!World) return;
+	ARSBaseItem* Item =
+		World->SpawnActor<ARSBaseItem>(ItemData->ItemActorClass);
+	if (!Item) return;
+	Item->ActivateItem(this);
+
 }
 
 void ARSPlayer::Tick(float DeltaTime)
@@ -212,6 +227,17 @@ void ARSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	UE_LOG(LogTemp, Warning, TEXT("Binding Actions..."));
 	EnhancedInputComponent->BindAction(GrenadeAction, ETriggerEvent::Started, this, &ARSPlayer::UseGrenade);
 	EnhancedInputComponent->BindAction(CombatFlareAction, ETriggerEvent::Started, this, &ARSPlayer::UseCombatFlare);
+
+	if (QuickSlotActions[0]) EnhancedInputComponent->BindAction(QuickSlotActions[0], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot1);
+	if (QuickSlotActions[1]) EnhancedInputComponent->BindAction(QuickSlotActions[1], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot2);
+	if (QuickSlotActions[2]) EnhancedInputComponent->BindAction(QuickSlotActions[2], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot3);
+	if (QuickSlotActions[3]) EnhancedInputComponent->BindAction(QuickSlotActions[3], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot4);
+	if (QuickSlotActions[4]) EnhancedInputComponent->BindAction(QuickSlotActions[4], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot5);
+	if (QuickSlotActions[5]) EnhancedInputComponent->BindAction(QuickSlotActions[5], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot6);
+	if (QuickSlotActions[6]) EnhancedInputComponent->BindAction(QuickSlotActions[6], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot7);
+	if (QuickSlotActions[7]) EnhancedInputComponent->BindAction(QuickSlotActions[7], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot8);
+	if (QuickSlotActions[8]) EnhancedInputComponent->BindAction(QuickSlotActions[8], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot9);
+	if (QuickSlotActions[9]) EnhancedInputComponent->BindAction(QuickSlotActions[9], ETriggerEvent::Started, this, &ARSPlayer::OnQuickSlot0);
 	//PlayerInputComponent->BindAction("UseThrowableSlot1", IE_Pressed, this, &ARSPlayer::UseGrenade);
 	//PlayerInputComponent->BindAction("UseThrowableSlot1", IE_Pressed, this, &ARSPlayer::UseCombatFlare);
 }
@@ -237,12 +263,47 @@ void ARSPlayer::PickUpItem(FName ItemID, int32 Count)
 
 void ARSPlayer::UseItem(FName ItemID)
 {
+	if (InventoryComponent->RemoveItem(ItemID, 1))
+	{
+		if (ItemID == FName("Heal"))
+		{
+			RecoverHealth(100.0f);
+			UE_LOG(LogTemp, Warning, TEXT("체력 100 회복 완료!"));
+		}
+	}
+}
+
+void ARSPlayer::QuickSlot(int32 Index)
+{
+	if (InventoryComponent && InventoryComponent->Items.IsValidIndex(Index))
+	{
+		FName ID = InventoryComponent->Items[Index].ItemID;
+		if (ID != NAME_None)
+		{
+			UseItem(ID);
+		}
+	}
+}
+
+void ARSPlayer::QuickSlotInput(int32 SlotIndex)
+{
+	//인벤토리 컴포넌트가 유효한지 확인
 	if (InventoryComponent)
 	{
-		bool bRemoved = InventoryComponent->RemoveItem(ItemID, 1);
-		if (!bRemoved)
+		//'Items' 배열에 직접 접근하여 인덱스 체크
+		if (InventoryComponent->Items.IsValidIndex(SlotIndex))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("아이템 [%s] 사용 실패"), *ItemID.ToString());
+			//해당 칸의 ItemID 가져오기
+			FName SelectedID = InventoryComponent->Items[SlotIndex].ItemID;
+
+			//아이템이 들어있다면(None이 아니라면) 사용
+			if (SelectedID != NAME_None)
+			{
+				UseItem(SelectedID);
+
+				// (선택 사항) 사용 후 로그 출력
+				UE_LOG(LogTemp, Log, TEXT("%d번 슬롯의 [%s] 사용 시도!"), SlotIndex + 1, *SelectedID.ToString());
+			}
 		}
 	}
 }
@@ -466,6 +527,12 @@ void ARSPlayer::AddThrowable(EThrowableType ItemType)
 		secondThrowableSlot.numThrowables++;
 		onCombatFlareChanged.Broadcast(secondThrowableSlot.numThrowables);
 	}
+}
+
+void ARSPlayer::RecoverHealth(float Amount)
+{
+	Stat.CurrentHealth = FMath::Clamp(Stat.CurrentHealth + Amount, 0.0f, Stat.MaxHealth);
+	UE_LOG(LogTemp, Warning, TEXT("체력 회복: %.f / 현재 체력: %.f"), Amount, Stat.CurrentHealth);
 }
 
 void ARSPlayer::Fire(const FInputActionValue& Value)

@@ -21,7 +21,7 @@ class RISEOFSUN_API ARSBaseItem : public AActor, public IItemInterface
 	
 public:	
 	ARSBaseItem();
-
+	virtual void ActivateItem(AActor* Activator) override;
 protected:
 	//픽업 이벤트 연결 함수(OnpickedUp 호출)
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
@@ -62,7 +62,6 @@ protected:
 		int32 OtherBodyIndex
 	) override;
 
-	virtual void ActivateItem(AActor* Activator) override;
 	virtual FName GetItemType() const override;
 	virtual void DestroyItem();
 
@@ -81,5 +80,7 @@ public:
 	// 플레이어가 접근했을 때 호출
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void OnPickedUp(ARSPlayer* Player);
+
+	void Use(AActor* Activator);
 
 };

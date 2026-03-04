@@ -24,8 +24,8 @@ void UQuickbarWidget::NativeConstruct()
 		const FRSItemData& GrenadeData = ItemManager->GetItemDataByID("Grenade");
 		const FRSItemData& FlareData = ItemManager->GetItemDataByID("Flare");
 
-		QuickbarWidget->SetItemByIndex(0, GrenadeData.Thumbnail, RSPlayer->firstThrowableSlot.numThrowables);
-		QuickbarWidget->SetItemByIndex(1, FlareData.Thumbnail, RSPlayer->secondThrowableSlot.numThrowables);
+		QuickbarWidget->SetItemByIndex(0, FName("Grenade"), GrenadeData.Thumbnail, RSPlayer->firstThrowableSlot.numThrowables);
+		QuickbarWidget->SetItemByIndex(1, FName("Flare"), FlareData.Thumbnail, RSPlayer->secondThrowableSlot.numThrowables);
 
 		RSPlayer->onGrenadeChanged.AddDynamic(this, &ThisClass::OnGrenadeChanged);
 		RSPlayer->onCombatFlareChanged.AddDynamic(this, &ThisClass::OnCombatFlareChanged);
