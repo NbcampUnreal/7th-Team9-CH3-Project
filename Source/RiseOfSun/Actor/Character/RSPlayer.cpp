@@ -459,10 +459,12 @@ void ARSPlayer::AddThrowable(EThrowableType ItemType)
 	if (firstThrowableSlot.throwableType == ItemType)
 	{
 		firstThrowableSlot.numThrowables++;
+		onGrenadeChanged.Broadcast(firstThrowableSlot.numThrowables);
 	}
 	else if (secondThrowableSlot.throwableType == ItemType)
 	{
 		secondThrowableSlot.numThrowables++;
+		onCombatFlareChanged.Broadcast(secondThrowableSlot.numThrowables);
 	}
 }
 

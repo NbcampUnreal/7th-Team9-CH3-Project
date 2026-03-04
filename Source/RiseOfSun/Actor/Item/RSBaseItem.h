@@ -39,6 +39,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	UStaticMeshComponent* Mesh;
 
+	
 	//실제 아이템 데이터 객체 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	URSItemBase* ItemInstance;

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Data/RSItemData.h"
 #include "RSItemSpawnVolume.generated.h"
 
 UCLASS()
@@ -12,15 +13,23 @@ class RISEOFSUN_API ARSItemSpawnVolume : public AActor
 public:
 	ARSItemSpawnVolume();
 
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	void SpawnRandomItem();
+	
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	void SpawnItem(TSubclassOf<AActor> ItemClass);
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	USceneComponent* Scene;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	class UBoxComponent* SpawningBox;
 
-	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	FVector GetRandomPointInVolume() const;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning")
+	UDataTable* ItemDataTable;
 
-	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void SpawnItem(TSubclassOf<AActor> ItemClass);
+	FVector GetRandomPointInVolume() const;
+	FRSItemData* GetRandomItem()const;
+	//void SpawnItem(TSubclassOf<AActor> ItemClass);
+
 };

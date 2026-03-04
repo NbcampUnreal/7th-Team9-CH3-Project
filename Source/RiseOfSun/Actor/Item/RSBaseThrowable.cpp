@@ -46,9 +46,17 @@ void ARSBaseThrowable::BeginPlay()
 
 void ARSBaseThrowable::Explode()
 {
+	TArray<AActor*> IgnoreActor;
+	IgnoreActor.Add(this);
+
 	APawn* InstigatorPawn = GetInstigator();
 	AController* InstigatorController =
 		InstigatorPawn ? InstigatorPawn->GetController() : nullptr;
+
+	if (type == EThrowableType::E_CombatFlare && InstigatorPawn)
+	{
+        IgnoreActor.Add(InstigatorPawn);
+	}
 
 	UGameplayStatics::ApplyRadialDamage(
 		this,
@@ -56,7 +64,7 @@ void ARSBaseThrowable::Explode()
 		GetActorLocation(),
 		ExplosionRadius,
 		nullptr,
-		TArray<AActor*>(),
+		IgnoreActor,
 		this,
 		InstigatorController,
 		true
