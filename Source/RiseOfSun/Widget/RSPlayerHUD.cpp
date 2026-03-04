@@ -189,7 +189,7 @@ void URSPlayerHUD::UpdateInventoryUI(TArray<FInventorySlot> Slots)
     {
         const FInventorySlot& InventorySlot = Slots[i];
         const FRSItemData& ItemData = ItemManager->GetItemDataByID(InventorySlot.ItemID);
-        InventoryWidget->SetItemByIndex(i, ItemData.Thumbnail, InventorySlot.StackCount);
+        InventoryWidget->SetItemByIndex(i, ItemData.ItemID, ItemData.Thumbnail, InventorySlot.StackCount);
     }
 
     UE_LOG(LogTemp, Log, TEXT("Inventory UI Updated!"));

@@ -97,12 +97,23 @@ void ARSItemSpawnVolume::SpawnItem(TSubclassOf<AActor> ItemClass)
 		SpawnParams
 	);*/
 
-	if (!ItemClass)return;
+	/*if (!ItemClass)return;
 
 	GetWorld()->SpawnActor<AActor>(
 		ItemClass,
 		GetRandomPointInVolume(),
 		FRotator::ZeroRotator
-	);
+	);*/
+
+	if (!GetWorld() || !ItemClass) return;
+
+	// GetRandomPointInVolume()이 구현되어 있어야 합니다.
+	FVector SpawnLocation = GetRandomPointInVolume();
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(ItemClass, SpawnLocation, SpawnRotation, SpawnParams);
 }
 

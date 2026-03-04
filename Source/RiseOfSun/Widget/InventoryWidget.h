@@ -24,7 +24,7 @@ public:
 	void InitSlot(int32 Count, int32 MaxColumns = 5);
 
 	UFUNCTION(BlueprintCallable)
-	void SetItemByIndex(int32 Index, UTexture2D* Texture, int32 StackCount);
+	void SetItemByIndex(int32 Index, FName ItemID, UTexture2D* Texture, int32 StackCount);
 
 	UFUNCTION(BlueprintCallable)
 	void SetItemStackCountByIndex(int32 Index, int32 StackCount);

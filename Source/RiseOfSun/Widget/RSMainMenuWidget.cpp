@@ -2,6 +2,8 @@
 
 
 #include "Widget/RSMainMenuWidget.h"
+
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -9,14 +11,15 @@ void URSMainMenuWidget::OnStartClicked()
 {
 	if (MenuMode == EMenuMode::MainMenu)
 	{
-		StartEndText->SetText(FText::FromString("Start"));
-		TitleText->SetText(FText::FromString("The Rise Of Sun"));
 		UGameplayStatics::OpenLevel(this, "TestLevel");
 	}
 	else if (MenuMode == EMenuMode::GameOver)
 	{
-		StartEndText->SetText(FText::FromString("ReStart"));
-		TitleText->SetText(FText::FromString("Game Over"));
+		UGameplayStatics::OpenLevel(this, "TestLevel");
+	}
+	
+	else if (MenuMode == EMenuMode::GameClear)
+	{
 		UGameplayStatics::OpenLevel(this, "TestLevel");
 	}
 }
@@ -37,12 +40,20 @@ void URSMainMenuWidget::NativeConstruct()
 	Super::NativeConstruct();
 	if (MenuMode == EMenuMode::MainMenu)
 	{
+		GameClear->SetVisibility(ESlateVisibility::Collapsed);
 		StartEndText->SetText(FText::FromString("Start"));
 		TitleText->SetText(FText::FromString("The Rise Of Sun"));
 	}
 	else if (MenuMode == EMenuMode::GameOver)
 	{
+		GameClear->SetVisibility(ESlateVisibility::Collapsed);
 		StartEndText->SetText(FText::FromString("Restart"));
 		TitleText->SetText(FText::FromString("Game Over"));
+	}
+	else if (MenuMode == EMenuMode::GameClear)
+	{
+		GameStart->SetVisibility(ESlateVisibility::Collapsed);
+		StartEndText->SetText(FText::FromString("Restart"));
+		TitleText->SetText(FText::FromString("Game Clear"));
 	}
 }

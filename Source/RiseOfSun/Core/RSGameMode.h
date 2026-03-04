@@ -21,4 +21,5 @@ public:
 	TSubclassOf<class URSMainMenuWidget> MenuClass;
 	
 	void OnPlayerDied();
+	void GameClear();
 };

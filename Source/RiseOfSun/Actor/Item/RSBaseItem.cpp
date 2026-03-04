@@ -12,20 +12,19 @@ ARSBaseItem::ARSBaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	SetRootComponent(Scene);
-
+	// 1. 콜리전을 생성하고 바로 루트로 잡습니다. (수류탄 방식)
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	SetRootComponent(Collision);
+	Collision->InitSphereRadius(50.0f);
 	Collision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	Collision->SetupAttachment(Scene);
-	// 공통 메시 생성
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(Collision);
 
-	// 메시를 루트로 사용
-	//RootComponent = Mesh;
+	// 2. 메쉬를 생성하고 콜리전(Root)에 붙입니다.
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(RootComponent); // 이제 콜리전의 자식이 됩니다.
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 이벤트 바인딩
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ARSBaseItem::OnItemOverlap);
-	Collision->OnComponentEndOverlap.AddDynamic(this, &ARSBaseItem::OnItemEndOverlap);
 }
 
 void ARSBaseItem::OnItemOverlap(UPrimitiveComponent* OverlappedComp, 
@@ -118,5 +117,10 @@ void ARSBaseItem::OnPickedUp(ARSPlayer* Player)
 		// 실패 시 로그 출력
 		UE_LOG(LogTemp, Warning, TEXT("인벤토리 꽉참! 아이템 [%s] 추가 실패"), *ItemData.ItemID.ToString());
 	}
+}
+
+void ARSBaseItem::Use(AActor* Activator)
+{
+	ActivateItem(Activator);
 }
 
