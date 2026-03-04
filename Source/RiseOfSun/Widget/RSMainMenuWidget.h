@@ -11,7 +11,8 @@ UENUM(BlueprintType)
 enum class EMenuMode : uint8
 {
 	MainMenu,
-	GameOver
+	GameOver,
+	GameClear
 };
 
 
@@ -32,6 +33,10 @@ public:
 	class UTextBlock* StartEndText;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TitleText;
+	UPROPERTY(meta = (BindWidget))
+	class UImage* GameStart;
+	UPROPERTY(meta = (BindWidget))
+	class UImage* GameClear;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Menu")
