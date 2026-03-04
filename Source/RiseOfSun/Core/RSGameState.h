@@ -75,6 +75,9 @@ public:
 	//보스몬스터 호출 함수
 	void SpawnBossMonster();
 	
+	//보스몬스터를 죽일 시 호출하는 함수
+	void OnBossKilled();
+	
 	UFUNCTION()
 	void SpawnOneMonster();
 
@@ -98,9 +101,6 @@ protected:
 
 	// BeginPlay에서 라이트를 찾는 함수
 	void FindMainLight();
-	
-	//보스몬스터를 죽일 시 호출하는 함수
-	void OnBossKilled();
 	
 	//블루프린트에서 보스 몬스터 클래스 할당
 	UPROPERTY(EditAnywhere, Category = "BossMonster")

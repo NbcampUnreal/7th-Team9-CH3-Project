@@ -38,5 +38,5 @@ public:
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	int32 DamageAmount = 350;
+	int32 DamageAmount = 250;
 };

@@ -5,18 +5,19 @@
 #include "Widget/RSMonsterWidget.h"
 #include "Actor/Character/Controller/RSMonsterController.h"
 #include "Component/RSBossMonsterProjectile.h"
+#include "Core/RSGameState.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 ARSBossMonster::ARSBossMonster()
 {
 	RockMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RockMesh"));
 
-	RockMesh->SetupAttachment(GetMesh(), TEXT("Rock")); // 내가만든  소켓
+	RockMesh->SetupAttachment(GetMesh(), TEXT("Rock")); // 내가만든 소켓
 	RockMesh->SetVisibility(false); // 기본은 안 보이게
 	RockMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	//원기리 공격 쿨타임
-	AttackInterval = 7.0f;
+	AttackInterval = 10.0f;
 }
 
 void ARSBossMonster::ShowRock()
@@ -111,6 +112,12 @@ void ARSBossMonster::Die()
 	Super::Die();
 	
 	GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+	
+	ARSGameState* GameState = Cast<ARSGameState>(GetWorld()->GetGameState());
+	if (GameState)
+	{
+		GameState->OnBossKilled(); 
+	}
 }
 
 void ARSBossMonster::FireProjectile()

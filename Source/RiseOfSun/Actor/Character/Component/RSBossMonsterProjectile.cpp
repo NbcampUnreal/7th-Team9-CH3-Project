@@ -53,8 +53,6 @@ void ARSBossMonsterProjectile::OnOverlap(
 {
     if (OtherActor && OtherActor != this)
     {
-        UE_LOG(LogTemp, Warning, TEXT("투사체 오버랩 발생! 상대방 액터: %s"), *OtherActor->GetName());
-        
         if (ARSPlayer* HitPlayer = Cast<ARSPlayer>(OtherActor))
         {
             HitPlayer->HitDamage(DamageAmount);

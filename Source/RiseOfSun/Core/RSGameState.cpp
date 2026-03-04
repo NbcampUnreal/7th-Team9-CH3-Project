@@ -131,7 +131,6 @@ void ARSGameState::OnMonsterKilled()
 		{
 			EndLevelAndReward();
 		}
-		//3레벨일때는 위의 조건이 맞지 않으므로 맨 아래의 OnBossKilled 함수가 레벨클리어를 담당함
 	}
 }
 
