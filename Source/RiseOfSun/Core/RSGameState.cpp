@@ -246,8 +246,8 @@ void ARSGameState::EndLevelAndReward()
 	if (FoundItemVolumes.Num() > 0)
 	{
 		// 레벨별 개수 설정 (0번 인덱스가 레벨 1이므로 이미 10, 20... 으로 계산됨)
-		int32 FlareToSpawn = CurrentLevelIndex * 10;
-		int32 GrenadeToSpawn = (CurrentLevelIndex * 10)+10;
+		int32 FlareToSpawn = CurrentLevelIndex + 3;
+		int32 GrenadeToSpawn = CurrentLevelIndex +2;
 
 		// 조명탄 스폰 요청
 		for (int32 i = 0; i < FlareToSpawn; i++)
@@ -268,6 +268,15 @@ void ARSGameState::EndLevelAndReward()
 			if (Vol)
 			{
 				Vol->SpawnItem(GrenadeClass);// 볼륨에게 스폰을 시킴
+			}
+		}
+		for (int32 i = 0; i < GrenadeToSpawn; i++)
+		{
+			int32 Rnd = FMath::RandRange(0, FoundItemVolumes.Num() - 1);
+			ARSItemSpawnVolume* Vol = Cast<ARSItemSpawnVolume>(FoundItemVolumes[Rnd]);
+			if (Vol)
+			{
+				Vol->SpawnItem(HealClass);// 볼륨에게 스폰을 시킴
 			}
 		}
 	}

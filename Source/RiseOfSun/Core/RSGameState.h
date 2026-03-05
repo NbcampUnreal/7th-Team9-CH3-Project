@@ -55,6 +55,9 @@ public:
 	TSubclassOf<AActor> GrenadeClass; // 에디터에서 수류탄 할당
 
 	UPROPERTY(EditAnywhere, Category = "Reward")
+	TSubclassOf<AActor> HealClass; // 에디터에서 수류탄 할당
+
+	UPROPERTY(EditAnywhere, Category = "Reward")
 	FVector RewardSpawnLocation; // 아이템이 떨어질 중심 좌표
 
 	UFUNCTION(BlueprintPure, Category = "Score")

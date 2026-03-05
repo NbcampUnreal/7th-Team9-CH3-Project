@@ -38,7 +38,7 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
-	const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
+	const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::None;
 
 	FVector MuzzleStart = MuzzlePoint->GetComponentLocation();
 	FVector FIreDirection = AimEnd - MuzzleStart;
@@ -60,10 +60,7 @@ void URSRifleComponent::Fire(USceneComponent* MuzzlePoint, UNiagaraSystem* Muzzl
 		ActorsToIgnore,
 		DrawDebugType,
 		Hit,
-		true,
-		FLinearColor::Red,
-		FLinearColor::Green,
-		FireDebugDuration
+		true
 	);
 
 	if (bIsHit)

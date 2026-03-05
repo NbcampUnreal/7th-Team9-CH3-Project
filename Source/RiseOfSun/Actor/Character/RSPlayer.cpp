@@ -638,7 +638,7 @@ void ARSPlayer::AimStart()
 		TArray<AActor*> ActorsToIgnore;
 		ActorsToIgnore.Add(this);
 
-		const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForDuration;
+		const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::None;
 
 		FVector TraceStart = CamStart;
 		FVector TraceEnd = CamStart + (CamDirection * CamRange);
@@ -654,10 +654,7 @@ void ARSPlayer::AimStart()
 			ActorsToIgnore,
 			DrawDebugType,
 			Hit,
-			true,
-			FLinearColor::Red,
-			FLinearColor::Green,
-			FireDebugDuration
+			true
 		);
 		LastAimPoint = bIsHit ? Hit.ImpactPoint : TraceEnd;
 		bHasAimPoint = true;
